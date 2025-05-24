@@ -1,0 +1,111 @@
+{
+	"name": "archunit-ts",
+	"version": "1.0.0",
+	"description": "",
+	"keywords": [],
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"author": "Lukas Niessen <lks.niessen@gmail.com> (https://lukasniessen.com)",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/LukasNiessen/ArchUnitTS.git"
+	},
+	"license": "MIT",
+	"engines": {
+		"node": ">=14.0.0"
+	},
+	"type": "module",
+	"scripts": {
+		"lint": "eslint src",
+		"clean": "rimraf dist",
+		"prebuild": "rimraf dist",
+		"build": "tsc && typedoc --out docs --target es6 --theme minimal --mode file src",
+		"format": "prettier --ignore-path .gitignore --write '**/*.ts*'",
+		"format:check": "prettier --ignore-path .gitignore --check '**/*.ts*'",
+		"test": "jest --no-cache",
+		"test:watch": "jest --watch --no-cache",
+		"test:clear": "jest --clearCache",
+		"test:prod": "npm run lint && npm run test -- --coverage --no-cache",
+		"deploy-docs": "ts-node tools/gh-pages-publish",
+		"commit": "git-cz",
+		"commitmsg": "validate-commit-msg",
+		"semantic-release": "semantic-release --branches main",
+		"travis-deploy-once": "travis-deploy-once"
+	},
+	"config": {
+		"commitizen": {
+			"path": "node_modules/cz-conventional-changelog"
+		},
+		"validate-commit-msg": {
+			"types": "conventional-commit-types",
+			"helpMessage": "Use \"npm run commit\" instead, we use conventional-changelog format :) (https://github.com/commitizen/cz-cli)"
+		}
+	},
+	"jest": {
+		"testURL": "http://localhost/",
+		"transform": {
+			".(ts|tsx)": "ts-jest"
+		},
+		"testRegex": "(/(test|src)/.*\\.(test|spec))\\.(ts|tsx)$",
+		"moduleFileExtensions": [
+			"ts",
+			"tsx",
+			"js"
+		],
+		"coveragePathIgnorePatterns": [
+			"/node_modules/",
+			"/test/"
+		],
+		"coverageThreshold": {
+			"global": {
+				"branches": 70,
+				"functions": 70,
+				"lines": 70,
+				"statements": 70
+			}
+		},
+		"collectCoverage": true
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.27.0",
+		"@types/jest": "^23.0.0",
+		"@types/node": "^10.17.28",
+		"@typescript-eslint/eslint-plugin": "^8.32.1",
+		"@typescript-eslint/parser": "^8.32.1",
+		"colors": "^1.1.2",
+		"commitizen": "^2.9.6",
+		"cross-env": "^5.2.0",
+		"cz-conventional-changelog": "^2.0.0",
+		"eslint": "^9.27.0",
+		"eslint-config-prettier": "^10.1.5",
+		"eslint-plugin-import": "^2.31.0",
+		"eslint-plugin-jsdoc": "^50.6.17",
+		"globals": "^16.1.0",
+		"jest": "^23.0.0",
+		"lint-staged": "^7.2.0",
+		"lodash.camelcase": "^4.3.0",
+		"prettier": "^2.0.5",
+		"prompt": "^1.0.0",
+		"recast": "^0.16.1",
+		"replace-in-file": "^3.0.0-beta.2",
+		"rimraf": "^2.6.1",
+		"semantic-release": "^19.0.3",
+		"travis-deploy-once": "^5.0.1",
+		"ts-jest": "^23.10.5",
+		"ts-node": "^8.10.1",
+		"tslib": "^1.9.3",
+		"typedoc": "^0.17.8",
+		"validate-commit-msg": "^2.12.2"
+	},
+	"dependencies": {
+		"@zerollup/ts-helpers": "^1.7.18",
+		"fs": "0.0.1-security",
+		"path": "^0.12.7",
+		"plantuml-parser": "0.0.16",
+		"typescript": "^4.9.4",
+		"walk-sync": "^2.2.0"
+	}
+}

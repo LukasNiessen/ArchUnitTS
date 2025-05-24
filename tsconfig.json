@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"moduleResolution": "node",
+		"target": "es5",
+		"module": "commonjs",
+		"lib": ["es2019"],
+		"jsx": "preserve",
+		"strict": true,
+		"sourceMap": true,
+		"declaration": true,
+		"allowSyntheticDefaultImports": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"declarationDir": "dist",
+		"outDir": "dist",
+		"downlevelIteration": true,
+		"noImplicitAny": true,
+		"esModuleInterop": true
+	},
+	"include": ["src", "index.ts", "jest.ts", "test"]
+}

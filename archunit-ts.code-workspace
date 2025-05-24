@@ -1,0 +1,37 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"extensions": {
+		"recommendations": [
+			"esbenp.prettier-vscode",
+			"dbaeumer.vscode-eslint",
+			"yzhang.markdown-all-in-one"
+		]
+	},
+	"settings": {
+		"asciidoc.preview.attributes": {
+			"plantuml-server-url": "http://plantuml.com/plantuml"
+		},
+		"editor.tabSize": 4,
+		"typescript.preferences.quoteStyle": "single",
+		"javascript.preferences.quoteStyle": "single",
+		"editor.snippetSuggestions": "top",
+		"typescript.updateImportsOnFileMove.enabled": "always",
+		"[typescriptreact]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"files.autoSave": "afterDelay",
+		"editor.formatOnPaste": true,
+		"editor.formatOnSave": true,
+		"editor.formatOnType": true,
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/bower_components": true,
+			"**/*.code-search": true,
+			"**/.history": true
+		}
+	}
+}
