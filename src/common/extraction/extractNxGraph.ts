@@ -1,89 +1,102 @@
-import * as fs from "fs"
-import * as path from "path"
-import { Graph } from "./graph"
-import { TechnicalError } from "../error/errors"
+import * as fs from 'fs';
+import * as path from 'path';
+import { Graph } from './graph';
+import { TechnicalError } from '../error/errors';
 
 type Nodes = {
-  [index: string]: Outgoing[]
-}
+	[index: string]: Outgoing[];
+};
 
 type Outgoing = {
-  source: string
-  target: string
-}
+	source: string;
+	target: string;
+};
 
-export function extractNxGraph(rootFolder?: string): Graph {
-  const workspaceRoot = rootFolder ?? guessNxWorkspaceRoot()
+export const extractNxGraph = (rootFolder?: string): Graph => {
+	const workspaceRoot = rootFolder ?? guessNxWorkspaceRoot();
 
-  // The location of the project graph was moved from .nx/cache to .nx/workspace-data in Nx v19.2.0
-  // If using Nx 19.2.0+ us the new location
-  let projectGraphCacheDirectory = absolutePath(
-    workspaceRoot,
-    process.env["NX_PROJECT_GRAPH_CACHE_DIRECTORY"] ?? defaultWorkspaceDataDirectory(workspaceRoot)
-  )
-  // If using Nx <19.2.0 use the old location
-  if (!fs.existsSync(path.join(projectGraphCacheDirectory, "project-graph.json"))) {
-    projectGraphCacheDirectory = absolutePath(workspaceRoot, defaultCacheDirectory(workspaceRoot))
-  }
-  const depGraph = fs.readFileSync(path.join(projectGraphCacheDirectory, "project-graph.json"))
-  const deps: Nodes = JSON.parse(depGraph.toString("utf-8")).dependencies
-  return mapToGraph(deps)
-}
+	// The location of the project graph was moved from .nx/cache to .nx/workspace-data in Nx v19.2.0
+	// If using Nx 19.2.0+ use the new location
+	let projectGraphCacheDirectory = absolutePath(
+		workspaceRoot,
+		process.env['NX_PROJECT_GRAPH_CACHE_DIRECTORY'] ??
+			defaultWorkspaceDataDirectory(workspaceRoot)
+	);
 
-function mapToGraph(nodes: Nodes): Graph {
-  const entries = Object.values(nodes)
-  return entries.flatMap((x) => {
-    return x.map((y) => {
-      return {
-        source: y.source,
-        target: y.target,
-        external: y.target.startsWith("npm:")
-      }
-    })
-  })
-}
+	// If using Nx <19.2.0 use the old location
+	if (!fs.existsSync(path.join(projectGraphCacheDirectory, 'project-graph.json'))) {
+		projectGraphCacheDirectory = absolutePath(
+			workspaceRoot,
+			defaultCacheDirectory(workspaceRoot)
+		);
+	}
 
-function absolutePath(root: string, pathName: string): string {
-  if (path.isAbsolute(pathName)) {
-    return pathName
-  } else {
-    return path.join(root, pathName)
-  }
-}
+	const depGraph = fs.readFileSync(
+		path.join(projectGraphCacheDirectory, 'project-graph.json')
+	);
+	const deps: Nodes = JSON.parse(depGraph.toString('utf-8')).dependencies;
 
-function defaultCacheDirectory(root: string) {
-  if (fs.existsSync(path.join(root, "lerna.json")) && !fs.existsSync(path.join(root, "nx.json"))) {
-    return path.join(root, "node_modules", ".cache", "nx")
-  }
-  return path.join(root, ".nx", "cache")
-}
+	return mapToGraph(deps);
+};
 
-function defaultWorkspaceDataDirectory(root: string) {
-  return path.join(root, ".nx", "workspace-data")
-}
+const mapToGraph = (nodes: Nodes): Graph => {
+	return Object.values(nodes).flatMap((edges) =>
+		edges.map((edge) => ({
+			source: edge.source,
+			target: edge.target,
+			external: edge.target.startsWith('npm:'),
+		}))
+	);
+};
 
-export function guessNxWorkspaceRoot(): string {
-  const nxConfigFileName = guessLocationOfNxConfigRecursively(".")
-  if (nxConfigFileName === undefined) {
-    throw new TechnicalError(`Unable to extract dependency graph: No root folder 
-of nx project was given and no nx config file could be resolved.`)
-  }
+const absolutePath = (root: string, pathName: string): string => {
+	return path.isAbsolute(pathName) ? pathName : path.join(root, pathName);
+};
 
-  return path.dirname(nxConfigFileName)
-}
+const defaultCacheDirectory = (root: string): string => {
+	if (
+		fs.existsSync(path.join(root, 'lerna.json')) &&
+		!fs.existsSync(path.join(root, 'nx.json'))
+	) {
+		return path.join(root, 'node_modules', '.cache', 'nx');
+	}
+	return path.join(root, '.nx', 'cache');
+};
 
-function guessLocationOfNxConfigRecursively(pathName: string): string | undefined {
-  const dir = fs.readdirSync(pathName)
-  for (const fileName of dir) {
-    if (path.basename(fileName) === "nx.json") {
-      return path.resolve(pathName, "nx.json")
-    }
-  }
-  const levelUp = path.resolve(pathName, "..")
-  const pr = path.relative(levelUp, pathName)
-  if (pr === "") {
-    return undefined
-  } else {
-    return guessLocationOfNxConfigRecursively(levelUp)
-  }
-}
+const defaultWorkspaceDataDirectory = (root: string): string => {
+	return path.join(root, '.nx', 'workspace-data');
+};
+
+export const guessNxWorkspaceRoot = (): string => {
+	const nxConfigFileName = guessLocationOfNxConfigRecursively('.');
+
+	if (!nxConfigFileName) {
+		throw new TechnicalError(
+			`Unable to extract dependency graph: No root folder of nx project was given and no nx config file could be resolved.`
+		);
+	}
+
+	return path.dirname(nxConfigFileName);
+};
+
+const guessLocationOfNxConfigRecursively = (pathName: string): string | undefined => {
+	const dir = fs.readdirSync(pathName);
+
+	// First check if nx.json exists in the current directory
+	const nxConfigFile = dir.find((fileName) => path.basename(fileName) === 'nx.json');
+	if (nxConfigFile) {
+		return path.resolve(pathName, 'nx.json');
+	}
+
+	// If not, go up one level in directory structure
+	const levelUp = path.resolve(pathName, '..');
+	const pr = path.relative(levelUp, pathName);
+
+	// Stop if we've reached the filesystem root
+	if (pr === '') {
+		return undefined;
+	}
+
+	// Continue recursively
+	return guessLocationOfNxConfigRecursively(levelUp);
+};

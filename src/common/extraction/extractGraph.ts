@@ -7,70 +7,81 @@ import { normalizeWindowsPaths } from '../util/pathUtils';
 import { ImportPathsResolver } from '@zerollup/ts-helpers';
 
 // TODO write exception code free everywhere
-export function guessLocationOfTsconfig(): string | undefined {
+export const guessLocationOfTsconfig = (): string | undefined => {
 	return guessLocationOfTsconfigRecursively('.');
-}
+};
 
-function guessLocationOfTsconfigRecursively(pathName: string): string | undefined {
+const guessLocationOfTsconfigRecursively = (pathName: string): string | undefined => {
 	const dir = fs.readdirSync(pathName);
-	for (const fileName of dir) {
-		if (path.basename(fileName) === 'tsconfig.json') {
-			return path.resolve(pathName, 'tsconfig.json');
-		}
+
+	// First check if tsconfig exists in the current directory
+	const tsconfigFileName = dir.find(
+		(fileName) => path.basename(fileName) === 'tsconfig.json'
+	);
+	if (tsconfigFileName) {
+		return path.resolve(pathName, 'tsconfig.json');
 	}
+
+	// If not, go up one level
 	const levelUp = path.resolve(pathName, '..');
+
+	// Stop if we've reached the filesystem root
 	if (path.relative(levelUp, pathName) === '') {
 		return undefined;
 	}
-	return guessLocationOfTsconfigRecursively(levelUp);
-}
 
-function getProjectFiles(
+	// Continue recursively
+	return guessLocationOfTsconfigRecursively(levelUp);
+};
+
+const getProjectFiles = (
 	rootDir: string,
 	compilerHost: CompilerHost,
 	config: CompilerOptions & TypeAcquisition
-): string[] {
-	const files = compilerHost.readDirectory
-		? compilerHost.readDirectory(
-				rootDir,
-				['ts', 'tsx'],
-				config.exclude ?? [],
-				config.include ?? []
-		  )
-		: undefined;
+): string[] => {
+	if (!compilerHost.readDirectory) {
+		throw new TechnicalError('compiler host is missing readDirectory method');
+	}
 
-	if (files === undefined) {
+	const files = compilerHost.readDirectory(
+		rootDir,
+		['ts', 'tsx'],
+		config.exclude ?? [],
+		config.include ?? []
+	);
+
+	if (!files) {
 		throw new TechnicalError('compiler could not resolve project files');
 	}
+
 	return files;
-}
+};
 
 const graphCache: Map<string | undefined, Promise<Edge[]>> = new Map();
 
-export async function extractGraph(configFileName?: string): Promise<Edge[]> {
-	const there = graphCache.get(configFileName);
-	if (there !== undefined) {
-		return there;
+export const extractGraph = async (configFileName?: string): Promise<Edge[]> => {
+	const cachedResult = graphCache.get(configFileName);
+	if (cachedResult) {
+		return cachedResult;
 	}
 	const computedResult = extractGraphUncached(configFileName);
 	graphCache.set(configFileName, computedResult);
 	return await computedResult;
-}
+};
 
 // TODO - distinguish between different import kinds (types, function etc.)
-export async function extractGraphUncached(configFileName?: string): Promise<Edge[]> {
-	let configFile = configFileName;
-	if (configFile === undefined) {
-		configFile = guessLocationOfTsconfig();
-	}
-	if (configFile === undefined) {
+export const extractGraphUncached = async (configFileName?: string): Promise<Edge[]> => {
+	const configFile = configFileName ?? guessLocationOfTsconfig();
+
+	if (!configFile) {
 		throw new TechnicalError('Could not find configuration path');
 	}
+
 	const config = ts.readConfigFile(configFile, (path: string) => {
 		return fs.readFileSync(path).toString();
 	});
 
-	if (config.error !== undefined) {
+	if (config.error) {
 		throw new TechnicalError('invalid config path');
 	}
 
@@ -140,4 +151,4 @@ export async function extractGraphUncached(configFileName?: string): Promise<Edg
 	}
 
 	return imports;
-}
+};

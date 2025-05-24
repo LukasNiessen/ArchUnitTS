@@ -1,3 +1,19 @@
-export class TechnicalError extends Error {}
+export class TechnicalError extends Error {
+	constructor(message: string | undefined) {
+		super(message);
+		this.name = 'TechnicalError';
 
-export class UserError extends Error {}
+		// For stack traces
+		Object.setPrototypeOf(this, TechnicalError.prototype);
+	}
+}
+
+export class UserError extends Error {
+	constructor(message: string | undefined) {
+		super(message);
+		this.name = 'UserError';
+
+		// For stack traces
+		Object.setPrototypeOf(this, UserError.prototype);
+	}
+}

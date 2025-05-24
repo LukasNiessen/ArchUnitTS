@@ -11,10 +11,10 @@ export class ViolatingCycle implements Violation {
 	}
 }
 
-export function gatherCycleViolations(
+export const gatherCycleViolations = (
 	projectedEdges: ProjectedEdge[],
 	preconditionPatterns: string[]
-): ViolatingCycle[] {
+): ViolatingCycle[] => {
 	const filteredEdges = projectedEdges.filter(
 		(edge) =>
 			matchingAllPatterns(edge.sourceLabel, preconditionPatterns) &&
@@ -23,5 +23,5 @@ export function gatherCycleViolations(
 
 	const projectedCycles = projectCycles(filteredEdges);
 
-	return projectedCycles.map((cs) => new ViolatingCycle(cs));
-}
+	return projectedCycles.map((cycle) => new ViolatingCycle(cycle));
+};

@@ -50,9 +50,16 @@ class CycleProcessor {
 			}
 		});
 		return filteredEdges.map((e) => {
+			const fromId = this.labelToId.get(e.sourceLabel);
+			const toId = this.labelToId.get(e.targetLabel);
+
+			if (fromId === undefined || toId === undefined) {
+				throw new Error('Label IDs should be defined at this point');
+			}
+
 			return {
-				from: this.labelToId.get(e.sourceLabel)!, // WATCH-IMP: was !! before. Two. Idk why though.
-				to: this.labelToId.get(e.targetLabel)!, // WATCH-IMP: was !! before. Two. Idk why though.
+				from: fromId,
+				to: toId,
 			};
 		});
 	}
@@ -62,9 +69,15 @@ class CycleProcessor {
 			return c.map((e) => {
 				const sourceLabel = this.idToLabel.get(e.from);
 				const targetLabel = this.idToLabel.get(e.to);
-				return this.sourceEdges.find(
+				const foundEdge = this.sourceEdges.find(
 					(e) => e.sourceLabel === sourceLabel && e.targetLabel === targetLabel
-				)!!; // TODO bad!
+				);
+
+				if (!foundEdge) {
+					throw new Error('Edge should be found at this point');
+				}
+
+				return foundEdge;
 			});
 		});
 	}

@@ -11,15 +11,17 @@ export class ViolatingFileDependency implements Violation {
 	}
 }
 
-export function gatherDependOnFileViolations(
+export const gatherDependOnFileViolations = (
 	projectedEdges: ProjectedEdge[],
 	objectPatterns: string[],
 	subjectPatterns: string[],
 	isNegated: boolean
-): ViolatingFileDependency[] {
+): ViolatingFileDependency[] => {
 	if (objectPatterns.length === 0 && subjectPatterns.length === 0) {
 		throw new UserError('object and subject patterns must be set');
 	}
+
+	const createViolation = (edge: ProjectedEdge) => new ViolatingFileDependency(edge);
 
 	if (isNegated) {
 		const filteredEdges = projectedEdges.filter(
@@ -27,17 +29,13 @@ export function gatherDependOnFileViolations(
 				matchingAllPatterns(edge.sourceLabel, objectPatterns) &&
 				matchingAllPatterns(edge.targetLabel, subjectPatterns)
 		);
-		return filteredEdges.map((e) => {
-			return new ViolatingFileDependency(e);
-		});
+		return filteredEdges.map(createViolation);
 	} else {
 		const filteredEdges = projectedEdges.filter(
 			(edge) =>
 				!matchingAllPatterns(edge.sourceLabel, objectPatterns) ||
 				!matchingAllPatterns(edge.targetLabel, subjectPatterns)
 		);
-		return filteredEdges.map((e) => {
-			return new ViolatingFileDependency(e);
-		});
+		return filteredEdges.map(createViolation);
 	}
-}
+};

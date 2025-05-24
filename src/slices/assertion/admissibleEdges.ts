@@ -16,10 +16,10 @@ export class ViolatingEdge implements Violation {
 	}
 }
 
-export function gatherViolations(
+export const gatherViolations = (
 	graph: ProjectedEdge[],
 	forbidden: Rule[]
-): ViolatingEdge[] {
+): ViolatingEdge[] => {
 	const violatingEdges: ViolatingEdge[] = [];
 	for (const edge of graph) {
 		for (const rule of forbidden) {
@@ -29,14 +29,14 @@ export function gatherViolations(
 		}
 	}
 	return violatingEdges;
-}
+};
 
-export function gatherPositiveViolations(
+export const gatherPositiveViolations = (
 	graph: ProjectedGraph,
 	allowed: Rule[],
 	nodesOfInterest: string[],
 	ignoreNonListed: boolean
-): ViolatingEdge[] {
+): ViolatingEdge[] => {
 	const violatingEdges: ViolatingEdge[] = [];
 	for (const edge of graph) {
 		if (
@@ -60,6 +60,6 @@ export function gatherPositiveViolations(
 		}
 	}
 	return violatingEdges;
-}
+};
 
 // TODO implement complete coherence

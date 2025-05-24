@@ -1,4 +1,9 @@
-export function matchingAllPatterns(input: string, patterns: Array<string | RegExp>): boolean {
-  const matches = patterns.map((p) => input.match(p)).map((m) => m != null && m.length > 0)
-  return matches.indexOf(false) === -1
-}
+export const matchingAllPatterns = (
+	input: string,
+	patterns: Array<string | RegExp>
+): boolean => {
+	const matches = patterns
+		.map((pattern) => input.match(pattern))
+		.map((match) => match !== null && match.length > 0);
+	return matches.indexOf(false) === -1;
+};

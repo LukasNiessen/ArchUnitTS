@@ -1,18 +1,23 @@
 import { ProjectedGraph } from '../../common/projection/projectEdges';
 
-export function exportDiagram(graph: ProjectedGraph): string {
+export const exportDiagram = (graph: ProjectedGraph): string => {
 	let output = '@startuml\n';
 
+	// Extract all unique vertices from edges
 	const vertices = new Set<string>(
 		graph.flatMap((edge) => [edge.sourceLabel, edge.targetLabel])
 	);
+
+	// Add component declarations
 	for (const vertex of vertices.values()) {
 		output += `component [${vertex}]\n`;
 	}
 
+	// Add relationships between components
 	for (const edge of graph) {
 		output += `[${edge.sourceLabel}] --> [${edge.targetLabel}]\n`;
 	}
+
 	output += '@enduml';
 	return output;
-}
+};

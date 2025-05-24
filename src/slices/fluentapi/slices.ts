@@ -14,28 +14,28 @@ import { identity, sliceByPattern } from '../projection/slicingProjections';
 import { MapFunction, projectEdges } from '../../common/projection/projectEdges';
 import { Graph } from '../../common/extraction/graph';
 
-export function slicesOfProject(filename?: string): SliceConditionBuilder {
+export const slicesOfProject = (filename?: string): SliceConditionBuilder => {
 	const graphProvider = () => extractGraph(filename);
 	return new SliceConditionBuilder(graphProvider);
-}
+};
 
 export class SliceConditionBuilder {
 	mapFunction: MapFunction = identity();
 
 	constructor(readonly graphProvider: GraphProvider) {}
 
-	public definedBy(pattern: string): SliceConditionBuilder {
+	public definedBy = (pattern: string): SliceConditionBuilder => {
 		this.mapFunction = sliceByPattern(pattern);
-
 		return this;
-	}
-	public should(): PositiveConditionBuilder {
-		return new PositiveConditionBuilder(this);
-	}
+	};
 
-	public shouldNot(): NegativeSliceCondition {
+	public should = (): PositiveConditionBuilder => {
+		return new PositiveConditionBuilder(this);
+	};
+
+	public shouldNot = (): NegativeSliceCondition => {
 		return new NegativeSliceCondition(this, []);
-	}
+	};
 }
 
 export class NegativeSliceCondition implements Checkable {
@@ -44,18 +44,18 @@ export class NegativeSliceCondition implements Checkable {
 		private readonly forbiddenEdges: Rule[]
 	) {}
 
-	public containDependency(from: string, to: string): NegativeSliceCondition {
+	public containDependency = (from: string, to: string): NegativeSliceCondition => {
 		return new NegativeSliceCondition(this.sliceConditionBuilder, [
 			...this.forbiddenEdges,
 			{ source: from, target: to },
 		]);
-	}
+	};
 
-	public async check(): Promise<Violation[]> {
+	public check = async (): Promise<Violation[]> => {
 		const graph = await this.sliceConditionBuilder.graphProvider();
 		const mapped = projectEdges(graph, this.sliceConditionBuilder.mapFunction);
 		return gatherViolations(mapped, this.forbiddenEdges);
-	}
+	};
 }
 
 export class PositiveConditionBuilder {
@@ -123,9 +123,7 @@ export class PositiveSliceCondition implements Checkable {
 
 type GraphProvider = () => Promise<Graph>;
 
-export function slicesOfNxProject(rootFolder?: string): SliceConditionBuilder {
-	const graphProvider = () => {
-		return Promise.resolve(extractNxGraph(rootFolder));
-	};
+export const slicesOfNxProject = (rootFolder?: string): SliceConditionBuilder => {
+	const graphProvider = () => Promise.resolve(extractNxGraph(rootFolder));
 	return new SliceConditionBuilder(graphProvider);
-}
+};
