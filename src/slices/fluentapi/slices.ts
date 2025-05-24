@@ -1,6 +1,6 @@
-import { generateRule } from '../uml/generateRules';
-import { extractGraph } from '../../common/extraction/extractGraph';
-import { extractNxGraph } from '../../common/extraction/extractNxGraph';
+import { generateRule } from '../uml/generate-rules';
+import { extractGraph } from '../../common/extraction/extract-graph';
+import { extractNxGraph } from '../../common/extraction/extract-nx-graph';
 import * as fs from 'fs';
 import { TechnicalError } from '../../common/error/errors';
 import { Checkable } from '../../common/fluentapi/checkable';
@@ -8,10 +8,10 @@ import {
 	gatherPositiveViolations,
 	gatherViolations,
 	Rule,
-} from '../assertion/admissibleEdges';
+} from '../assertion/admissible-edges';
 import { Violation } from '../../common/assertion/violation';
-import { identity, sliceByPattern } from '../projection/slicingProjections';
-import { MapFunction, projectEdges } from '../../common/projection/projectEdges';
+import { identity, sliceByPattern } from '../projection/slicing-projections';
+import { MapFunction, projectEdges } from '../../common/projection/project-edges';
 import { Graph } from '../../common/extraction/graph';
 
 export const slicesOfProject = (filename?: string): SliceConditionBuilder => {

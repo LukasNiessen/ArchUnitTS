@@ -1,5 +1,5 @@
 import { Component, parse, Relationship } from 'plantuml-parser';
-import { Rule } from '../assertion/admissibleEdges';
+import { Rule } from '../assertion/admissible-edges';
 
 export function generateRule(data: string): { rules: Rule[]; containedNodes: string[] } {
 	const parsed = parse(data);
@@ -8,17 +8,15 @@ export function generateRule(data: string): { rules: Rule[]; containedNodes: str
 		.map((element) => {
 			if (element instanceof Relationship) {
 				return [{ source: element.left, target: element.right }];
-			} else {
-				return [];
 			}
+			return [];
 		})
 		.flat();
 	const containedNodes = diagram.elements.flatMap((element) => {
 		if (element instanceof Component) {
 			return [element.name];
-		} else {
-			return [];
 		}
+		return [];
 	});
 	return { rules, containedNodes };
 }

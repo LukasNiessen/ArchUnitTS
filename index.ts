@@ -1,3 +1,3 @@
-export * from './src/jest/ArchMatchers';
+export * from './src/jest/arch-matchers';
 export * from './src/slices/fluentapi/slices';
 export * from './src/files/fluentapi/files';

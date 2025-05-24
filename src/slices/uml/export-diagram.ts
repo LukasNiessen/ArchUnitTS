@@ -1,4 +1,4 @@
-import { ProjectedGraph } from '../../common/projection/projectEdges';
+import { ProjectedGraph } from '../../common/projection/project-edges';
 
 export const exportDiagram = (graph: ProjectedGraph): string => {
 	let output = '@startuml\n';

@@ -1,4 +1,4 @@
-import { NumberEdge } from "./Model"
+import { NumberEdge } from "./model"
 
 class Vertex {
   public index: number = -1

@@ -1,4 +1,4 @@
-import { NumberEdge, NumberNode } from './Model';
+import { NumberEdge, NumberNode } from './model';
 
 export class CycleUtils {
 	public static getOutgoingNeighbours(

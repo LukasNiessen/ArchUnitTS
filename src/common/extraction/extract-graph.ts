@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { Edge } from './graph';
 import { TechnicalError } from '../error/errors';
-import { normalizeWindowsPaths } from '../util/pathUtils';
+import { normalizeWindowsPaths } from '../util/path-utils';
 import { ImportPathsResolver } from '@zerollup/ts-helpers';
 
 // TODO write exception code free everywhere

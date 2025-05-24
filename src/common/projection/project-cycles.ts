@@ -1,7 +1,7 @@
-import { ProjectedEdge, projectEdges } from './projectEdges';
-import { NumberEdge } from './cycles/Model';
+import { ProjectedEdge, projectEdges } from './project-edges';
+import { NumberEdge } from './cycles/model';
 import { calculateCycles } from './cycles/cycles';
-import { perInternalEdge } from './edgeProjections';
+import { perInternalEdge } from './edge-projections';
 import { Edge } from '../extraction/graph';
 
 export type ProjectedCycles = Array<ProjectedEdge[]>;

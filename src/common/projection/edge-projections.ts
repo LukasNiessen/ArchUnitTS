@@ -1,4 +1,4 @@
-import { MapFunction } from './projectEdges';
+import { MapFunction } from './project-edges';
 
 export const perInternalEdge = (): MapFunction => {
 	return (edge) => {

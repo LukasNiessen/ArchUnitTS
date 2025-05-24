@@ -1,5 +1,5 @@
-import { gatherRegexMatchingViolations } from "./matchingFiles"
-import { ProjectedNode } from "../../common/projection/projectNodes"
+import { gatherRegexMatchingViolations } from "./matching-files"
+import { ProjectedNode } from "../../common/projection/project-nodes"
 
 describe("matchingFiles", () => {
   describe("when not negated", () => {

@@ -1,13 +1,13 @@
-import { extractGraph } from '../../common/extraction/extractGraph';
-import { RegexFactory } from './RegexFactory';
+import { extractGraph } from '../../common/extraction/extract-graph';
+import { RegexFactory } from './regex-factory';
 import { Checkable } from '../../common/fluentapi/checkable';
-import { projectEdges } from '../../common/projection/projectEdges';
-import { perEdge, perInternalEdge } from '../../common/projection/edgeProjections';
-import { projectToNodes } from '../../common/projection/projectNodes';
-import { gatherRegexMatchingViolations } from '../assertion/matchingFiles';
+import { projectEdges } from '../../common/projection/project-edges';
+import { perEdge, perInternalEdge } from '../../common/projection/edge-projections';
+import { projectToNodes } from '../../common/projection/project-nodes';
+import { gatherRegexMatchingViolations } from '../assertion/matching-files';
 import { Violation } from '../../common/assertion/violation';
-import { gatherCycleViolations } from '../assertion/freeOfCycles';
-import { gatherDependOnFileViolations } from '../assertion/dependOnFiles';
+import { gatherCycleViolations } from '../assertion/free-of-cycles';
+import { gatherDependOnFileViolations } from '../assertion/depend-on-files';
 
 export const filesOfProject = (tsConfigFilePath?: string): FileConditionBuilder => {
 	return new FileConditionBuilder(tsConfigFilePath);

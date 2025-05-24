@@ -1,4 +1,4 @@
-import { generateRule } from './generateRules';
+import { generateRule } from './generate-rules';
 
 describe('generateRules', () => {
 	it('generates positves rules', () => {

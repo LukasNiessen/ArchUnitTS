@@ -1,6 +1,6 @@
-import { matchingAllPatterns } from '../../common/util/regexUtils';
+import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { Violation } from '../../common/assertion/violation';
-import { ProjectedNode } from '../../common/projection/projectNodes';
+import { ProjectedNode } from '../../common/projection/project-nodes';
 
 export class ViolatingNode implements Violation {
 	public checkPattern: string;

@@ -1,4 +1,4 @@
-import { sliceByPattern } from './slicingProjections';
+import { sliceByPattern } from './slicing-projections';
 
 describe('slicingProjections', () => {
 	it('slices sub directories', () => {

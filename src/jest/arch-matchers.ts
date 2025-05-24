@@ -1,9 +1,9 @@
 import { Checkable } from '../common/fluentapi/checkable';
 import { Violation } from '../common/assertion/violation';
-import { ViolatingNode } from '../files/assertion/matchingFiles';
-import { ViolatingEdge } from '../slices/assertion/admissibleEdges';
-import { ViolatingCycle } from '../files/assertion/freeOfCycles';
-import { ViolatingFileDependency } from '../files/assertion/dependOnFiles';
+import { ViolatingNode } from '../files/assertion/matching-files';
+import { ViolatingEdge } from '../slices/assertion/admissible-edges';
+import { ViolatingCycle } from '../files/assertion/free-of-cycles';
+import { ViolatingFileDependency } from '../files/assertion/depend-on-files';
 
 /*
  * Extending Jest and defining its type

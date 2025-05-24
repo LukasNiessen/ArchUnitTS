@@ -1,2 +1,2 @@
-import "../controllers/Controller"
+import "../controllers/controller"
 import "./SomeController"

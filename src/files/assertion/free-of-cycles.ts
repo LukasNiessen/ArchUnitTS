@@ -1,6 +1,6 @@
-import { matchingAllPatterns } from '../../common/util/regexUtils';
-import { ProjectedEdge } from '../../common/projection/projectEdges';
-import { projectCycles } from '../../common/projection/projectCycles';
+import { matchingAllPatterns } from '../../common/util/regex-utils';
+import { ProjectedEdge } from '../../common/projection/project-edges';
+import { projectCycles } from '../../common/projection/project-cycles';
 import { Violation } from '../../common/assertion/violation';
 
 export class ViolatingCycle implements Violation {

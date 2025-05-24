@@ -1,6 +1,6 @@
-import { NumberEdge } from './Model';
-import { TrajanSCC } from './TrajanSCC';
-import { JohnsonsAPSP } from './JohnsonsAPSP';
+import { NumberEdge } from './model';
+import { TrajanSCC } from './trajan-scc';
+import { JohnsonsAPSP } from './johnsons-apsp';
 
 export function calculateCycles(idEdges: NumberEdge[]) {
 	const cycles: Array<NumberEdge[]> = [];

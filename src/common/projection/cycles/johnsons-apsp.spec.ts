@@ -1,4 +1,4 @@
-import { JohnsonsAPSP } from './JohnsonsAPSP';
+import { JohnsonsAPSP } from './johnsons-apsp';
 
 describe('Johnsons All Pairs Shortest Paths Algorithm', () => {
 	function expectArrayElementsToBeEqual(arr1: any[], arr2: any[]) {

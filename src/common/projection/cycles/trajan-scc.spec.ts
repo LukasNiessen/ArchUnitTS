@@ -1,4 +1,4 @@
-import { TrajanSCC } from './TrajanSCC';
+import { TrajanSCC } from './trajan-scc';
 
 describe('Trajans Algorithm for finding strongly connected components in a directed graph', () => {
 	function expectArrayElementsToBeEqual(arr1: any[], arr2: any[]) {

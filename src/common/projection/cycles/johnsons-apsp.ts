@@ -1,5 +1,5 @@
-import { NumberNode, NumberEdge } from "./Model"
-import { CycleUtils } from "./CycleUtils"
+import { NumberNode, NumberEdge } from "./model"
+import { CycleUtils } from "./cycle-utils"
 
 interface BlockedBy {
   blocked: NumberNode

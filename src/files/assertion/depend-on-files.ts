@@ -1,7 +1,7 @@
-import { matchingAllPatterns } from '../../common/util/regexUtils';
+import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { UserError } from '../../common/error/errors';
 import { Violation } from '../../common/assertion/violation';
-import { ProjectedEdge } from '../../common/projection/projectEdges';
+import { ProjectedEdge } from '../../common/projection/project-edges';
 
 export class ViolatingFileDependency implements Violation {
 	public dependency: ProjectedEdge;

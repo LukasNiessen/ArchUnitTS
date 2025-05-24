@@ -1,2 +1,2 @@
-import { extendJestMatchers } from "./src/jest/ArchMatchers"
+import { extendJestMatchers } from "./src/jest/arch-matchers"
 extendJestMatchers()
