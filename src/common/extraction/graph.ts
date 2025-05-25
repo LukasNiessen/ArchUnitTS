@@ -1,10 +1,4 @@
-export enum ImportKind {
-	DEFAULT = 'default',
-	NAMED = 'named',
-	NAMESPACE = 'namespace',
-	TYPE = 'type',
-	VALUE = 'value',
-}
+import { ImportKind } from '../util/import-kinds';
 
 export type Edge = {
 	source: string;

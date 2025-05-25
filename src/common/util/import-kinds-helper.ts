@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { ImportKind } from '../extraction/graph';
+import { ImportKind } from './import-kinds';
 
 export const determineImportKinds = (x: ts.ImportDeclaration): ImportKind[] => {
 	const clause = x.importClause;

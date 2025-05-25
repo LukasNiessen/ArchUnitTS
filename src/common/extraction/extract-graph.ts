@@ -82,14 +82,25 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 		throw new TechnicalError('invalid config path');
 	}
 
-	const parsedConfig: CompilerOptions = config.config;
+	const parsedConfig = ts.parseJsonConfigFileContent(
+		config.config,
+		ts.sys,
+		path.dirname(configFile)
+	);
+
+	if (parsedConfig.errors && parsedConfig.errors.length > 0) {
+		throw new TechnicalError(
+			'Error parsing config file: ' + parsedConfig.errors[0].messageText
+		);
+	}
+
 	const rootDir = path.dirname(path.resolve(configFile));
-	const compilerHost = ts.createCompilerHost(parsedConfig);
+	const compilerHost = ts.createCompilerHost(parsedConfig.options);
 	const files = getProjectFiles(rootDir, compilerHost, config?.config);
 
 	const program = ts.createProgram({
 		rootNames: files ?? [],
-		options: parsedConfig,
+		options: parsedConfig.options,
 		host: compilerHost,
 	});
 
@@ -112,7 +123,17 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 					return;
 				}
 
-				const resolver = new ImportPathsResolver(parsedConfig.compilerOptions);
+				// Create TSOptions object for ImportPathsResolver
+				const tsOptions: {
+					paths?: Record<string, string[]>;
+					baseUrl?: string;
+					exclude?: string[];
+				} = {
+					paths: parsedConfig.options.paths,
+					baseUrl: parsedConfig.options.baseUrl,
+					exclude: parsedConfig.options.exclude as string[] | undefined,
+				};
+				const resolver = new ImportPathsResolver(tsOptions);
 
 				const suggestion = resolver.getImportSuggestions(
 					module,
@@ -125,7 +146,7 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 				const resolvedModule = ts.resolveModuleName(
 					bestGuess ?? module,
 					sourceFile.fileName,
-					parsedConfig,
+					parsedConfig.options,
 					compilerHost
 				).resolvedModule;
 
