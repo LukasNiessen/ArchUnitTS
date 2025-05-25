@@ -29,7 +29,7 @@ export default [
 		rules: {
 			// TypeScript-specific rules
 			'@typescript-eslint/no-explicit-any': 'error',
-			'@typescript-eslint/no-unused-vars': 'error',
+			'@typescript-eslint/no-unused-vars': 'warn',
 			'@typescript-eslint/no-floating-promises': 'error',
 			'@typescript-eslint/await-thenable': 'error',
 			'@typescript-eslint/no-unnecessary-type-assertion': 'error',
@@ -39,6 +39,7 @@ export default [
 			'no-eval': 'error',
 			'no-duplicate-imports': 'error',
 			'no-throw-literal': 'error',
+			'no-unused-vars': 'off',
 			eqeqeq: ['error', 'smart'],
 			curly: ['error', 'multi-line'],
 

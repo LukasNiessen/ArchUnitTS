@@ -12,7 +12,7 @@ export class JohnsonsAPSP {
 	private stack: NumberNode[] = [];
 	private blockedMap: BlockedBy[] = [];
 	private graph: NumberNode[] = [];
-	private start: NumberNode = null as any;
+	private start: NumberNode | null = null;
 	private cycles: Array<NumberEdge[]> = [];
 
 	public findSimpleCycles(edges: NumberEdge[]): Array<NumberEdge[]> {
@@ -65,10 +65,13 @@ export class JohnsonsAPSP {
 	}
 
 	private isPartOfCurrentStartCycle(currentNode: NumberNode): boolean {
+		if (!this.start) {
+			return false;
+		}
 		return (
 			this.cycles.filter(
 				(x) =>
-					x[0].from === this.start.node &&
+					x[0].from === this.start!.node &&
 					x.find((y) => y.from === currentNode.node)
 			).length > 0
 		);
@@ -111,7 +114,10 @@ export class JohnsonsAPSP {
 					cycleEdges[i - 1].to = id;
 				}
 			});
-		cycleEdges[cycleEdges.length - 1].to = this.start.node;
+		if (this.start) {
+			// Add null check
+			cycleEdges[cycleEdges.length - 1].to = this.start.node;
+		}
 
 		return cycleEdges;
 	}

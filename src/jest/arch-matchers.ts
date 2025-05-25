@@ -121,7 +121,7 @@ export function extendJestMatchers() {
 			}
 			const violations = await checkable.check();
 			const jestViolations = violations.map((v) => JestViolationFactory.from(v));
-			return JestResultFactory.result(this.isNot, jestViolations);
+			return JestResultFactory.result(Boolean(this.isNot), jestViolations); // Ensure this.isNot is a boolean
 		},
-	} as any);
+	});
 }
