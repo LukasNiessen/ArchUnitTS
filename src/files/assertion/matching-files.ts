@@ -5,10 +5,16 @@ import { ProjectedNode } from '../../common/projection/project-nodes';
 export class ViolatingNode implements Violation {
 	public checkPattern: string;
 	public projectedNode: ProjectedNode;
+	public isNegated: boolean;
 
-	constructor(checkPattern: string, projectedNode: ProjectedNode) {
+	constructor(
+		checkPattern: string,
+		projectedNode: ProjectedNode,
+		isNegated: boolean = false
+	) {
 		this.checkPattern = checkPattern;
 		this.projectedNode = projectedNode;
+		this.isNegated = isNegated;
 	}
 }
 
@@ -43,7 +49,7 @@ const checkNegativeViolation = (
 	file: ProjectedNode,
 	pattern: string
 ): ViolatingNode | null => {
-	return match && match.length > 0 ? new ViolatingNode(pattern, file) : null;
+	return match && match.length > 0 ? new ViolatingNode(pattern, file, true) : null;
 };
 
 const checkPositiveViolation = (
@@ -51,5 +57,5 @@ const checkPositiveViolation = (
 	file: ProjectedNode,
 	pattern: string
 ): ViolatingNode | null => {
-	return !match || match.length === 0 ? new ViolatingNode(pattern, file) : null;
+	return !match || match.length === 0 ? new ViolatingNode(pattern, file, false) : null;
 };

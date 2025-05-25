@@ -5,9 +5,11 @@ import { ProjectedEdge } from '../../common/projection/project-edges';
 
 export class ViolatingFileDependency implements Violation {
 	public dependency: ProjectedEdge;
+	public isNegated: boolean;
 
-	constructor(dependency: ProjectedEdge) {
+	constructor(dependency: ProjectedEdge, isNegated: boolean = false) {
 		this.dependency = dependency;
+		this.isNegated = isNegated;
 	}
 }
 
@@ -21,21 +23,19 @@ export const gatherDependOnFileViolations = (
 		throw new UserError('object and subject patterns must be set');
 	}
 
-	const createViolation = (edge: ProjectedEdge) => new ViolatingFileDependency(edge);
-
 	if (isNegated) {
 		const filteredEdges = projectedEdges.filter(
 			(edge) =>
 				matchingAllPatterns(edge.sourceLabel, objectPatterns) &&
 				matchingAllPatterns(edge.targetLabel, subjectPatterns)
 		);
-		return filteredEdges.map(createViolation);
+		return filteredEdges.map((edge) => new ViolatingFileDependency(edge, true));
 	} else {
 		const filteredEdges = projectedEdges.filter(
 			(edge) =>
 				!matchingAllPatterns(edge.sourceLabel, objectPatterns) ||
 				!matchingAllPatterns(edge.targetLabel, subjectPatterns)
 		);
-		return filteredEdges.map(createViolation);
+		return filteredEdges.map((edge) => new ViolatingFileDependency(edge, false));
 	}
 };

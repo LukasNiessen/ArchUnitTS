@@ -6,7 +6,7 @@ import { ViolatingCycle } from '../files/assertion/free-of-cycles';
 import { ViolatingFileDependency } from '../files/assertion/depend-on-files';
 
 /*
- * Extending Jest and defining its type
+ * Extend Jest
  */
 declare global {
 	namespace jest {

@@ -5,6 +5,9 @@ import { Violation } from '../../common/assertion/violation';
 
 export class ViolatingCycle implements Violation {
 	public cycle: ProjectedEdge[];
+	// Note: For cycles, negation doesn't make sense
+	// as we're only checking for presence of cycles
+	public isNegated: boolean = false;
 
 	constructor(cycle: ProjectedEdge[]) {
 		this.cycle = cycle;

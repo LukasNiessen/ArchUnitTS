@@ -1,20 +1,33 @@
 import { Edge } from '../extraction/graph';
 
 export type ProjectedNode = {
-	// TODO this should have a list of incoming and outgoing edges
 	label: string;
+	incoming: Edge[];
+	outgoing: Edge[];
 };
 
-export const projectToNodes = (graph: Edge[]): ProjectedNode[] => {
-	// TODO only internal files are relevant for this projection. maybe it still should be configurable
-	const internalGraph = graph.filter((e) => !e.external);
+export interface ProjectionOptions {
+	includeExternals?: boolean;
+}
+
+export const projectToNodes = (
+	graph: Edge[],
+	options: ProjectionOptions = {}
+): ProjectedNode[] => {
+	const filteredGraph = options.includeExternals
+		? graph
+		: graph.filter((e) => !e.external);
 
 	// Get unique file names from both sources and targets
 	const uniqueFiles = new Set([
-		...internalGraph.map((edge) => edge.target),
-		...internalGraph.map((edge) => edge.source),
+		...filteredGraph.map((edge) => edge.target),
+		...filteredGraph.map((edge) => edge.source),
 	]);
 
-	// Transform to projected nodes
-	return Array.from(uniqueFiles).map((fileName) => ({ label: fileName }));
+	// Transform to projected nodes with incoming and outgoing edges
+	return Array.from(uniqueFiles).map((fileName) => ({
+		label: fileName,
+		incoming: filteredGraph.filter((edge) => edge.target === fileName),
+		outgoing: filteredGraph.filter((edge) => edge.source === fileName),
+	}));
 };
