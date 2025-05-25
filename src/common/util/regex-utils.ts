@@ -4,7 +4,8 @@ export const matchingAllPatterns = (
 ): boolean => {
 	return patterns.every((pattern) => {
 		if (typeof pattern === 'string') {
-			return input.includes(pattern);
+			const regex = new RegExp(pattern);
+			return regex.test(input);
 		}
 		return pattern.test(input);
 	});

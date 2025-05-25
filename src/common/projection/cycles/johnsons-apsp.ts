@@ -115,7 +115,7 @@ export class JohnsonsAPSP {
 				}
 			});
 		if (this.start) {
-			// Add null check
+			// Add null check.
 			cycleEdges[cycleEdges.length - 1].to = this.start.node;
 		}
 

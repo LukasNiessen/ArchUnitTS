@@ -1,1 +1,1 @@
-import "@components/ATest/ATest"
+import '@components/ATest/ATest';

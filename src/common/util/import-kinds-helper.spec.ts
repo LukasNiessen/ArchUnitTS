@@ -1,6 +1,6 @@
 import ts from 'typescript';
-import { ImportKind } from '../extraction/graph';
 import { determineImportKinds } from './import-kinds-helper';
+import { ImportKind } from './import-kinds';
 
 describe('determineImportKinds', () => {
 	// Helper function to create AST from source code

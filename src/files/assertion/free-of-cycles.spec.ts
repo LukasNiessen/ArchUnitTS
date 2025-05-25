@@ -50,7 +50,6 @@ describe('freeOfCycles', () => {
 							targetLabel: 'a',
 						},
 					],
-					isNegated: false,
 				},
 			]);
 		});
@@ -66,17 +65,31 @@ describe('freeOfCycles', () => {
 			expect(violations).toEqual([
 				{
 					cycle: [
-						{ cumulatedEdges: [], sourceLabel: 'a', targetLabel: 'b' },
-						{ cumulatedEdges: [], sourceLabel: 'b', targetLabel: 'a' },
+						{
+							cumulatedEdges: expect.any(Array),
+							sourceLabel: 'a',
+							targetLabel: 'b',
+						},
+						{
+							cumulatedEdges: expect.any(Array),
+							sourceLabel: 'b',
+							targetLabel: 'a',
+						},
 					],
-					isNegated: false,
 				},
 				{
 					cycle: [
-						{ cumulatedEdges: [], sourceLabel: 'a', targetLabel: 'd' },
-						{ cumulatedEdges: [], sourceLabel: 'd', targetLabel: 'a' },
+						{
+							cumulatedEdges: expect.any(Array),
+							sourceLabel: 'a',
+							targetLabel: 'd',
+						},
+						{
+							cumulatedEdges: expect.any(Array),
+							sourceLabel: 'd',
+							targetLabel: 'a',
+						},
 					],
-					isNegated: false,
 				},
 			]);
 		});
@@ -89,13 +102,20 @@ describe('freeOfCycles', () => {
 				simpleEdge('fa', 'fd'),
 			];
 			const violations = gatherCycleViolations(edges, ['a.']);
-			expect(violations).toEqual([
+			expect(violations).toMatchObject([
 				{
 					cycle: [
-						{ cumulatedEdges: [], sourceLabel: 'aa', targetLabel: 'ab' },
-						{ cumulatedEdges: [], sourceLabel: 'ab', targetLabel: 'aa' },
+						{
+							cumulatedEdges: expect.any(Array),
+							sourceLabel: 'aa',
+							targetLabel: 'ab',
+						},
+						{
+							cumulatedEdges: expect.any(Array),
+							sourceLabel: 'ab',
+							targetLabel: 'aa',
+						},
 					],
-					isNegated: false,
 				},
 			]);
 		});

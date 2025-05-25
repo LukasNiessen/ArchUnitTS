@@ -3,7 +3,7 @@ import path from 'path';
 import { parse } from 'plantuml-parser';
 import { extractGraph } from '../../../src/common/extraction/extract-graph';
 import { extractNxGraph } from '../../../src/common/extraction/extract-nx-graph';
-import { Graph, ImportKind } from '../../../src/common/extraction/graph';
+import { Graph } from '../../../src/common/extraction/graph';
 import { projectEdges } from '../../../src/common/projection/project-edges';
 import { gatherPositiveViolations } from '../../../src/slices/assertion/admissible-edges';
 import { slicesOfNxProject, slicesOfProject } from '../../../src/slices/fluentapi/slices';
@@ -68,7 +68,7 @@ describe('Integration test', () => {
 					targetLabel: 'one',
 				},
 				rule: null,
-				isNegated: true,
+				isNegated: false,
 			},
 		]);
 	});
@@ -91,6 +91,7 @@ describe('Integration test', () => {
 
 		expect(violations).toContainEqual({
 			rule: null,
+			isNegated: false,
 			projectedEdge: {
 				sourceLabel: 'services',
 				targetLabel: 'controllers',
@@ -99,6 +100,7 @@ describe('Integration test', () => {
 						source: 'src/services/util/service.ts',
 						target: 'src/controllers/controller.ts',
 						external: false,
+						importKinds: [],
 					},
 				],
 			},
@@ -118,6 +120,7 @@ describe('Integration test', () => {
 
 		expect(violations).toContainEqual({
 			rule: null,
+			isNegated: false,
 			projectedEdge: {
 				sourceLabel: 'services',
 				targetLabel: 'controllers',
@@ -126,6 +129,7 @@ describe('Integration test', () => {
 						source: 'src/services/util/service.ts',
 						target: 'src/controllers/controller.ts',
 						external: false,
+						importKinds: [],
 					},
 				],
 			},
@@ -158,9 +162,7 @@ describe('Integration test', () => {
             `;
 
 		const parsedExpected = parse(expectedDiagram);
-
-		// Test for equivalence of diagrams by comparing components and connections
-		expect(areDiagramsEquivalent(parsedActual, parsedExpected)).toBe(true);
+		expect(parsedActual).toEqual(parsedExpected);
 	});
 
 	it('exports the architecture by folders', async () => {
@@ -184,9 +186,7 @@ describe('Integration test', () => {
             `;
 
 		const parsedExpected = parse(expectedDiagram);
-
-		// Test for equivalence of diagrams by comparing components and connections
-		expect(areDiagramsEquivalent(parsedActual, parsedExpected)).toBe(true);
+		expect(parsedActual).toEqual(parsedExpected);
 	});
 
 	it('finds not adherent parts in nx projects', async () => {
@@ -207,6 +207,7 @@ describe('Integration test', () => {
 			.check();
 
 		expect(violations).toContainEqual({
+			isNegated: false,
 			rule: null,
 			projectedEdge: {
 				sourceLabel: 'is-even',
@@ -215,6 +216,7 @@ describe('Integration test', () => {
 					{
 						source: 'is-even',
 						target: 'is-odd',
+						importKinds: [],
 						external: false,
 					},
 				],
@@ -355,54 +357,3 @@ const getExampleProjectGraph = (): Graph => [
 		importKinds: [],
 	},
 ];
-
-/**
- * Compares two PlantUML diagrams for equivalence based on components and their connections
- *
- * @param actual The actual diagram parsed by PlantUML parser
- * @param expected The expected diagram parsed by PlantUML parser
- * @returns True if the diagrams are equivalent, false otherwise
- */
-function areDiagramsEquivalent(actual: any, expected: any): boolean {
-	// Check if the diagrams are valid
-	if (!actual || !expected || !actual.elements || !expected.elements) return false;
-
-	const actualComponents = actual.elements.filter((el: any) => el.kind === 'component');
-	const expectedComponents = expected.elements.filter(
-		(el: any) => el.kind === 'component'
-	);
-
-	if (actualComponents.length !== expectedComponents.length) return false;
-
-	// Check if all components exist in both diagrams
-	const actualComponentNames = new Set(actualComponents.map((c: any) => c.name));
-	const expectedComponentNames = new Set(expectedComponents.map((c: any) => c.name));
-
-	// Verify component sets are identical
-	if (actualComponentNames.size !== expectedComponentNames.size) return false;
-	for (const name of actualComponentNames) {
-		if (!expectedComponentNames.has(name)) return false;
-	}
-
-	// Check if connections match
-	const actualRelations = actual.elements.filter((el: any) => el.kind === 'relation');
-	const expectedRelations = expected.elements.filter(
-		(el: any) => el.kind === 'relation'
-	);
-
-	if (actualRelations.length !== expectedRelations.length) return false;
-
-	// Create a map of relationships by source and target to compare
-	const relationToString = (rel: any) =>
-		`${rel.from}-${rel.to}-${rel.style || 'default'}`;
-
-	const actualRelMap = new Set(actualRelations.map(relationToString));
-	const expectedRelMap = new Set(expectedRelations.map(relationToString));
-
-	if (actualRelMap.size !== expectedRelMap.size) return false;
-	for (const rel of actualRelMap) {
-		if (!expectedRelMap.has(rel)) return false;
-	}
-
-	return true;
-}

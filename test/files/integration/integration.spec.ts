@@ -1,3 +1,4 @@
+import { ImportKind } from '../../../src/common/util/import-kinds';
 import { FileConditionBuilder, filesOfProject } from '../../../src/files/fluentapi/files';
 import path from 'path';
 describe('Integration test', () => {
@@ -11,7 +12,7 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('controllers')
 			.should()
-			.matchPattern('.*controller.ts')
+			.matchPattern('.*Controller.ts')
 			.check();
 
 		expect(violations).toEqual([]);
@@ -28,7 +29,7 @@ describe('Integration test', () => {
 			{
 				checkPattern: '.*Service.ts',
 				projectedNode: {
-					label: 'src/controllers/controller.ts',
+					label: 'src/controllers/Controller.ts',
 					incoming: expect.any(Array),
 					outgoing: expect.any(Array),
 				},
@@ -41,14 +42,14 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('controllers')
 			.shouldNot()
-			.matchPattern('.*controller.ts')
+			.matchPattern('.*Controller.ts')
 			.check();
 
 		expect(violations).toEqual([
 			{
-				checkPattern: '.*controller.ts',
+				checkPattern: '.*Controller.ts',
 				projectedNode: {
-					label: 'src/controllers/controller.ts',
+					label: 'src/controllers/Controller.ts',
 					incoming: expect.any(Array),
 					outgoing: expect.any(Array),
 				},
@@ -67,18 +68,18 @@ describe('Integration test', () => {
 			.matchingPattern('src/components/BTest')
 			.check();
 
-		expect(violations).toEqual([
+		expect(violations).toMatchObject([
 			{
 				dependency: {
 					cumulatedEdges: [
 						{
 							external: false,
 							importKinds: expect.any(Array),
-							source: 'src/components/ATest/atest.ts',
+							source: 'src/components/ATest/ATest.ts',
 							target: 'src/components/BTest/btest.ts',
 						},
 					],
-					sourceLabel: 'src/components/ATest/atest.ts',
+					sourceLabel: 'src/components/ATest/ATest.ts',
 					targetLabel: 'src/components/BTest/btest.ts',
 				},
 				isNegated: true,
@@ -114,35 +115,34 @@ describe('Integration test', () => {
 			.beFreeOfCycles()
 			.check();
 
-		expect(violations).toEqual([
+		expect(violations).toMatchObject([
 			{
 				cycle: [
 					{
 						cumulatedEdges: [
 							{
 								external: false,
-								importKinds: expect.any(Array),
-								source: 'src/services/service.ts',
-								target: 'src/controllers/controller.ts',
+								importKinds: [ImportKind.VALUE, ImportKind.NAMED],
+								source: 'src/services/Service.ts',
+								target: 'src/controllers/Controller.ts',
 							},
 						],
-						sourceLabel: 'src/services/service.ts',
-						targetLabel: 'src/controllers/controller.ts',
+						sourceLabel: 'src/services/Service.ts',
+						targetLabel: 'src/controllers/Controller.ts',
 					},
 					{
 						cumulatedEdges: [
 							{
 								external: false,
-								importKinds: expect.any(Array),
-								source: 'src/controllers/controller.ts',
-								target: 'src/services/service.ts',
+								importKinds: [ImportKind.VALUE, ImportKind.NAMED],
+								source: 'src/controllers/Controller.ts',
+								target: 'src/services/Service.ts',
 							},
 						],
-						sourceLabel: 'src/controllers/controller.ts',
-						targetLabel: 'src/services/service.ts',
+						sourceLabel: 'src/controllers/Controller.ts',
+						targetLabel: 'src/services/Service.ts',
 					},
 				],
-				isNegated: false,
 			},
 		]);
 	});

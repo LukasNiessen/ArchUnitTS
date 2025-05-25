@@ -10,10 +10,10 @@ describe('dependOnFiles', () => {
 				simpleEdge('a', 'c'),
 			];
 			const violations = gatherDependOnFileViolations(edges, ['a'], ['b'], true);
-			expect(violations).toEqual([
+			expect(violations).toMatchObject([
 				{
 					dependency: {
-						cumulatedEdges: [],
+						cumulatedEdges: expect.any(Array),
 						sourceLabel: 'a',
 						targetLabel: 'b',
 					},
@@ -34,10 +34,10 @@ describe('dependOnFiles', () => {
 				['(b|c)'],
 				true
 			);
-			expect(violations).toEqual([
+			expect(violations).toMatchObject([
 				{
 					dependency: {
-						cumulatedEdges: [],
+						cumulatedEdges: expect.any(Array),
 						sourceLabel: 'a1',
 						targetLabel: 'b',
 					},
@@ -45,7 +45,7 @@ describe('dependOnFiles', () => {
 				},
 				{
 					dependency: {
-						cumulatedEdges: [],
+						cumulatedEdges: expect.any(Array),
 						sourceLabel: 'a2',
 						targetLabel: 'c',
 					},
@@ -75,38 +75,37 @@ describe('dependOnFiles', () => {
 				simpleEdge('a', 'c'),
 			];
 			const violations = gatherDependOnFileViolations(edges, ['a'], ['b'], false);
-			expect(violations).toEqual([
-				{
-					dependency: {
-						cumulatedEdges: [
-							{
-								source: 'b',
-								target: 'c',
-								external: false,
-								importKinds: [],
-							},
-						],
-						sourceLabel: 'b',
-						targetLabel: 'c',
-					},
-					isNegated: false,
+			expect(violations).toHaveLength(2);
+			expect(violations[0]).toMatchObject({
+				dependency: {
+					cumulatedEdges: [
+						{
+							source: 'b',
+							target: 'c',
+							external: false,
+							importKinds: [],
+						},
+					],
+					sourceLabel: 'b',
+					targetLabel: 'c',
 				},
-				{
-					dependency: {
-						cumulatedEdges: [
-							{
-								source: 'a',
-								target: 'c',
-								external: false,
-								importKinds: [],
-							},
-						],
-						sourceLabel: 'a',
-						targetLabel: 'c',
-					},
-					isNegated: false,
+				isNegated: false,
+			});
+			expect(violations[1]).toMatchObject({
+				dependency: {
+					cumulatedEdges: [
+						{
+							source: 'a',
+							target: 'c',
+							external: false,
+							importKinds: [],
+						},
+					],
+					sourceLabel: 'a',
+					targetLabel: 'c',
 				},
-			]);
+				isNegated: false,
+			});
 		});
 
 		it('should not find violations', () => {

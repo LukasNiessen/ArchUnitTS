@@ -1,2 +1,2 @@
-import '../controllers/controller';
+import '../controllers/Controller';
 import './SomeController';

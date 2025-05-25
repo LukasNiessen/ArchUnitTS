@@ -175,7 +175,10 @@ export class CycleFreeFileCondition implements Checkable {
 				.tsConfigFilePath
 		);
 
+		//console.log('XXX projEdges:', graph);
 		const projectedEdges = projectEdges(graph, perInternalEdge());
+
+		//console.log('XXX projEdges:', projectedEdges);
 
 		return gatherCycleViolations(
 			projectedEdges,

@@ -62,7 +62,7 @@ export const gatherPositiveViolations = (
 			);
 		});
 		if (match === undefined) {
-			violatingEdges.push(new ViolatingEdge(null, edge, true));
+			violatingEdges.push(new ViolatingEdge(null, edge, false));
 		}
 	}
 	return violatingEdges;
