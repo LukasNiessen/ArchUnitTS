@@ -4,7 +4,7 @@
 
 💚 As of 2025, it's the #1 architecture testing library for TS and JS, measured by GitHub stars.
 
-⚠️ The library and its name are directly inspired by ArchUnit. However, **we are in no way affiliated with ArchUnit or their team.**
+⚠️ The library and its name are directly inspired by the amazing ArchUnit library. However, **we are in no way affiliated with ArchUnit or their team.**
 
 Some of the functionality:
 
