@@ -90,7 +90,8 @@ export const checkCoherence = (
 	options: CoherenceOptions = {}
 ): ViolatingEdge[] => {
 	const violations: ViolatingEdge[] = [];
-	const { ignoreOrphans = false, ignoreExternal = true } = options;
+
+	//const { ignoreOrphans = false, ignoreExternal = true } = options;
 
 	// Create a map of all allowed source -> target connections
 	const allowedConnections = new Map<string, string[]>();

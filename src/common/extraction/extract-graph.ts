@@ -112,9 +112,7 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 					return;
 				}
 
-				const resolver = new ImportPathsResolver(
-					(parsedConfig as any).compilerOptions
-				);
+				const resolver = new ImportPathsResolver(parsedConfig.compilerOptions);
 
 				const suggestion = resolver.getImportSuggestions(
 					module,

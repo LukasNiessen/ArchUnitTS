@@ -1,4 +1,4 @@
-name: Build
+name: Integrate
 on:
     - push
     - pull_request
