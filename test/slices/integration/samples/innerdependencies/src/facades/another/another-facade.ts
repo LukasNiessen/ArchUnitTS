@@ -1,1 +1,1 @@
-import "../one/one-facade"
+import '../one/one-facade';

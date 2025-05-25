@@ -1,1 +1,1 @@
-import "../services/service"
+import '../services/service';

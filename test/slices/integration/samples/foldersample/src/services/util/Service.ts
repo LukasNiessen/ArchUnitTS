@@ -1,1 +1,1 @@
-import "../../controllers/controller"
+import '../../controllers/controller';

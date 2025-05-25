@@ -1,1 +1,1 @@
-import "../domain2/domain-service"
+import '../domain2/domain-service';
