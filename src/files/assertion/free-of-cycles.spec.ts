@@ -13,35 +13,41 @@ describe('freeOfCycles', () => {
 			expect(violations).toEqual([
 				{
 					cycle: [
-						{ 
-							cumulatedEdges: [{
-								source: 'a',
-								target: 'b',
-								external: false,
-								importKinds: []
-							}], 
-							sourceLabel: 'a', 
-							targetLabel: 'b' 
+						{
+							cumulatedEdges: [
+								{
+									source: 'a',
+									target: 'b',
+									external: false,
+									importKinds: [],
+								},
+							],
+							sourceLabel: 'a',
+							targetLabel: 'b',
 						},
-						{ 
-							cumulatedEdges: [{
-								source: 'b',
-								target: 'c',
-								external: false,
-								importKinds: []
-							}], 
-							sourceLabel: 'b', 
-							targetLabel: 'c' 
+						{
+							cumulatedEdges: [
+								{
+									source: 'b',
+									target: 'c',
+									external: false,
+									importKinds: [],
+								},
+							],
+							sourceLabel: 'b',
+							targetLabel: 'c',
 						},
-						{ 
-							cumulatedEdges: [{
-								source: 'c',
-								target: 'a',
-								external: false,
-								importKinds: []
-							}], 
-							sourceLabel: 'c', 
-							targetLabel: 'a' 
+						{
+							cumulatedEdges: [
+								{
+									source: 'c',
+									target: 'a',
+									external: false,
+									importKinds: [],
+								},
+							],
+							sourceLabel: 'c',
+							targetLabel: 'a',
 						},
 					],
 					isNegated: false,
@@ -96,15 +102,17 @@ describe('freeOfCycles', () => {
 	});
 
 	function simpleEdge(from: string, to: string): ProjectedEdge {
-		return { 
-			sourceLabel: from, 
-			targetLabel: to, 
-			cumulatedEdges: [{
-				source: from,
-				target: to,
-				external: false,
-				importKinds: []
-			}] 
+		return {
+			sourceLabel: from,
+			targetLabel: to,
+			cumulatedEdges: [
+				{
+					source: from,
+					target: to,
+					external: false,
+					importKinds: [],
+				},
+			],
 		};
 	}
 });

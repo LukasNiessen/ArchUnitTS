@@ -27,10 +27,10 @@ describe('Integration test', () => {
 		expect(violations).toEqual([
 			{
 				checkPattern: '.*Service.ts',
-				projectedNode: { 
+				projectedNode: {
 					label: 'src/controllers/controller.ts',
 					incoming: expect.any(Array),
-					outgoing: expect.any(Array) 
+					outgoing: expect.any(Array),
 				},
 				isNegated: false,
 			},
@@ -47,10 +47,10 @@ describe('Integration test', () => {
 		expect(violations).toEqual([
 			{
 				checkPattern: '.*controller.ts',
-				projectedNode: { 
+				projectedNode: {
 					label: 'src/controllers/controller.ts',
 					incoming: expect.any(Array),
-					outgoing: expect.any(Array)
+					outgoing: expect.any(Array),
 				},
 				isNegated: true,
 			},

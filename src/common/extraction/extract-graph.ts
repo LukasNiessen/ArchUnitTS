@@ -5,7 +5,7 @@ import { Edge } from './graph';
 import { TechnicalError } from '../error/errors';
 import { normalizeWindowsPaths } from '../util/path-utils';
 import { ImportPathsResolver } from '@zerollup/ts-helpers';
-import { determineImportKinds } from './import-kinds-helper';
+import { determineImportKinds } from '../util/import-kinds-helper';
 
 export const guessLocationOfTsconfig = (): string | undefined => {
 	return guessLocationOfTsconfigRecursively('.');

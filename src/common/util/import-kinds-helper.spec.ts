@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { ImportKind } from './graph';
+import { ImportKind } from '../extraction/graph';
 import { determineImportKinds } from './import-kinds-helper';
 
 describe('determineImportKinds', () => {
