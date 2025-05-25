@@ -1,6 +1,6 @@
 # ArchUnitTS
 
-ArchUnitTS is a library for ensuring software architecture rules in TypeScript & JavaScript projects. It's directly inspired by ArchUnit (Java). As of 2025, ArchUnitTS is the #1 software architecture testing library for TypeScript, measured by GitHub stars.
+ArchUnitTS is a library for ensuring software architecture rules in TypeScript & JavaScript projects. It's directly inspired by ArchUnit (but not affiliated with). As of 2025, ArchUnitTS is the #1 software architecture testing library for TypeScript, measured by GitHub stars.
 
 Some of the functionality:
 
