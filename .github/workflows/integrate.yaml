@@ -6,7 +6,7 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: true
 jobs:
-    build:
+    integrate:
         runs-on: ubuntu-latest
         steps:
             - name: Set up Node.js

@@ -6,7 +6,10 @@ interface BlockedBy {
 	by: NumberNode;
 }
 
-// Check https://www.youtube.com/watch?v=johyrWospv0
+/**
+ * See:
+ * https://www.youtube.com/watch?v=johyrWospv0
+ */
 export class JohnsonsAPSP {
 	private blocked: NumberNode[] = [];
 	private stack: NumberNode[] = [];
