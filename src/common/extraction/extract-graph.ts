@@ -1,7 +1,7 @@
 import ts, { CompilerHost, TypeAcquisition, CompilerOptions } from 'typescript';
 import fs from 'fs';
 import path from 'path';
-import { Edge, ImportKind } from './graph';
+import { Edge } from './graph';
 import { TechnicalError } from '../error/errors';
 import { normalizeWindowsPaths } from '../util/path-utils';
 import { ImportPathsResolver } from '@zerollup/ts-helpers';

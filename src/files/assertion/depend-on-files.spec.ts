@@ -7,7 +7,7 @@ describe("dependOnFiles", () => {
       const edges = [simpleEdge("a", "b"), simpleEdge("b", "c"), simpleEdge("a", "c")]
       const violations = gatherDependOnFileViolations(edges, ["a"], ["b"], true)
       expect(violations).toEqual([
-        { dependency: { cumulatedEdges: [], sourceLabel: "a", targetLabel: "b" } }
+        { dependency: { cumulatedEdges: [], sourceLabel: "a", targetLabel: "b" }, isNegated: true }
       ])
     })
 
@@ -15,8 +15,8 @@ describe("dependOnFiles", () => {
       const edges = [simpleEdge("a1", "b"), simpleEdge("a2", "c"), simpleEdge("b", "c")]
       const violations = gatherDependOnFileViolations(edges, ["a."], ["(b|c)"], true)
       expect(violations).toEqual([
-        { dependency: { cumulatedEdges: [], sourceLabel: "a1", targetLabel: "b" } },
-        { dependency: { cumulatedEdges: [], sourceLabel: "a2", targetLabel: "c" } }
+        { dependency: { cumulatedEdges: [], sourceLabel: "a1", targetLabel: "b" }, isNegated: true },
+        { dependency: { cumulatedEdges: [], sourceLabel: "a2", targetLabel: "c" }, isNegated: true }
       ])
     })
 
@@ -38,8 +38,30 @@ describe("dependOnFiles", () => {
       const edges = [simpleEdge("a", "b"), simpleEdge("b", "c"), simpleEdge("a", "c")]
       const violations = gatherDependOnFileViolations(edges, ["a"], ["b"], false)
       expect(violations).toEqual([
-        { dependency: { cumulatedEdges: [], sourceLabel: "b", targetLabel: "c" } },
-        { dependency: { cumulatedEdges: [], sourceLabel: "a", targetLabel: "c" } }
+        { dependency: { 
+            cumulatedEdges: [{
+              source: "b",
+              target: "c",
+              external: false,
+              importKinds: []
+            }], 
+            sourceLabel: "b", 
+            targetLabel: "c" 
+          }, 
+          isNegated: false 
+        },
+        { dependency: { 
+            cumulatedEdges: [{
+              source: "a",
+              target: "c",
+              external: false,
+              importKinds: []
+            }], 
+            sourceLabel: "a", 
+            targetLabel: "c" 
+          }, 
+          isNegated: false 
+        }
       ])
     })
 
@@ -51,6 +73,15 @@ describe("dependOnFiles", () => {
   })
 
   function simpleEdge(from: string, to: string): ProjectedEdge {
-    return { sourceLabel: from, targetLabel: to, cumulatedEdges: [] }
+    return { 
+      sourceLabel: from, 
+      targetLabel: to, 
+      cumulatedEdges: [{
+        source: from,
+        target: to,
+        external: false,
+        importKinds: []
+      }] 
+    }
   }
 })

@@ -76,7 +76,7 @@ export interface CoherenceOptions {
 /**
  * Checks for complete coherence in the architecture, ensuring all nodes are properly connected
  * according to the defined rules.
- * 
+ *
  * @param graph The projected graph to check
  * @param allowed List of allowed rules
  * @param nodes List of nodes that should be checked for coherence
@@ -91,32 +91,34 @@ export const checkCoherence = (
 ): ViolatingEdge[] => {
 	const violations: ViolatingEdge[] = [];
 	const { ignoreOrphans = false, ignoreExternal = true } = options;
-	
+
 	// Create a map of all allowed source -> target connections
 	const allowedConnections = new Map<string, string[]>();
-	
+
 	for (const rule of allowed) {
 		if (!allowedConnections.has(rule.source)) {
 			allowedConnections.set(rule.source, []);
 		}
 		allowedConnections.get(rule.source)?.push(rule.target);
 	}
-	
+
 	// Check for nodes that should have connections but don't
 	for (const node of nodes) {
 		// Skip if this node doesn't have any defined rules
 		if (!allowedConnections.has(node)) {
 			continue;
 		}
-		
+
 		// Get actual edges for this node
-		const nodeEdges = graph.filter(edge => edge.sourceLabel === node);
-		
+		const nodeEdges = graph.filter((edge) => edge.sourceLabel === node);
+
 		// Check that each allowed target is actually connected
 		const expectedTargets = allowedConnections.get(node) || [];
 		for (const expectedTarget of expectedTargets) {
-			const hasConnection = nodeEdges.some(edge => edge.targetLabel === expectedTarget);
-			
+			const hasConnection = nodeEdges.some(
+				(edge) => edge.targetLabel === expectedTarget
+			);
+
 			if (!hasConnection) {
 				// This is a coherence violation - missing a required connection
 				violations.push(
@@ -125,17 +127,17 @@ export const checkCoherence = (
 						{
 							sourceLabel: node,
 							targetLabel: expectedTarget,
-							cumulatedEdges: []
+							cumulatedEdges: [],
 						},
 						true
 					)
 				);
 			}
 		}
-		
+
 		// Check for orphaned nodes (no incoming or outgoing edges) if not ignoring orphans
 		if (!ignoreOrphans && nodeEdges.length === 0) {
-			const incomingEdges = graph.filter(edge => edge.targetLabel === node);
+			const incomingEdges = graph.filter((edge) => edge.targetLabel === node);
 			if (incomingEdges.length === 0) {
 				// This node is completely orphaned - no connections at all
 				violations.push(
@@ -144,7 +146,7 @@ export const checkCoherence = (
 						{
 							sourceLabel: node,
 							targetLabel: node, // Self-reference to indicate orphan
-							cumulatedEdges: []
+							cumulatedEdges: [],
 						},
 						true
 					)
@@ -152,6 +154,6 @@ export const checkCoherence = (
 			}
 		}
 	}
-	
+
 	return violations;
-}
+};

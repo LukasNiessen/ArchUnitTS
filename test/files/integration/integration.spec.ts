@@ -27,7 +27,12 @@ describe('Integration test', () => {
 		expect(violations).toEqual([
 			{
 				checkPattern: '.*Service.ts',
-				projectedNode: { label: 'src/controllers/controller.ts' },
+				projectedNode: { 
+					label: 'src/controllers/controller.ts',
+					incoming: expect.any(Array),
+					outgoing: expect.any(Array) 
+				},
+				isNegated: false,
 			},
 		]);
 	});
@@ -42,7 +47,12 @@ describe('Integration test', () => {
 		expect(violations).toEqual([
 			{
 				checkPattern: '.*controller.ts',
-				projectedNode: { label: 'src/controllers/controller.ts' },
+				projectedNode: { 
+					label: 'src/controllers/controller.ts',
+					incoming: expect.any(Array),
+					outgoing: expect.any(Array)
+				},
+				isNegated: true,
 			},
 		]);
 	});
@@ -63,6 +73,7 @@ describe('Integration test', () => {
 					cumulatedEdges: [
 						{
 							external: false,
+							importKinds: expect.any(Array),
 							source: 'src/components/ATest/atest.ts',
 							target: 'src/components/BTest/btest.ts',
 						},
@@ -70,6 +81,7 @@ describe('Integration test', () => {
 					sourceLabel: 'src/components/ATest/atest.ts',
 					targetLabel: 'src/components/BTest/btest.ts',
 				},
+				isNegated: true,
 			},
 		]);
 	});
@@ -109,6 +121,7 @@ describe('Integration test', () => {
 						cumulatedEdges: [
 							{
 								external: false,
+								importKinds: expect.any(Array),
 								source: 'src/services/service.ts',
 								target: 'src/controllers/controller.ts',
 							},
@@ -120,6 +133,7 @@ describe('Integration test', () => {
 						cumulatedEdges: [
 							{
 								external: false,
+								importKinds: expect.any(Array),
 								source: 'src/controllers/controller.ts',
 								target: 'src/services/service.ts',
 							},
@@ -128,6 +142,7 @@ describe('Integration test', () => {
 						targetLabel: 'src/services/service.ts',
 					},
 				],
+				isNegated: false,
 			},
 		]);
 	});

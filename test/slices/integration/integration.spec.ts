@@ -35,10 +35,12 @@ describe('Integration test', () => {
 						source: 'src/services/util/service.ts',
 						target: 'src/controllers/controller.ts',
 						external: false,
+						importKinds: expect.any(Array),
 					},
 				],
 			},
 			rule: { source: 'services', target: 'controllers' },
+			isNegated: false,
 		});
 	});
 
@@ -57,6 +59,7 @@ describe('Integration test', () => {
 					cumulatedEdges: [
 						{
 							external: false,
+							importKinds: expect.any(Array),
 							source: 'src/facades/another/another-facade.ts',
 							target: 'src/facades/one/one-facade.ts',
 						},
@@ -65,6 +68,7 @@ describe('Integration test', () => {
 					targetLabel: 'one',
 				},
 				rule: null,
+				isNegated: true,
 			},
 		]);
 	});
@@ -360,8 +364,8 @@ const getExampleProjectGraph = (): Graph => [
  * @returns True if the diagrams are equivalent, false otherwise
  */
 function areDiagramsEquivalent(actual: any, expected: any): boolean {
-	// Check if the component counts match
-	if (!actual || !expected) return false;
+	// Check if the diagrams are valid
+	if (!actual || !expected || !actual.elements || !expected.elements) return false;
 
 	const actualComponents = actual.elements.filter((el: any) => el.kind === 'component');
 	const expectedComponents = expected.elements.filter(

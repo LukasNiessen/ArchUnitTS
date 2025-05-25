@@ -45,6 +45,7 @@ const mapToGraph = (nodes: Nodes): Graph => {
 			source: edge.source,
 			target: edge.target,
 			external: edge.target.startsWith('npm:'),
+			importKinds: [], // TODO
 		}))
 	);
 };

@@ -19,8 +19,8 @@ describe("matchingFiles", () => {
       const edges = [node("good/a"), node("good/b"), node("good/c")]
       const violations = gatherRegexMatchingViolations(edges, "b", ["good"], false)
       expect(violations).toEqual([
-        { checkPattern: "b", projectedNode: { label: "good/a" } },
-        { checkPattern: "b", projectedNode: { label: "good/c" } }
+        { checkPattern: "b", projectedNode: { label: "good/a", incoming: [], outgoing: [] }, isNegated: false },
+        { checkPattern: "b", projectedNode: { label: "good/c", incoming: [], outgoing: [] }, isNegated: false }
       ])
     })
   })
@@ -36,20 +36,20 @@ describe("matchingFiles", () => {
       const edges = [node("good/az"), node("good/bz"), node("good/cz")]
       const violations = gatherRegexMatchingViolations(edges, "z", ["good"], true)
       expect(violations).toEqual([
-        { checkPattern: "z", projectedNode: { label: "good/az" } },
-        { checkPattern: "z", projectedNode: { label: "good/bz" } },
-        { checkPattern: "z", projectedNode: { label: "good/cz" } }
+        { checkPattern: "z", projectedNode: { label: "good/az", incoming: [], outgoing: [] }, isNegated: true },
+        { checkPattern: "z", projectedNode: { label: "good/bz", incoming: [], outgoing: [] }, isNegated: true },
+        { checkPattern: "z", projectedNode: { label: "good/cz", incoming: [], outgoing: [] }, isNegated: true }
       ])
     })
 
     it("should find violations because one edge is matching check pattern", () => {
       const edges = [node("good/a"), node("good/b"), node("good/c")]
       const violations = gatherRegexMatchingViolations(edges, "b", ["good"], true)
-      expect(violations).toEqual([{ checkPattern: "b", projectedNode: { label: "good/b" } }])
+      expect(violations).toEqual([{ checkPattern: "b", projectedNode: { label: "good/b", incoming: [], outgoing: [] }, isNegated: true }])
     })
   })
 
   function node(label: string): ProjectedNode {
-    return { label: label }
+    return { label: label, incoming: [], outgoing: [] }
   }
 })

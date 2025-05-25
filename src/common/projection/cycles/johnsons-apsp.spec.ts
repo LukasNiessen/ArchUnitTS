@@ -1,100 +1,35 @@
 import { JohnsonsAPSP } from './johnsons-apsp';
 
 describe('Johnsons All Pairs Shortest Paths Algorithm', () => {
+	/*
 	function expectArrayElementsToBeEqual(arr1: any[], arr2: any[]) {
 		arr2.forEach((x: any) => expect(arr1).toContainEqual(x));
 		arr1.forEach((x: any) => expect(arr2).toContainEqual(x));
 		expect(arr1.length).toBe(arr2.length);
 	}
+	*/
 
 	it.each`
 		edges
 		${[]}
-		${[
-	{ from: 0, to: 1 },
-	{ from: 1, to: 2 },
-]}
-		${[
-	{ from: 0, to: 1 },
-	{ from: 1, to: 2 },
-	{ from: 2, to: 3 },
-]}
-		${[
-	{ from: 0, to: 1 },
-	{ from: 2, to: 3 },
-]}
+		${[{ from: 0, to: 1 }, { from: 1, to: 2 }]}
+		${[{ from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }]}
+		${[{ from: 0, to: 1 }, { from: 2, to: 3 }]}
 	`('should detect no cycle', ({ edges }) => {
 		const johnson = new JohnsonsAPSP();
 		expect(johnson.findSimpleCycles(edges)).toEqual([]);
 	});
 
 	it.each`
-		edges | cycles
-		${[
-	{ from: 0, to: 1 },
-	{ from: 1, to: 0 },
-]} | ${[[
-		{ from: 0, to: 1 },
-		{ from: 1, to: 0 },
-	]]}
-		${[
-	{ from: 0, to: 1 },
-	{ from: 1, to: 0 },
-	{ from: 1, to: 2 },
-	{ from: 2, to: 0 },
-]} | ${[
-	[
-		{ from: 0, to: 1 },
-		{ from: 1, to: 0 },
-	],
-	[
-		{ from: 0, to: 1 },
-		{ from: 1, to: 2 },
-		{ from: 2, to: 0 },
-	],
-]}
-		${[
-	{ from: 0, to: 1 },
-	{ from: 1, to: 2 },
-	{ from: 2, to: 0 },
-]} | ${[[
-		{ from: 0, to: 1 },
-		{ from: 1, to: 2 },
-		{ from: 2, to: 0 },
-	]]}
-		${[
-	{ from: 1, to: 2 },
-	{ from: 1, to: 5 },
-	{ from: 2, to: 3 },
-	{ from: 3, to: 1 },
-	{ from: 3, to: 2 },
-	{ from: 3, to: 4 },
-	{ from: 3, to: 6 },
-	{ from: 4, to: 5 },
-	{ from: 5, to: 2 },
-	{ from: 6, to: 4 },
-]} | ${[
-	[
-		{ from: 1, to: 2 },
-		{ from: 2, to: 3 },
-		{ from: 3, to: 1 },
-	],
-	[
-		{ from: 1, to: 5 },
-		{ from: 5, to: 2 },
-		{ from: 2, to: 3 },
-		{ from: 3, to: 1 },
-	],
-	[
-		{ from: 2, to: 3 },
-		{ from: 3, to: 2 },
-	],
-	[
-		{ from: 2, to: 3 },
-		{ from: 3, to: 4 },
-		{ from: 4, to: 5 },
-		{ from: 5, to: 2 },
-	],
+		edges                                                                               | cycles
+		${[{ from: 0, to: 1 }, { from: 1, to: 0 }]}                                         | ${[[{ from: 0, to: 1 }, { from: 1, to: 0 }]]}
+		${[{ from: 0, to: 1 }, { from: 1, to: 0 }, { from: 1, to: 2 }, { from: 2, to: 0 }]} | ${[[{ from: 0, to: 1 }, { from: 1, to: 0 }], [{ from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 0 }]]}
+		${[{ from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 0 }]}                     | ${[[{ from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 0 }]]}
+		${[{ from: 1, to: 2 }, { from: 1, to: 5 }, { from: 2, to: 3 }, { from: 3, to: 1 }, { from: 3, to: 2 }, { from: 3, to: 4 }, { from: 3, to: 6 }, { from: 4, to: 5 }, { from: 5, to: 2 }, { from: 6, to: 4 }]} | ${[
+	[{ from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 1 }],
+	[{ from: 1, to: 5 }, { from: 5, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 1 }],
+	[{ from: 2, to: 3 }, { from: 3, to: 2 }],
+	[{ from: 2, to: 3 }, { from: 3, to: 4 }, { from: 4, to: 5 }, { from: 5, to: 2 }],
 	[
 		{ from: 2, to: 3 },
 		{ from: 3, to: 6 },

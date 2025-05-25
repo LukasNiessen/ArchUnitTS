@@ -2,8 +2,10 @@ export const matchingAllPatterns = (
 	input: string,
 	patterns: Array<string | RegExp>
 ): boolean => {
-	const matches = patterns
-		.map((pattern) => input.match(pattern))
-		.map((match) => match !== null && match.length > 0);
-	return matches.indexOf(false) === -1;
+	return patterns.every((pattern) => {
+		if (typeof pattern === 'string') {
+			return input.includes(pattern);
+		}
+		return pattern.test(input);
+	});
 };

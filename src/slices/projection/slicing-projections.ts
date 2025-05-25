@@ -1,5 +1,4 @@
 import { Edge } from '../../common/extraction/graph';
-import { safeArrayGet } from '../../common/util/array-utils';
 import { MapFunction, MappedEdge } from '../../common/projection/project-edges';
 
 export const identity = (): MapFunction => {
