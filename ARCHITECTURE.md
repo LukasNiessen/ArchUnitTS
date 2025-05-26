@@ -1,8 +1,6 @@
 # Architecture Notes
 
-We package by domain, similar to DDD in a braoder sense. Our domains are `extraction`, `projection`, `assertion` and `fluentapi`.
-
-The flow is `extraction -> projection -> assertion` and is coordinated by the `fluentapi`.
+We package by domain, similar to DDD in a braoder sense. The flow is `extraction -> projection -> assertion` and is coordinated by the `fluentapi`.
 
 Our domains include:
 

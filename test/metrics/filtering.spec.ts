@@ -1,4 +1,4 @@
-import { ClassInfo } from '../../src/metrics/extraction/extract-class-info';
+import { ClassInfo } from '../../src/metrics/common/interface';
 import {
 	FolderPathFilter,
 	SingleFileFilter,

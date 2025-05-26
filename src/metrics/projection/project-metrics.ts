@@ -1,25 +1,6 @@
-import { ClassInfo } from '../extraction/extract-class-info';
-import { LCOMMetric } from '../calculation/lcom';
+import { ClassFilter, ClassInfo, Metric } from '../extraction/interface';
+import { MetricComparison } from './types';
 import * as path from 'path';
-
-export type MetricComparison =
-	| 'below'
-	| 'above'
-	| 'equal'
-	| 'above-equal'
-	| 'below-equal';
-
-/**
- * Interface for filtering classes based on various criteria
- */
-export interface ClassFilter {
-	/**
-	 * Apply the filter to a list of classes
-	 * @param classes The classes to filter
-	 * @returns Filtered classes that match the criteria
-	 */
-	apply(classes: ClassInfo[]): ClassInfo[];
-}
 
 /**
  * Filter classes by folder path using regex patterns
@@ -160,7 +141,7 @@ export interface MetricResult {
  */
 export function projectToMetricResults<T extends ClassInfo>(
 	classes: T[],
-	metric: LCOMMetric,
+	metric: Metric,
 	threshold: number,
 	comparison: MetricComparison
 ): MetricResult[] {

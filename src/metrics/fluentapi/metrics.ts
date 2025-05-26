@@ -1,17 +1,27 @@
 import { Checkable } from '../../common/fluentapi/checkable';
 import { Violation } from '../../common/assertion/violation';
 import { extractClassInfo } from '../extraction/extract-class-info';
-import { LCOMMetric, LCOM96b, LCOM96a } from '../calculation/lcom';
+import {
+	LCOMMetric,
+	LCOM96b,
+	LCOM96a,
+	LCOM1,
+	LCOM2,
+	LCOM3,
+	LCOM4,
+	LCOM5,
+	LCOMStar,
+} from '../calculation/lcom';
 import { gatherMetricViolations } from '../assertion/metric-thresholds';
 import {
-	MetricComparison,
 	projectToMetricResults,
-	ClassFilter,
 	byFolderPath,
 	bySingleFile,
 	byClassName,
 	combineFilters,
 } from '../projection/project-metrics';
+import { ClassFilter, Metric } from '../extraction/interface';
+import { MetricComparison } from './types';
 
 /**
  * Entry point for code metrics analysis.
@@ -34,14 +44,6 @@ import {
  *   .lcom()
  *   .lcom96b()
  *   .shouldBeAbove(0.5)
- *   .check();
- *
- * // Check cohesion for classes matching a pattern
- * const violations = await metrics()
- *   .forClassesMatching(/.*Service$/)
- *   .lcom()
- *   .lcom96b()
- *   .shouldBeAbove(0.8)
  *   .check();
  * ```
  */
@@ -83,9 +85,11 @@ export class MetricsBuilder {
 		this.filters.push(byClassName(namePattern));
 		return this;
 	}
+
 	/**
 	 * Get the combined filter for all applied filters
-	 */ public getFilter(): ClassFilter | null {
+	 */
+	public getFilter(): ClassFilter | null {
 		if (this.filters.length === 0) {
 			return null;
 		}
@@ -113,10 +117,34 @@ export class LCOMMetricsBuilder {
 	public lcom96b(): LCOMThresholdBuilder {
 		return new LCOMThresholdBuilder(this.metricsBuilder, new LCOM96b());
 	}
+
+	public lcom1(): LCOMThresholdBuilder {
+		return new LCOMThresholdBuilder(this.metricsBuilder, new LCOM1());
+	}
+
+	public lcom2(): LCOMThresholdBuilder {
+		return new LCOMThresholdBuilder(this.metricsBuilder, new LCOM2());
+	}
+
+	public lcom3(): LCOMThresholdBuilder {
+		return new LCOMThresholdBuilder(this.metricsBuilder, new LCOM3());
+	}
+
+	public lcom4(): LCOMThresholdBuilder {
+		return new LCOMThresholdBuilder(this.metricsBuilder, new LCOM4());
+	}
+
+	public lcom5(): LCOMThresholdBuilder {
+		return new LCOMThresholdBuilder(this.metricsBuilder, new LCOM5());
+	}
+
+	public lcomstar(): LCOMThresholdBuilder {
+		return new LCOMThresholdBuilder(this.metricsBuilder, new LCOMStar());
+	}
 }
 
 /**
- * Builder for configuring metric thresholds
+ * Builder for configuring LCOM metric thresholds
  */
 export class LCOMThresholdBuilder {
 	constructor(
@@ -176,13 +204,15 @@ export class LCOMThresholdBuilder {
 export class MetricCondition implements Checkable {
 	constructor(
 		readonly metricsBuilder: MetricsBuilder,
-		readonly metric: LCOMMetric,
+		readonly metric: Metric,
 		readonly threshold: number,
 		readonly comparison: MetricComparison
 	) {}
+
 	/**
 	 * Check if classes violate the metric condition
-	 */ public async check(): Promise<Violation[]> {
+	 */
+	public async check(): Promise<Violation[]> {
 		// Extract class information from the codebase
 		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
 

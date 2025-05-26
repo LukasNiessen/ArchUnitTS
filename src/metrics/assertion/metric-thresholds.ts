@@ -1,5 +1,6 @@
 import { Violation } from '../../common/assertion/violation';
-import { MetricComparison, MetricResult } from '../projection/project-metrics';
+import { MetricComparison } from './types';
+import { MetricResult } from '../projection/project-metrics';
 
 /**
  * Represents a class that violates a metric threshold
