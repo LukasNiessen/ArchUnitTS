@@ -1,1 +1,1 @@
-import "../dontImport/dontImport"
+import '../dontImport/dont-import';

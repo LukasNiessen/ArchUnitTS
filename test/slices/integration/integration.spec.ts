@@ -26,14 +26,15 @@ describe('Integration test', () => {
 			.containDependency('services', 'controllers')
 			.check();
 
-		expect(violations).toContainEqual({
+		expect(violations).toHaveLength(1);
+		expect(violations[0]).toMatchObject({
 			projectedEdge: {
 				sourceLabel: 'services',
 				targetLabel: 'controllers',
 				cumulatedEdges: [
 					{
-						source: 'src/services/util/service.ts',
-						target: 'src/controllers/controller.ts',
+						source: 'src/services/util/Service.ts',
+						target: 'src/controllers/Controller.ts',
 						external: false,
 						importKinds: expect.any(Array),
 					},
@@ -89,7 +90,8 @@ describe('Integration test', () => {
 			.adhereToDiagram(diagram)
 			.check();
 
-		expect(violations).toContainEqual({
+		expect(violations).toHaveLength(1);
+		expect(violations[0]).toMatchObject({
 			rule: null,
 			isNegated: false,
 			projectedEdge: {
@@ -97,8 +99,8 @@ describe('Integration test', () => {
 				targetLabel: 'controllers',
 				cumulatedEdges: [
 					{
-						source: 'src/services/util/service.ts',
-						target: 'src/controllers/controller.ts',
+						source: 'src/services/util/Service.ts',
+						target: 'src/controllers/Controller.ts',
 						external: false,
 						importKinds: [],
 					},
@@ -118,7 +120,8 @@ describe('Integration test', () => {
 			.adhereToDiagramInFile(exampleUml)
 			.check();
 
-		expect(violations).toContainEqual({
+		expect(violations).toHaveLength(1);
+		expect(violations[0]).toMatchObject({
 			rule: null,
 			isNegated: false,
 			projectedEdge: {
@@ -126,8 +129,8 @@ describe('Integration test', () => {
 				targetLabel: 'controllers',
 				cumulatedEdges: [
 					{
-						source: 'src/services/util/service.ts',
-						target: 'src/controllers/controller.ts',
+						source: 'src/services/util/Service.ts',
+						target: 'src/controllers/Controller.ts',
 						external: false,
 						importKinds: [],
 					},
