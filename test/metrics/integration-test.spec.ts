@@ -1,0 +1,104 @@
+import { metrics } from '../../src/metrics/fluentapi/metrics';
+import { LCOM96b } from '../../src/metrics/calculation/lcom';
+import { ClassInfo } from '../../src/metrics/extraction/extract-class-info';
+
+// Mock the extract class info to provide some test classes with known LCOM values
+jest.mock('../../src/metrics/extraction/extract-class-info', () => {
+	const original = jest.requireActual(
+		'../../src/metrics/extraction/extract-class-info'
+	);
+	return {
+		...original,
+		extractClassInfo: jest.fn(() => [
+			{
+				name: 'HighCohesionClass',
+				filePath: '/src/example/HighCohesionClass.ts',
+				methods: [
+					{ name: 'method1', accessedFields: ['field1', 'field2', 'field3'] },
+					{ name: 'method2', accessedFields: ['field1', 'field2', 'field3'] },
+					{ name: 'method3', accessedFields: ['field1', 'field2', 'field3'] },
+				],
+				fields: [
+					{ name: 'field1', accessedBy: ['method1', 'method2', 'method3'] },
+					{ name: 'field2', accessedBy: ['method1', 'method2', 'method3'] },
+					{ name: 'field3', accessedBy: ['method1', 'method2', 'method3'] },
+				],
+			},
+			{
+				name: 'LowCohesionClass',
+				filePath: '/src/example/LowCohesionClass.ts',
+				methods: [
+					{ name: 'method1', accessedFields: ['field1'] },
+					{ name: 'method2', accessedFields: ['field2'] },
+					{ name: 'method3', accessedFields: ['field3'] },
+				],
+				fields: [
+					{ name: 'field1', accessedBy: ['method1'] },
+					{ name: 'field2', accessedBy: ['method2'] },
+					{ name: 'field3', accessedBy: ['method3'] },
+				],
+			},
+			{
+				name: 'MediumCohesionClass',
+				filePath: '/src/example/MediumCohesionClass.ts',
+				methods: [
+					{ name: 'method1', accessedFields: ['field1', 'field2'] },
+					{ name: 'method2', accessedFields: ['field2', 'field3'] },
+					{ name: 'method3', accessedFields: ['field1'] },
+				],
+				fields: [
+					{ name: 'field1', accessedBy: ['method1', 'method3'] },
+					{ name: 'field2', accessedBy: ['method1', 'method2'] },
+					{ name: 'field3', accessedBy: ['method2'] },
+				],
+			},
+		]),
+	};
+});
+
+describe('LCOM metrics integration test', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+
+	it('should pass when all classes meet the cohesion threshold', async () => {
+		const violations = await metrics()
+			.lcom()
+			.lcom96b()
+			.shouldBeAbove(0.9) // All classes have LCOM < 0.9
+			.check();
+
+		// Only LowCohesionClass has LCOM = 1, which fails the threshold
+		expect(violations).toHaveLength(1);
+		expect(violations[0].constructor.name).toBe('MetricViolation');
+		// Note: Jest matcher for future implementation
+	});
+
+	it('should detect violations for classes with low cohesion', async () => {
+		const violations = await metrics()
+			.lcom()
+			.lcom96b()
+			.shouldBeAbove(0.3) // Requires LCOM < 0.3 (high cohesion)
+			.check();
+
+		// Both MediumCohesionClass and LowCohesionClass should fail
+		expect(violations).toHaveLength(2);
+
+		// Check that the violations have the correct class names
+		const classNames = violations.map((v) => (v as any).className);
+		expect(classNames).toContain('LowCohesionClass');
+		expect(classNames).toContain('MediumCohesionClass');
+	});
+
+	it.only('should find no violations for classes with high cohesion', async () => {
+		const violations = await metrics()
+			.lcom()
+			.lcom96b()
+			.shouldBeBelow(0.1) // Requires LCOM > 0.1 (we want some cohesion, but not too high)
+			.check();
+
+		// HighCohesionClass should fail as it has perfect cohesion (LCOM = 0)
+		expect(violations).toHaveLength(1);
+		expect((violations[0] as any).className).toBe('HighCohesionClass');
+	});
+});

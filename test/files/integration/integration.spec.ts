@@ -1,11 +1,11 @@
 import { ImportKind } from '../../../src/common/util/import-kinds';
-import { FileConditionBuilder, filesOfProject } from '../../../src/files/fluentapi/files';
+import { FileConditionBuilder, projectFiles } from '../../../src/files/fluentapi/files';
 import path from 'path';
 describe('Integration test', () => {
 	let files: FileConditionBuilder;
 
 	beforeAll(() => {
-		files = filesOfProject(__dirname + '/samples/namingsample/tsconfig.json');
+		files = projectFiles(__dirname + '/samples/namingsample/tsconfig.json');
 	});
 
 	it('does not find a violation', async () => {
@@ -59,7 +59,7 @@ describe('Integration test', () => {
 	});
 
 	it('handles absolute imports', async () => {
-		const violations = await filesOfProject(
+		const violations = await projectFiles(
 			path.resolve(__dirname, 'samples', 'absoluteimports', 'tsconfig.json')
 		)
 			.matchingPattern('src/components/ATest')
@@ -112,7 +112,7 @@ describe('Integration test', () => {
 		const violations = await files
 			.matchingPattern('.*')
 			.should()
-			.beFreeOfCycles()
+			.haveNoCycles()
 			.check();
 
 		expect(violations).toMatchObject([
@@ -148,7 +148,7 @@ describe('Integration test', () => {
 	});
 
 	it('correctly ignores files excluded by tsconfig', async () => {
-		const violations = await filesOfProject(
+		const violations = await projectFiles(
 			path.resolve(__dirname, 'samples', 'ignores', 'tsconfig.json')
 		)
 			.inFolder('ignore')

@@ -9,7 +9,7 @@ import { Violation } from '../../common/assertion/violation';
 import { gatherCycleViolations } from '../assertion/free-of-cycles';
 import { gatherDependOnFileViolations } from '../assertion/depend-on-files';
 
-export const filesOfProject = (tsConfigFilePath?: string): FileConditionBuilder => {
+export const projectFiles = (tsConfigFilePath?: string): FileConditionBuilder => {
 	return new FileConditionBuilder(tsConfigFilePath);
 };
 
@@ -88,7 +88,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 		return new MatchPatternFileCondition(this, pattern);
 	}
 
-	public beFreeOfCycles(): CycleFreeFileCondition {
+	public haveNoCycles(): CycleFreeFileCondition {
 		return new CycleFreeFileCondition(this);
 	}
 
@@ -175,10 +175,7 @@ export class CycleFreeFileCondition implements Checkable {
 				.tsConfigFilePath
 		);
 
-		//console.log('XXX projEdges:', graph);
 		const projectedEdges = projectEdges(graph, perInternalEdge());
-
-		//console.log('XXX projEdges:', projectedEdges);
 
 		return gatherCycleViolations(
 			projectedEdges,

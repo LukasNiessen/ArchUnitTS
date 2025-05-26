@@ -4,6 +4,12 @@ We package by domain, similar to DDD in a braoder sense. Our domains are `extrac
 
 The flow is `extraction -> projection -> assertion` and is coordinated by the `fluentapi`.
 
+Our domains include:
+
+- `files` - For file-based architecture rules
+- `slices` - For slice-based architecture rules
+- `metrics` - For code quality metrics analysis (LCOM, etc.)
+
 ## fluentapi
 
 This is the api layer of this project. It is the layer that defines the language of rules and their possible combinations.

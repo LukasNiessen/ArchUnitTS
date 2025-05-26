@@ -4,6 +4,7 @@ import { ViolatingNode } from '../files/assertion/matching-files';
 import { ViolatingEdge } from '../slices/assertion/admissible-edges';
 import { ViolatingCycle } from '../files/assertion/free-of-cycles';
 import { ViolatingFileDependency } from '../files/assertion/depend-on-files';
+import { MetricViolation } from '../metrics/assertion/metric-thresholds';
 
 /*
  * Extend Jest
@@ -53,7 +54,19 @@ export class JestViolationFactory {
 		if (violation instanceof ViolatingFileDependency) {
 			return this.fromViolatingFileDependency(violation);
 		}
+		if (violation instanceof MetricViolation) {
+			return this.fromMetricViolation(violation);
+		}
 		return new UnknownJestViolation(violation);
+	}
+
+	private static fromMetricViolation(metric: MetricViolation): JestViolation {
+		const comparisonText =
+			metric.comparison === 'below' ? 'below threshold' : 'above threshold';
+		return {
+			message: `${metric.className} has ${metric.metricName} value of ${metric.metricValue}, which is ${comparisonText} ${metric.threshold}`,
+			details: metric,
+		};
 	}
 
 	private static fromViolatingFile(file: ViolatingNode): JestViolation {

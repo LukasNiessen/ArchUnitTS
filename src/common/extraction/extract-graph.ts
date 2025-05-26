@@ -143,7 +143,6 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 				const normalizedTargetFileName = path.relative(rootDir, resolvedFileName);
 
 				const importKinds = determineImportKinds(x);
-				//console.log('XXX importKinds:', importKinds);
 
 				imports.push({
 					source: normalizeWindowsPaths(normalizedSourceFileName),
