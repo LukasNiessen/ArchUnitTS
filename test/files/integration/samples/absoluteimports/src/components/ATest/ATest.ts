@@ -1,1 +1,1 @@
-import '@components/BTest/btest';
+import '@components/BTest/BTest';
