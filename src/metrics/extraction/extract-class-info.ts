@@ -35,6 +35,7 @@ export interface FileAnalysisResult {
 	concreteClasses: number;
 	totalTypes: number;
 	dependencies: ClassDependencyInfo;
+	sourceFile?: ts.SourceFile; // Optional source file for more detailed analysis
 }
 
 /**
@@ -335,13 +336,11 @@ function processSourceFileEnhanced(
 	}
 
 	visit(sourceFile);
-
 	const totalTypes = interfaces + abstractClasses + concreteClasses;
 	const fileDependencies = calculateClassDependencies(
 		sourceFile.fileName,
 		dependencyGraph
 	);
-
 	return {
 		filePath: sourceFile.fileName,
 		classes,
@@ -350,6 +349,7 @@ function processSourceFileEnhanced(
 		concreteClasses,
 		totalTypes,
 		dependencies: fileDependencies,
+		sourceFile, // Include the sourceFile for file-wise analysis
 	};
 }
 

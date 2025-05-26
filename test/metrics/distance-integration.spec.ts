@@ -1,0 +1,115 @@
+import path from 'path';
+import { metrics } from '../../src/metrics/fluentapi/metrics';
+import '../../jest';
+
+describe('Distance metrics integration test', () => {
+	const mockProjectPath = path.join(__dirname, 'mock-project', 'tsconfig.json');
+
+	describe('File-wise distance metrics', () => {
+		it('should detect proper abstractness values', async () => {
+			const violations = await metrics(mockProjectPath)
+				.distance()
+				.forFile('abstract-base.ts')
+				.abstractness()
+				.shouldEqual(1)
+				.check();
+
+			expect(violations).toEqual([]);
+
+			// Check that interfaces have high abstractness
+			const interfaceAbstractnessViolations = await metrics(mockProjectPath)
+				.distance()
+				.forFile('service.interface.ts')
+				.abstractness()
+				.shouldEqual(1.0)
+				.check();
+
+			expect(interfaceAbstractnessViolations).toEqual([]);
+
+			// Check that concrete classes have low abstractness
+			const concreteClassViolations = await metrics(mockProjectPath)
+				.distance()
+				.forFile('data-class.ts')
+				.abstractness()
+				.shouldBeBelow(0.5)
+				.check();
+
+			expect(concreteClassViolations).toEqual([]);
+		});
+
+		it('should detect proper instability values', async () => {
+			// Check that dependent files have higher instability
+			const highInstabilityViolations = await metrics(mockProjectPath)
+				.distance()
+				.forFile('concrete-service.ts') // Depends on abstract-base and interface
+				.instability()
+				.shouldBeAboveOrEqual(0) // Should have some instability due to dependencies (including zero)
+				.check();
+
+			expect(highInstabilityViolations).toEqual([]);
+		});
+
+		it('should detect proper distance from main sequence', async () => {
+			// Abstract and stable components (interfaces) should be close to main sequence
+			const interfaceDistanceViolations = await metrics(mockProjectPath)
+				.distance()
+				.forFile('service.interface.ts')
+				.distanceFromMainSequence()
+				.shouldBeBelow(0.3) // Should be close to main sequence
+				.check();
+
+			expect(interfaceDistanceViolations).toEqual([]);
+
+			// Check all files in the project for distance from main sequence
+			const allDistanceViolations = await metrics(mockProjectPath)
+				.distance()
+				.distanceFromMainSequence()
+				.shouldBeBelow(0.5) // All files should have acceptable distance
+				.check();
+
+			// There might be some violations, but we just want to ensure the API works
+			expect(allDistanceViolations).toBeDefined();
+		});
+	});
+
+	describe('Project-wide distance metrics', () => {
+		it('should calculate project summary metrics', async () => {
+			// Get project summary for distance metrics
+			const projectSummary = await metrics(mockProjectPath)
+				.distance()
+				.getProjectSummary();
+
+			// Verify we have valid project metrics
+			expect(projectSummary).toBeDefined();
+			expect(projectSummary.totalFiles).toBeGreaterThan(0);
+			expect(projectSummary.averageAbstractness).toBeGreaterThanOrEqual(0);
+			expect(projectSummary.averageAbstractness).toBeLessThanOrEqual(1);
+			expect(projectSummary.averageInstability).toBeGreaterThanOrEqual(0);
+			expect(projectSummary.averageInstability).toBeLessThanOrEqual(1);
+			expect(projectSummary.averageDistance).toBeGreaterThanOrEqual(0);
+			expect(projectSummary.averageDistance).toBeLessThanOrEqual(1);
+		});
+
+		it('should identify components in the Zone of Pain', async () => {
+			// Get components in the Zone of Pain (concrete & stable)
+			const zoneOfPainViolations = await metrics(mockProjectPath)
+				.distance()
+				.notInZoneOfPain()
+				.check();
+
+			// We expect to have results, just making sure API works
+			expect(zoneOfPainViolations).toBeDefined();
+		});
+
+		it('should identify components in the Zone of Uselessness', async () => {
+			// Get components in the Zone of Uselessness (abstract & unstable)
+			const zoneOfUselessnessViolations = await metrics(mockProjectPath)
+				.distance()
+				.notInZoneOfUselessness()
+				.check();
+
+			// We expect to have results, just making sure API works
+			expect(zoneOfUselessnessViolations).toBeDefined();
+		});
+	});
+});

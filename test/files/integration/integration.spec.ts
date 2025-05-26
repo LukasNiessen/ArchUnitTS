@@ -1,6 +1,7 @@
 import { ImportKind } from '../../../src/common/util/import-kinds';
 import { FileConditionBuilder, projectFiles } from '../../../src/files/fluentapi/files';
 import path from 'path';
+
 describe('Integration test', () => {
 	let files: FileConditionBuilder;
 
