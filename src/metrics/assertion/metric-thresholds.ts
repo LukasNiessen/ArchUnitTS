@@ -15,7 +15,7 @@ export class MetricViolation implements Violation {
 	) {}
 
 	toString(): string {
-		const comparisonText = this.comparison === 'below' ? 'less than' : 'greater than';
+		const comparisonText = this.comparison === 'below' ? 'not below' : 'not above';
 		return `Class '${this.className}' in file '${this.filePath}' has ${this.metricName} value of ${this.metricValue}, which is ${comparisonText} threshold ${this.threshold}`;
 	}
 }
