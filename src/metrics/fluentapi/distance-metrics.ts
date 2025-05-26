@@ -6,6 +6,8 @@ import {
 	DistanceFromMainSequence,
 	DistanceMetric,
 	calculateDistanceMetricsForProject,
+	CouplingFactor,
+	NormalizedDistance,
 } from '../calculation/distance';
 import { extractEnhancedClassInfo } from '../extraction/extract-class-info';
 import { MetricComparison } from './types';
@@ -18,6 +20,8 @@ export interface DistanceMetricsSummary {
 	averageAbstractness: number;
 	averageInstability: number;
 	averageDistance: number;
+	averageCouplingFactor: number;
+	averageNormalizedDistance: number;
 	filesOnMainSequence: number;
 }
 
@@ -77,6 +81,30 @@ export class DistanceMetricsBuilder {
 		return new DistanceThresholdBuilder(
 			this.tsConfigFilePath,
 			new DistanceFromMainSequence(),
+			this.targetFile,
+			this.targetFolder
+		);
+	}
+
+	/**
+	 * Configure coupling factor metric (CF)
+	 */
+	public couplingFactor(): DistanceThresholdBuilder {
+		return new DistanceThresholdBuilder(
+			this.tsConfigFilePath,
+			new CouplingFactor(),
+			this.targetFile,
+			this.targetFolder
+		);
+	}
+
+	/**
+	 * Configure normalized distance metric (ND)
+	 */
+	public normalizedDistance(): DistanceThresholdBuilder {
+		return new DistanceThresholdBuilder(
+			this.tsConfigFilePath,
+			new NormalizedDistance(),
 			this.targetFile,
 			this.targetFolder
 		);

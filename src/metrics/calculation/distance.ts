@@ -149,26 +149,122 @@ export class DistanceFromMainSequence implements DistanceMetric {
 }
 
 /**
+ * Coupling Factor metric (CF)
+ *
+ * Measures how tightly coupled a file is based on both incoming and outgoing dependencies.
+ * Higher values indicate more coupling, which generally should be minimized.
+ * Formula: CF = (Ca + Ce) / Cmax
+ * Where:
+ * - Ca = afferent coupling (incoming dependencies)
+ * - Ce = efferent coupling (outgoing dependencies)
+ * - Cmax = maximum possible coupling (a normalization factor, typically file count - 1)
+ */
+export class CouplingFactor implements DistanceMetric {
+	name = 'CouplingFactor';
+	description =
+		'Measures how tightly coupled a file is based on dependencies (0 = no coupling, 1 = maximum coupling)';
+
+	calculateForFile(analysisResult: FileAnalysisResult, totalFiles?: number): number {
+		// Get dependency info from file analysis
+		const dependencies = analysisResult.dependencies;
+
+		// Calculate efferent coupling (Ce) - outgoing dependencies
+		const efferentCoupling = dependencies.efferentCoupling;
+
+		// Calculate afferent coupling (Ca) - incoming dependencies
+		const afferentCoupling = dependencies.afferentCoupling;
+
+		// Total coupling is the sum of incoming and outgoing dependencies
+		const totalCoupling = efferentCoupling + afferentCoupling;
+
+		// If we know total files in project, normalize by that, otherwise use a default normalization
+		const maxPossibleCoupling = totalFiles ? totalFiles - 1 : 10;
+
+		if (maxPossibleCoupling <= 0) {
+			return 0; // Avoid division by zero
+		}
+
+		// Normalize to [0,1]
+		return Math.min(1, totalCoupling / maxPossibleCoupling);
+	}
+}
+
+/**
+ * Normalized Distance metric (ND)
+ *
+ * A modified version of Distance from Main Sequence that accounts for file size.
+ * Files with more code are expected to be more complex and potentially have
+ * more responsibilities, so they should be closer to the main sequence.
+ * Formula: ND = D * (1 - S/Smax)
+ * Where:
+ * - D = Distance from Main Sequence
+ * - S = Size of file (measured in LOC or declarations)
+ * - Smax = Maximum size for normalization
+ */
+export class NormalizedDistance implements DistanceMetric {
+	name = 'NormalizedDistance';
+	description =
+		'A size-adjusted distance metric that accounts for file complexity (0 = ideal balance, 1 = furthest from ideal)';
+
+	// Use the standard distance metric as a base
+	private distance = new DistanceFromMainSequence();
+
+	calculateForFile(analysisResult: FileAnalysisResult): number {
+		// Calculate the standard distance from main sequence
+		const baseDistance = this.distance.calculateForFile(analysisResult);
+
+		// Use declaration count as a measure of file size
+		let fileSize = 0;
+		if (analysisResult.sourceFile) {
+			const declarationCounts = countDeclarations(analysisResult.sourceFile);
+			fileSize = declarationCounts.total;
+		} else {
+			fileSize = analysisResult.totalTypes;
+		}
+
+		// Maximum file size for normalization - this can be adjusted based on project standards
+		const maxFileSize = 100;
+
+		// Normalize file size to a factor between 0 and 1
+		const sizeFactor = Math.min(1, fileSize / maxFileSize);
+
+		// Reduce the distance penalty for larger files (more complex files are expected to have
+		// more responsibilities, so they get more leeway in terms of distance from main sequence)
+		return baseDistance * (1 - sizeFactor * 0.5); // Only reduce by up to 50%
+	}
+}
+
+/**
  * Calculate distance metrics for a single file
  * @param analysisResult The file analysis result
+ * @param totalFiles Optional total number of files for coupling factor calculation
  * @returns Distance metrics for the file
  */
-export function calculateFileDistanceMetrics(analysisResult: FileAnalysisResult): {
+export function calculateFileDistanceMetrics(
+	analysisResult: FileAnalysisResult,
+	totalFiles?: number
+): {
 	filePath: string;
 	abstractness: number;
 	instability: number;
 	distanceFromMainSequence: number;
+	couplingFactor: number;
+	normalizedDistance: number;
 	analysisResult: FileAnalysisResult;
 } {
 	const abstractness = new Abstractness();
 	const instability = new Instability();
 	const distance = new DistanceFromMainSequence();
+	const coupling = new CouplingFactor();
+	const normalizedDistance = new NormalizedDistance();
 
 	return {
 		filePath: analysisResult.filePath,
 		abstractness: abstractness.calculateForFile(analysisResult),
 		instability: instability.calculateForFile(analysisResult),
 		distanceFromMainSequence: distance.calculateForFile(analysisResult),
+		couplingFactor: coupling.calculateForFile(analysisResult, totalFiles),
+		normalizedDistance: normalizedDistance.calculateForFile(analysisResult),
 		analysisResult,
 	};
 }
@@ -186,6 +282,8 @@ export async function calculateDistanceMetricsForProject(
 		abstractness: number;
 		instability: number;
 		distanceFromMainSequence: number;
+		couplingFactor: number;
+		normalizedDistance: number;
 		analysisResult: FileAnalysisResult;
 	}>;
 	projectSummary: {
@@ -193,14 +291,17 @@ export async function calculateDistanceMetricsForProject(
 		averageAbstractness: number;
 		averageInstability: number;
 		averageDistance: number;
+		averageCouplingFactor: number;
+		averageNormalizedDistance: number;
 		filesOnMainSequence: number; // files with distance < 0.1
 	};
 }> {
 	const analysisResults = await extractEnhancedClassInfo(tsConfigPath, projectPath);
+	const fileCount = analysisResults.length;
 
 	// Use the helper function to calculate metrics for each file
 	const fileResults = analysisResults.map((result) =>
-		calculateFileDistanceMetrics(result)
+		calculateFileDistanceMetrics(result, fileCount)
 	);
 
 	// Calculate project-level summary statistics
@@ -218,6 +319,14 @@ export async function calculateDistanceMetricsForProject(
 			? fileResults.reduce((sum, f) => sum + f.distanceFromMainSequence, 0) /
 				totalFiles
 			: 0;
+	const averageCouplingFactor =
+		totalFiles > 0
+			? fileResults.reduce((sum, f) => sum + f.couplingFactor, 0) / totalFiles
+			: 0;
+	const averageNormalizedDistance =
+		totalFiles > 0
+			? fileResults.reduce((sum, f) => sum + f.normalizedDistance, 0) / totalFiles
+			: 0;
 	const filesOnMainSequence = fileResults.filter(
 		(f) => f.distanceFromMainSequence < 0.1
 	).length;
@@ -229,6 +338,8 @@ export async function calculateDistanceMetricsForProject(
 			averageAbstractness,
 			averageInstability,
 			averageDistance,
+			averageCouplingFactor,
+			averageNormalizedDistance,
 			filesOnMainSequence,
 		},
 	};
