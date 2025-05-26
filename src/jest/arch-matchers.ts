@@ -62,7 +62,7 @@ export class JestViolationFactory {
 
 	private static fromMetricViolation(metric: MetricViolation): JestViolation {
 		const comparisonText =
-			metric.comparison === 'below' ? 'below threshold' : 'above threshold';
+			metric.comparison === 'below' ? 'not below threshold' : 'not above threshold';
 		return {
 			message: `${metric.className} has ${metric.metricName} value of ${metric.metricValue}, which is ${comparisonText} ${metric.threshold}`,
 			details: metric,
