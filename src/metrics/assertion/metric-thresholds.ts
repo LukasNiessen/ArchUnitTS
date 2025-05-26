@@ -1,8 +1,5 @@
 import { Violation } from '../../common/assertion/violation';
-import { LCOMMetric } from '../calculation/lcom';
-import { ClassInfo } from '../extraction/extract-class-info';
-import { MetricComparison } from '../fluentapi/metrics';
-import { projectToMetricResults } from '../projection/project-metrics';
+import { MetricComparison, MetricResult } from '../projection/project-metrics';
 
 /**
  * Represents a class that violates a metric threshold
@@ -24,19 +21,10 @@ export class MetricViolation implements Violation {
 }
 
 /**
- * Gathers violations from metric results
+ * Gathers violations from pre-computed metric results
  * @param metricResults The metric results to check for violations
  */
-export function gatherMetricViolations(
-	classes: ClassInfo[],
-	metric: LCOMMetric,
-	threshold: number,
-	comparison: MetricComparison
-): MetricViolation[] {
-	const metricResults = projectToMetricResults(classes, metric, threshold, comparison);
-
-	console.log('XXX res:', metricResults);
-
+export function gatherMetricViolations(metricResults: MetricResult[]): MetricViolation[] {
 	return metricResults
 		.filter((result) => result.isViolation)
 		.map(

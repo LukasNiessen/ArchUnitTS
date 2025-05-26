@@ -1,15 +1,17 @@
 import { Checkable } from '../../common/fluentapi/checkable';
 import { Violation } from '../../common/assertion/violation';
-import { ClassInfo, extractClassInfo } from '../extraction/extract-class-info';
+import { extractClassInfo } from '../extraction/extract-class-info';
 import { LCOMMetric, LCOM96b, LCOM96a } from '../calculation/lcom';
 import { gatherMetricViolations } from '../assertion/metric-thresholds';
-
-export type MetricComparison =
-	| 'below'
-	| 'above'
-	| 'equal'
-	| 'above-equal'
-	| 'below-equal';
+import {
+	MetricComparison,
+	projectToMetricResults,
+	ClassFilter,
+	byFolderPath,
+	bySingleFile,
+	byClassName,
+	combineFilters,
+} from '../projection/project-metrics';
 
 /**
  * Entry point for code metrics analysis.
@@ -25,6 +27,22 @@ export type MetricComparison =
  *   .lcom96b()
  *   .shouldHaveCohesionAbove(0.7)
  *   .check();
+ *
+ * // Check cohesion for specific folder
+ * const violations = await metrics()
+ *   .inFolder('src/models')
+ *   .lcom()
+ *   .lcom96b()
+ *   .shouldBeAbove(0.5)
+ *   .check();
+ *
+ * // Check cohesion for classes matching a pattern
+ * const violations = await metrics()
+ *   .forClassesMatching(/.*Service$/)
+ *   .lcom()
+ *   .lcom96b()
+ *   .shouldBeAbove(0.8)
+ *   .check();
  * ```
  */
 export const metrics = (tsConfigFilePath?: string): MetricsBuilder => {
@@ -35,22 +53,50 @@ export const metrics = (tsConfigFilePath?: string): MetricsBuilder => {
  * Builder for metrics analysis
  */
 export class MetricsBuilder {
+	private filters: ClassFilter[] = [];
+
 	constructor(readonly tsConfigFilePath?: string) {}
+
+	/**
+	 * Filter classes by folder path using regex pattern
+	 * @param folderPattern String or regex pattern matching folder paths
+	 */
+	public inFolder(folderPattern: string | RegExp): MetricsBuilder {
+		this.filters.push(byFolderPath(folderPattern));
+		return this;
+	}
+
+	/**
+	 * Filter classes to a specific file
+	 * @param filePath Path to the specific file
+	 */
+	public inFile(filePath: string): MetricsBuilder {
+		this.filters.push(bySingleFile(filePath));
+		return this;
+	}
+
+	/**
+	 * Filter classes by name using regex pattern
+	 * @param namePattern String or regex pattern matching class names
+	 */
+	public forClassesMatching(namePattern: string | RegExp): MetricsBuilder {
+		this.filters.push(byClassName(namePattern));
+		return this;
+	}
+	/**
+	 * Get the combined filter for all applied filters
+	 */ public getFilter(): ClassFilter | null {
+		if (this.filters.length === 0) {
+			return null;
+		}
+		return combineFilters(this.filters);
+	}
 
 	/**
 	 * Configure LCOM (Lack of Cohesion of Methods) metrics
 	 */
 	public lcom(): LCOMMetricsBuilder {
 		return new LCOMMetricsBuilder(this);
-	}
-
-	/**
-	 * Configure metrics for specific classes
-	 * @param pattern Regular expression pattern to match class names
-	 */
-	public forClasses(pattern: string): MetricsBuilder {
-		// This will be implemented for class filtering
-		return this;
 	}
 }
 
@@ -134,22 +180,25 @@ export class MetricCondition implements Checkable {
 		readonly threshold: number,
 		readonly comparison: MetricComparison
 	) {}
-
 	/**
 	 * Check if classes violate the metric condition
-	 */
-	public async check(): Promise<Violation[]> {
+	 */ public async check(): Promise<Violation[]> {
 		// Extract class information from the codebase
-		const classes = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
 
-		//console.log('XXX classes:', classes);
+		// Apply filters if any
+		const filter = this.metricsBuilder.getFilter();
+		const classes = filter ? filter.apply(allClasses) : allClasses;
 
-		// Return violations for classes that don't meet the metric threshold
-		return gatherMetricViolations(
+		// Project classes to metric results through the projection layer
+		const metricResults = projectToMetricResults(
 			classes,
 			this.metric,
 			this.threshold,
 			this.comparison
 		);
+
+		// Return violations using the assertion layer
+		return gatherMetricViolations(metricResults);
 	}
 }

@@ -1,6 +1,4 @@
 import { metrics } from '../../src/metrics/fluentapi/metrics';
-import { LCOM96b } from '../../src/metrics/calculation/lcom';
-import { ClassInfo } from '../../src/metrics/extraction/extract-class-info';
 
 // Mock the extract class info to provide some test classes with known LCOM values
 jest.mock('../../src/metrics/extraction/extract-class-info', () => {
@@ -61,44 +59,48 @@ describe('LCOM metrics integration test', () => {
 		jest.clearAllMocks();
 	});
 
-	it('should pass when all classes meet the cohesion threshold', async () => {
+	it('should pass when all classes but one meet the cohesion threshold', async () => {
 		const violations = await metrics()
 			.lcom()
-			.lcom96b()
-			.shouldBeAbove(0.9) // All classes have LCOM < 0.9
+			.lcom96a()
+			.shouldBeBelow(0.9) // All classes have LCOM < 0.9
 			.check();
-
 		// Only LowCohesionClass has LCOM = 1, which fails the threshold
-		expect(violations).toHaveLength(1);
-		expect(violations[0].constructor.name).toBe('MetricViolation');
-		// Note: Jest matcher for future implementation
+		expect(violations.length).toBe(1);
+
+		// Check that the violations have the correct class names
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const classNames = violations.map((v) => (v as any).className);
+		expect(classNames).toContain('LowCohesionClass');
 	});
 
 	it('should detect violations for classes with low cohesion', async () => {
 		const violations = await metrics()
 			.lcom()
 			.lcom96b()
-			.shouldBeAbove(0.3) // Requires LCOM < 0.3 (high cohesion)
+			.shouldBeBelow(0.3) // Requires LCOM < 0.3 (high cohesion)
 			.check();
-
 		// Both MediumCohesionClass and LowCohesionClass should fail
-		expect(violations).toHaveLength(2);
+		expect(violations.length).toBe(2);
 
 		// Check that the violations have the correct class names
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const classNames = violations.map((v) => (v as any).className);
 		expect(classNames).toContain('LowCohesionClass');
 		expect(classNames).toContain('MediumCohesionClass');
 	});
-
-	it.only('should find no violations for classes with high cohesion', async () => {
+	it('should find violations for classes with poor cohesion', async () => {
 		const violations = await metrics()
 			.lcom()
 			.lcom96b()
-			.shouldBeBelow(0.1) // Requires LCOM > 0.1 (we want some cohesion, but not too high)
+			.shouldBeBelow(0.1) // Classes should have LCOM < 0.1 (high cohesion required)
 			.check();
 
-		// HighCohesionClass should fail as it has perfect cohesion (LCOM = 0)
-		expect(violations).toHaveLength(1);
-		expect((violations[0] as any).className).toBe('HighCohesionClass');
+		// LowCohesionClass and MediumCohesionClass should fail as they have LCOM > 0.1
+		expect(violations.length).toBe(2);
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const classNames = violations.map((v) => (v as any).className);
+		expect(classNames).toContain('LowCohesionClass');
+		expect(classNames).toContain('MediumCohesionClass');
 	});
 });

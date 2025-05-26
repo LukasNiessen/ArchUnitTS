@@ -1,6 +1,119 @@
 import { ClassInfo } from '../extraction/extract-class-info';
 import { LCOMMetric } from '../calculation/lcom';
-import { MetricComparison } from '../fluentapi/metrics';
+import * as path from 'path';
+
+export type MetricComparison =
+	| 'below'
+	| 'above'
+	| 'equal'
+	| 'above-equal'
+	| 'below-equal';
+
+/**
+ * Interface for filtering classes based on various criteria
+ */
+export interface ClassFilter {
+	/**
+	 * Apply the filter to a list of classes
+	 * @param classes The classes to filter
+	 * @returns Filtered classes that match the criteria
+	 */
+	apply(classes: ClassInfo[]): ClassInfo[];
+}
+
+/**
+ * Filter classes by folder path using regex patterns
+ */
+export class FolderPathFilter implements ClassFilter {
+	constructor(private readonly pathPattern: RegExp) {}
+
+	apply(classes: ClassInfo[]): ClassInfo[] {
+		return classes.filter((classInfo) => {
+			// Normalize the file path to use forward slashes for consistency
+			const normalizedPath = classInfo.filePath.replace(/\\/g, '/');
+			return this.pathPattern.test(normalizedPath);
+		});
+	}
+}
+
+/**
+ * Filter classes by exact file path
+ */
+export class SingleFileFilter implements ClassFilter {
+	constructor(private readonly exactFilePath: string) {}
+
+	apply(classes: ClassInfo[]): ClassInfo[] {
+		return classes.filter((classInfo) => {
+			// Normalize both paths for comparison
+			const normalizedClassPath = path.resolve(classInfo.filePath);
+			const normalizedTargetPath = path.resolve(this.exactFilePath);
+			return normalizedClassPath === normalizedTargetPath;
+		});
+	}
+}
+
+/**
+ * Filter classes by class name using regex patterns
+ */
+export class ClassNameFilter implements ClassFilter {
+	constructor(private readonly namePattern: RegExp) {}
+	apply(classes: ClassInfo[]): ClassInfo[] {
+		return classes.filter((classInfo) => {
+			return this.namePattern.test(classInfo.name);
+		});
+	}
+}
+
+/**
+ * Combine multiple filters with AND logic
+ */
+export class CompositeFilter implements ClassFilter {
+	constructor(private readonly filters: ClassFilter[]) {}
+
+	apply(classes: ClassInfo[]): ClassInfo[] {
+		return this.filters.reduce((filteredClasses, filter) => {
+			return filter.apply(filteredClasses);
+		}, classes);
+	}
+}
+
+/**
+ * Helper function to create a folder path filter
+ * @param pathPattern String or regex pattern matching folder paths
+ * @returns ClassFilter instance
+ */
+export const byFolderPath = (pathPattern: string | RegExp): ClassFilter => {
+	const regex = typeof pathPattern === 'string' ? new RegExp(pathPattern) : pathPattern;
+	return new FolderPathFilter(regex);
+};
+
+/**
+ * Helper function to create a single file filter
+ * @param filePath Exact file path to match
+ * @returns ClassFilter instance
+ */
+export const bySingleFile = (filePath: string): ClassFilter => {
+	return new SingleFileFilter(filePath);
+};
+
+/**
+ * Helper function to create a class name filter
+ * @param namePattern String or regex pattern matching class names
+ * @returns ClassFilter instance
+ */
+export const byClassName = (namePattern: string | RegExp): ClassFilter => {
+	const regex = typeof namePattern === 'string' ? new RegExp(namePattern) : namePattern;
+	return new ClassNameFilter(regex);
+};
+
+/**
+ * Helper function to combine multiple filters with AND logic
+ * @param filters Array of filters to combine
+ * @returns Combined ClassFilter instance
+ */
+export const combineFilters = (filters: ClassFilter[]): ClassFilter => {
+	return new CompositeFilter(filters);
+};
 
 /**
  * Projects class information to calculate specific metrics

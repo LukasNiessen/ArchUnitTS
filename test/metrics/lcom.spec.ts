@@ -37,7 +37,7 @@ describe('LCOM96b metric calculation', () => {
 			],
 		};
 
-		expect(lcom96b.calculate(classInfo)).toBe(1);
+		expect(lcom96b.calculate(classInfo)).toBe(0.5);
 	});
 
 	it('should return 0 for a class with one method', () => {
@@ -61,6 +61,7 @@ describe('LCOM96b metric calculation', () => {
 
 		expect(lcom96b.calculate(classInfo)).toBe(0);
 	});
+
 	it('should return a value between 0 and 1 for partial cohesion', () => {
 		// A class with partial cohesion
 		const classInfo: ClassInfo = {

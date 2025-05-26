@@ -1,5 +1,7 @@
 # Code Metrics in ArchUnitTS
 
+XXX TODO: REWRITE AND UPDATE
+
 This module provides support for analyzing and enforcing code metrics in your TypeScript/JavaScript projects.
 
 ## Supported Metrics

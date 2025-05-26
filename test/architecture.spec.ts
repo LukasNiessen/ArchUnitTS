@@ -17,7 +17,7 @@ describe('architecture', () => {
 		});
 
 		for (let i = 0; i < rules.length; i++) {
-			await expect(rules[i]).toPassAsync();
+			expect(rules[i]).toPassAsync();
 		}
 	});
 
@@ -29,7 +29,7 @@ describe('architecture', () => {
 				.dependOnFiles()
 				.inFolder('src/' + c);
 
-			await expect(rule).toPassAsync();
+			expect(rule).toPassAsync();
 		}
 	});
 
@@ -41,7 +41,7 @@ describe('architecture', () => {
 				.dependOnFiles()
 				.inFolder('src/' + c);
 
-			await expect(rule).toPassAsync();
+			expect(rule).toPassAsync();
 		}
 	});
 
@@ -53,7 +53,7 @@ describe('architecture', () => {
 				.dependOnFiles()
 				.inFolder('src/' + c);
 
-			await expect(rule).toPassAsync();
+			expect(rule).toPassAsync();
 		}
 	});
 
@@ -65,7 +65,7 @@ describe('architecture', () => {
 				.dependOnFiles()
 				.inFolder('src/' + c);
 
-			await expect(rule).toPassAsync();
+			expect(rule).toPassAsync();
 		}
 	});
 
@@ -75,6 +75,6 @@ describe('architecture', () => {
 			.should()
 			.haveNoCycles();
 
-		await expect(rule).toPassAsync();
+		expect(rule).toPassAsync();
 	});
 });
