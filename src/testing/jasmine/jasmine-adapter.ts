@@ -8,9 +8,11 @@ export function extendJasmineMatchers() {
 		const jasmineObj = jasmine as unknown as {
 			addMatchers?: (matchers: Record<string, unknown>) => void;
 		};
-		
-		const beforeEachFn = (globalThis as unknown as { beforeEach?: (fn: () => void) => void }).beforeEach;
-		
+
+		const beforeEachFn = (
+			globalThis as unknown as { beforeEach?: (fn: () => void) => void }
+		).beforeEach;
+
 		if (jasmineObj.addMatchers && beforeEachFn) {
 			beforeEachFn(() => {
 				jasmineObj.addMatchers!({
@@ -19,18 +21,21 @@ export function extendJasmineMatchers() {
 							if (!checkable) {
 								return {
 									pass: false,
-									message: 'expected something checkable as an argument for expect()'
+									message:
+										'expected something checkable as an argument for expect()',
 								};
 							}
 							const violations = await checkable.check();
-							const testViolations = violations.map((v) => ViolationFactory.from(v));
+							const testViolations = violations.map((v) =>
+								ViolationFactory.from(v)
+							);
 							const result = ResultFactory.result(false, testViolations);
 							return {
 								pass: result.pass,
-								message: result.message()
+								message: result.message(),
 							};
-						}
-					})
+						},
+					}),
 				});
 			});
 		}

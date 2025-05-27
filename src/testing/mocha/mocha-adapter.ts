@@ -13,12 +13,14 @@ export function extendMochaMatchers() {
 		const mochaGlobal = global as unknown as MochaGlobal;
 		mochaGlobal.toPassAsync = async (checkable: Checkable) => {
 			if (!checkable) {
-				throw new Error('expected something checkable as an argument for toPassAsync()');
+				throw new Error(
+					'expected something checkable as an argument for toPassAsync()'
+				);
 			}
 			const violations = await checkable.check();
 			if (violations.length > 0) {
 				const testViolations = violations.map((v) => ViolationFactory.from(v));
-				const messages = testViolations.map(v => v.message).join('\n');
+				const messages = testViolations.map((v) => v.message).join('\n');
 				throw new Error(`Architecture rule violations found:\n${messages}`);
 			}
 		};
@@ -28,12 +30,14 @@ export function extendMochaMatchers() {
 // Helper function for more natural syntax in Mocha
 export async function expectToPassAsync(checkable: Checkable) {
 	if (!checkable) {
-		throw new Error('expected something checkable as an argument for expectToPassAsync()');
+		throw new Error(
+			'expected something checkable as an argument for expectToPassAsync()'
+		);
 	}
 	const violations = await checkable.check();
 	if (violations.length > 0) {
 		const testViolations = violations.map((v) => ViolationFactory.from(v));
-		const messages = testViolations.map(v => v.message).join('\n');
+		const messages = testViolations.map((v) => v.message).join('\n');
 		throw new Error(`Architecture rule violations found:\n${messages}`);
 	}
 }

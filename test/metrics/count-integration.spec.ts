@@ -1,6 +1,6 @@
 import path from 'path';
 import { metrics } from '../../src/metrics/fluentapi/metrics';
-import '../../jest';
+import '../../index';
 
 describe('Count metrics integration test', () => {
 	const mockProjectPath = path.join(__dirname, 'mock-project', 'tsconfig.json');

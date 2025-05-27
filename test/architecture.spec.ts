@@ -1,4 +1,4 @@
-import '../jest';
+import '../index';
 import path from 'path';
 import { slicesOfProject } from '../src/slices/fluentapi/slices';
 import { projectFiles } from '../src/files/fluentapi/files';

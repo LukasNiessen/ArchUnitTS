@@ -1,7 +1,6 @@
 import path from 'path';
 import { metrics } from '../../src/metrics/fluentapi/metrics';
-import { LCOMMetricsSummary } from '../../src/metrics/fluentapi/lcom-metrics';
-import '../../jest';
+import '../../index';
 
 describe('LCOM metrics project summary', () => {
 	const mockProjectPath = path.join(__dirname, 'mock-project', 'tsconfig.json');

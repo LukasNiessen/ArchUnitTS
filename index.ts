@@ -1,3 +1,6 @@
+// Auto-setup all testing frameworks
+import './src/testing/setup/auto-detect';
+
 // Core functionality exports
 export * from './src/slices/fluentapi/slices';
 export * from './src/files/fluentapi/files';

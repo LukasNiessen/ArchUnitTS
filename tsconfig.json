@@ -17,5 +17,5 @@
 		"noImplicitAny": true,
 		"esModuleInterop": true
 	},
-	"include": ["src", "index.ts", "jest.ts", "jasmine.ts", "vitest.ts", "mocha.ts", "qunit.ts", "ava.ts", "test"]
+	"include": ["src", "index.ts", "test"]
 }

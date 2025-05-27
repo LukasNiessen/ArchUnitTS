@@ -64,7 +64,9 @@ export class JestViolationFactory {
 	}
 
 	/** @deprecated Use ViolationFactory.from() instead */
-	private static fromViolatingFileDependency(edge: ViolatingFileDependency): JestViolation {
+	private static fromViolatingFileDependency(
+		edge: ViolatingFileDependency
+	): JestViolation {
 		const testViolation = ViolationFactory.from(edge);
 		return { message: testViolation.message, details: testViolation.details };
 	}
@@ -82,7 +84,10 @@ export class JestResultFactory {
 		violations: JestViolation[]
 	): JestResult {
 		// Use the generic ResultFactory and convert to Jest format
-		const testViolations = violations.map(v => ({ message: v.message, details: v.details }));
+		const testViolations = violations.map((v) => ({
+			message: v.message,
+			details: v.details,
+		}));
 		const result = ResultFactory.result(shouldNotPass, testViolations);
 		return {
 			pass: result.pass,

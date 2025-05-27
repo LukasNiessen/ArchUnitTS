@@ -14,7 +14,9 @@ declare global {
 export function extendVitestMatchers() {
 	// For Vitest, we need to check if expect.extend exists
 	if (typeof expect !== 'undefined' && 'extend' in expect) {
-		(expect as unknown as { extend: (matchers: Record<string, unknown>) => void }).extend({
+		(
+			expect as unknown as { extend: (matchers: Record<string, unknown>) => void }
+		).extend({
 			async toPassAsync(checkable: Checkable): Promise<TestResult> {
 				if (!checkable) {
 					return ResultFactory.error(
@@ -23,7 +25,10 @@ export function extendVitestMatchers() {
 				}
 				const violations = await checkable.check();
 				const testViolations = violations.map((v) => ViolationFactory.from(v));
-				return ResultFactory.result(Boolean((this as unknown as { isNot?: boolean }).isNot), testViolations);
+				return ResultFactory.result(
+					Boolean((this as unknown as { isNot?: boolean }).isNot),
+					testViolations
+				);
 			},
 		});
 	}
