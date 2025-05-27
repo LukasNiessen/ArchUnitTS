@@ -1,6 +1,6 @@
 {
 	"name": "archunit",
-	"version": "2.1.5",
+	"version": "2.1.6",
 	"description": "",
 	"keywords": [],
 	"main": "dist/index.js",
