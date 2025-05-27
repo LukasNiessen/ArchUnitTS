@@ -50,7 +50,7 @@ it('classes have high cohesion', async () => {
 ### Adding to Jest
 
 ```typescript
-expect(metrics().lcom().lcom96b().shouldHaveCohesionAbove(0.7)).toPassAsync();
+await expect(metrics().lcom().lcom96b().shouldHaveCohesionAbove(0.7)).toPassAsync();
 ```
 
 ## Integration with Architecture Rules
