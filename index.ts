@@ -6,7 +6,7 @@ export * from './src/slices/fluentapi/slices';
 export * from './src/files/fluentapi/files';
 export * from './src/metrics/fluentapi/metrics';
 export * from './src/metrics/calculation/count';
-export * from './src/metrics/fluentapi/count-metrics';
+export * from './src/metrics/fluentapi/metrics/count-metrics';
 
 // Testing framework integrations
 export * from './src/testing/index';

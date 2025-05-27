@@ -1,5 +1,5 @@
-import { Checkable } from '../../common/fluentapi/checkable';
-import { Violation } from '../../common/assertion/violation';
+import { Checkable } from '../../../common/fluentapi/checkable';
+import { Violation } from '../../../common/assertion/violation';
 import {
 	Abstractness,
 	Instability,
@@ -8,9 +8,9 @@ import {
 	calculateDistanceMetricsForProject,
 	CouplingFactor,
 	NormalizedDistance,
-} from '../calculation/distance';
-import { extractEnhancedClassInfo } from '../extraction/extract-class-info';
-import { MetricComparison } from './types';
+} from '../../calculation/distance';
+import { extractEnhancedClassInfo } from '../../extraction/extract-class-info';
+import { MetricComparison } from '../types';
 
 /**
  * Project summary for distance metrics

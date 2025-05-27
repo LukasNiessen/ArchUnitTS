@@ -5,9 +5,9 @@ import {
 	combineFilters,
 } from '../projection/project-metrics';
 import { ClassFilter } from '../extraction/interface';
-import { DistanceMetricsBuilder } from './distance-metrics';
-import { LCOMMetricsBuilder } from './lcom-metrics';
-import { CountMetricsBuilder } from './count-metrics';
+import { DistanceMetricsBuilder } from './metrics/distance-metrics';
+import { LCOMMetricsBuilder } from './metrics/lcom-metrics';
+import { CountMetricsBuilder } from './metrics/count-metrics';
 
 /**
  * Entry point for code metrics analysis.
@@ -56,20 +56,23 @@ export class MetricsBuilder {
 	}
 
 	/**
+	 * XXX-TODO: this was public before. should not though right?
 	 * Get the combined filter for all applied filters
 	 */
-	public getFilter(): ClassFilter | null {
+	getFilter(): ClassFilter | null {
 		if (this.filters.length === 0) {
 			return null;
 		}
 		return combineFilters(this.filters);
 	}
+
 	/**
 	 * Configure LCOM (Lack of Cohesion of Methods) metrics
 	 */
 	public lcom(): LCOMMetricsBuilder {
 		return new LCOMMetricsBuilder(this);
 	}
+
 	/**
 	 * Configure distance metrics (Abstractness, Instability, Distance from Main Sequence)
 	 */

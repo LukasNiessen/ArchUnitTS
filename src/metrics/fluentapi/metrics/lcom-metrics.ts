@@ -1,6 +1,6 @@
-import { Violation } from '../../common/assertion/violation';
-import { Checkable } from '../../common/fluentapi/checkable';
-import { gatherMetricViolations } from '../assertion/metric-thresholds';
+import { Violation } from '../../../common/assertion/violation';
+import { Checkable } from '../../../common/fluentapi/checkable';
+import { gatherMetricViolations } from '../../assertion/metric-thresholds';
 import {
 	LCOM96a,
 	LCOM96b,
@@ -11,12 +11,12 @@ import {
 	LCOM5,
 	LCOMStar,
 	LCOMMetric,
-} from '../calculation/lcom';
-import { extractClassInfo } from '../extraction/extract-class-info';
-import { Metric } from '../extraction/interface';
-import { projectToMetricResults } from '../projection/project-metrics';
-import { MetricsBuilder } from './metrics';
-import { MetricComparison } from './types';
+} from '../../calculation/lcom';
+import { extractClassInfo } from '../../extraction/extract-class-info';
+import { Metric } from '../../extraction/interface';
+import { projectToMetricResults } from '../../projection/project-metrics';
+import { MetricsBuilder } from '../metrics';
+import { MetricComparison } from '../types';
 
 /**
  * Project summary for LCOM metrics
