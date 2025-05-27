@@ -15,6 +15,11 @@ declare global {
 }
 
 export function extendJestMatchers() {
+	// Check if we're in a Jest environment (not Vitest)
+	if (typeof expect === 'undefined' || !expect.extend || typeof jest === 'undefined') {
+		return;
+	}
+
 	expect.extend({
 		async toPassAsync(checkable: Checkable): Promise<TestResult> {
 			if (!checkable) {

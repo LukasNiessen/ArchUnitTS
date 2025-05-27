@@ -12,24 +12,21 @@ declare global {
 }
 
 export function extendVitestMatchers() {
-	// For Vitest, we need to check if expect.extend exists
-	if (typeof expect !== 'undefined' && 'extend' in expect) {
-		(
-			expect as unknown as { extend: (matchers: Record<string, unknown>) => void }
-		).extend({
-			async toPassAsync(checkable: Checkable): Promise<TestResult> {
-				if (!checkable) {
-					return ResultFactory.error(
-						'expected something checkable as an argument for expect()'
-					);
-				}
-				const violations = await checkable.check();
-				const testViolations = violations.map((v) => ViolationFactory.from(v));
-				return ResultFactory.result(
-					Boolean((this as unknown as { isNot?: boolean }).isNot),
-					testViolations
-				);
-			},
-		});
+	// Check if we're in a Vitest environment
+	if (typeof expect === 'undefined' || !expect.extend || !('vi' in globalThis)) {
+		return;
 	}
+
+	expect.extend({
+		async toPassAsync(checkable: Checkable): Promise<TestResult> {
+			if (!checkable) {
+				return ResultFactory.error(
+					'expected something checkable as an argument for expect()'
+				);
+			}
+			const violations = await checkable.check();
+			const testViolations = violations.map((v) => ViolationFactory.from(v));
+			return ResultFactory.result(Boolean(this.isNot), testViolations);
+		},
+	});
 }
