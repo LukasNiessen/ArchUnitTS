@@ -30,7 +30,7 @@ ArchUnitTS supports multiple testing frameworks out of the box:
 import 'archunit/jest';
 // or manually: import { extendJestMatchers } from 'archunit'; extendJestMatchers();
 
-expect(myArchRule).toPassAsync();
+await expect(myArchRule).toPassAsync();
 ```
 
 ### Jasmine
@@ -39,7 +39,7 @@ expect(myArchRule).toPassAsync();
 import 'archunit/jasmine';
 // or manually: import { extendJasmineMatchers } from 'archunit'; extendJasmineMatchers();
 
-expect(myArchRule).toPassAsync();
+await expect(myArchRule).toPassAsync();
 ```
 
 ### Vitest
@@ -48,7 +48,7 @@ expect(myArchRule).toPassAsync();
 import 'archunit/vitest';
 // or manually: import { extendVitestMatchers } from 'archunit'; extendVitestMatchers();
 
-expect(myArchRule).toPassAsync();
+await expect(myArchRule).toPassAsync();
 ```
 
 ### Mocha
@@ -76,15 +76,3 @@ import 'archunit/qunit';
 
 await expectToPassAsync(myArchRule, assert);
 ```
-
-### Setup
-
-````typescript
-import { setupTestingFramework } from 'archunit';
-setupTestingFramework('vitest'); // or 'jest' or 'mocha', 'jasmine' etc.
-
-### Auto-Detection
-```typescript
-import { autoSetupTestingFramework } from 'archunit';
-autoSetupTestingFramework(); // Automatically detects and configures the framework
-````

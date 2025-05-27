@@ -24,7 +24,7 @@ describe('Count metrics integration test', () => {
 				.fieldCount()
 				.shouldBe(3);
 
-			expect(rule).toPassAsync();
+			await expect(rule).toPassAsync();
 		});
 
 		it('should validate method count with different comparison operators', async () => {
