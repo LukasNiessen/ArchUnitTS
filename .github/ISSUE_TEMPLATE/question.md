@@ -22,7 +22,7 @@ What are you trying to achieve with ArchUnitTS?
 
 ```typescript
 // Your code here
-import { projectFiles } from 'archunit-ts';
+import { projectFiles } from 'archunit';
 
 // What you're trying to do...
 ```

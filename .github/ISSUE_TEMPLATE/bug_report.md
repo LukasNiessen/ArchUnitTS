@@ -47,7 +47,7 @@ If applicable, add screenshots to help explain your problem.
 
 ```typescript
 // Please provide a minimal code example that reproduces the issue
-import { projectFiles } from 'archunit-ts';
+import { projectFiles } from 'archunit';
 
 const rule = projectFiles('tsconfig.json').should().beFreeOfCycles();
 

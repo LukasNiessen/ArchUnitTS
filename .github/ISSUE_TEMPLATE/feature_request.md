@@ -31,7 +31,7 @@ How would this feature be used? What problem does it solve?
 
 ```typescript
 // Example of how you envision using this feature
-import { projectFiles } from 'archunit-ts';
+import { projectFiles } from 'archunit';
 
 const rule = projectFiles('tsconfig.json').inFolder('src').should().yourNewFeature(); // Example API
 

@@ -4,8 +4,8 @@
 
 **Powerful TypeScript Architecture Testing Library**
 
-[![npm version](https://img.shields.io/npm/v/archunit-ts.svg)](https://www.npmjs.com/package/archunit-ts)
-[![npm downloads](https://img.shields.io/npm/dm/archunit-ts.svg)](https://www.npmjs.com/package/archunit-ts)
+[![npm version](https://img.shields.io/npm/v/archunit.svg)](https://www.npmjs.com/package/archunit)
+[![npm downloads](https://img.shields.io/npm/dm/archunit.svg)](https://www.npmjs.com/package/archunit)
 [![GitHub stars](https://img.shields.io/github/stars/LukasNiessen/ArchUnitTS.svg)](https://github.com/LukasNiessen/ArchUnitTS)
 [![CI Status](https://github.com/LukasNiessen/ArchUnitTS/actions/workflows/ci.yml/badge.svg)](https://github.com/LukasNiessen/ArchUnitTS/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
@@ -42,19 +42,19 @@ _Enforce coding standards, detect circular dependencies, and maintain clean code
 
 ```bash
 # npm
-npm install archunit-ts --save-dev
+npm install archunit --save-dev
 
 # yarn
-yarn add -D archunit-ts
+yarn add -D archunit
 
 # pnpm
-pnpm add -D archunit-ts
+pnpm add -D archunit
 ```
 
 ### Your First Architecture Test
 
 ```typescript
-import { projectFiles } from 'archunit-ts';
+import { projectFiles } from 'archunit';
 
 describe('Architecture Rules', () => {
 	it('should not have circular dependencies', async () => {
@@ -134,7 +134,7 @@ _Click on file paths to jump directly to the issue in your IDE!_
 ### 1. 🔄 Circular Dependencies
 
 ```typescript
-import { projectFiles } from 'archunit-ts';
+import { projectFiles } from 'archunit';
 
 // Test for any circular dependencies
 test('should be free of circular dependencies', async () => {
@@ -344,7 +344,7 @@ module.exports = {
 };
 
 // archunit.setup.js
-import 'archunit-ts/jest';
+import 'archunit/jest';
 ```
 
 ### Vitest
@@ -358,17 +358,17 @@ export default {
 };
 
 // archunit.setup.js
-import 'archunit-ts/vitest';
+import 'archunit/vitest';
 ```
 
 ### Mocha
 
 ```javascript
 // test/mocha.opts
---require archunit-ts/mocha
+--require archunit/mocha
 
 // Or in your test file
-import 'archunit-ts/mocha';
+import 'archunit/mocha';
 ```
 
 ---
@@ -460,7 +460,7 @@ expect(await rule.getViolations()).to.have.length(0);
 #### Custom Rules
 
 ```typescript
-import { Rule, FileSet } from 'archunit-ts';
+import { Rule, FileSet } from 'archunit';
 
 class CustomRule extends Rule {
 	async check(files: FileSet): Promise<boolean> {
