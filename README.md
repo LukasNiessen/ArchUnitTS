@@ -8,14 +8,83 @@
 
 Some of the functionality:
 
--   Check dependencies between files, folders and slices
--   Check for cyclic dependencies
--   Test for code metrics, eg. coupling and cohesion related ones (eg. LCOM96b)
--   Test whether the project adheres to a UML architecture diagram
--   Much more.
+- Check dependencies between files, folders and slices
+- Check for cyclic dependencies
+- Test for code metrics, eg. coupling and cohesion related ones (eg. LCOM96b)
+- Test whether the project adheres to a UML architecture diagram
+- Much more.
 
 ## Installation
 
 ```bash
 npm install archunit --save-dev
 ```
+
+## Testing Framework Integration
+
+ArchUnitTS supports multiple testing frameworks out of the box:
+
+### Jest
+
+```typescript
+import 'archunit/jest';
+// or manually: import { extendJestMatchers } from 'archunit'; extendJestMatchers();
+
+expect(myArchRule).toPassAsync();
+```
+
+### Jasmine
+
+```typescript
+import 'archunit/jasmine';
+// or manually: import { extendJasmineMatchers } from 'archunit'; extendJasmineMatchers();
+
+expect(myArchRule).toPassAsync();
+```
+
+### Vitest
+
+```typescript
+import 'archunit/vitest';
+// or manually: import { extendVitestMatchers } from 'archunit'; extendVitestMatchers();
+
+expect(myArchRule).toPassAsync();
+```
+
+### Mocha
+
+```typescript
+import 'archunit/mocha';
+// or manually: import { expectToPassAsync } from 'archunit';
+
+await expectToPassAsync(myArchRule);
+```
+
+### AVA
+
+```typescript
+import { expectToPassAsync } from 'archunit';
+
+await expectToPassAsync(myArchRule);
+```
+
+### QUnit
+
+```typescript
+import 'archunit/qunit';
+// or manually: import { expectToPassAsync } from 'archunit';
+
+await expectToPassAsync(myArchRule, assert);
+```
+
+### Setup
+
+````typescript
+import { setupTestingFramework } from 'archunit';
+setupTestingFramework('vitest'); // or 'jest' or 'mocha', 'jasmine' etc.
+
+### Auto-Detection
+```typescript
+import { autoSetupTestingFramework } from 'archunit';
+autoSetupTestingFramework(); // Automatically detects and configures the framework
+````

@@ -5,6 +5,8 @@ import { ViolatingEdge } from '../slices/assertion/admissible-edges';
 import { ViolatingCycle } from '../files/assertion/free-of-cycles';
 import { ViolatingFileDependency } from '../files/assertion/depend-on-files';
 import { MetricViolation } from '../metrics/assertion/metric-thresholds';
+import { ResultFactory } from '../testing/common/result-factory';
+import { ViolationFactory } from '../testing/common/violation-factory';
 
 /*
  * Extend Jest
@@ -24,16 +26,8 @@ interface JestResult {
 }
 
 /*
- * Matcher
+ * Matcher - Legacy types for backward compatibility
  */
-
-class UnknownJestViolation implements JestViolation {
-	details: Object = Object();
-	message: string = 'Unknown Violation found';
-	constructor(details: Object = Object()) {
-		this.details = details;
-	}
-}
 
 export interface JestViolation {
 	message: string;
@@ -42,65 +36,43 @@ export interface JestViolation {
 
 export class JestViolationFactory {
 	public static from(violation: Violation): JestViolation {
-		if (violation instanceof ViolatingNode) {
-			return this.fromViolatingFile(violation);
-		}
-		if (violation instanceof ViolatingEdge) {
-			return this.fromViolatingEdge(violation);
-		}
-		if (violation instanceof ViolatingCycle) {
-			return this.fromViolatingCycle(violation);
-		}
-		if (violation instanceof ViolatingFileDependency) {
-			return this.fromViolatingFileDependency(violation);
-		}
-		if (violation instanceof MetricViolation) {
-			return this.fromMetricViolation(violation);
-		}
-		return new UnknownJestViolation(violation);
+		// Use the generic violation factory and convert to Jest format
+		const testViolation = ViolationFactory.from(violation);
+		return {
+			message: testViolation.message,
+			details: testViolation.details,
+		};
 	}
 
+	// Keep legacy methods for backward compatibility but mark as deprecated
+	/** @deprecated Use ViolationFactory.from() instead */
 	private static fromMetricViolation(metric: MetricViolation): JestViolation {
-		const comparisonText =
-			metric.comparison === 'below' ? 'not below threshold' : 'not above threshold';
-		return {
-			message: `${metric.className} has ${metric.metricName} value of ${metric.metricValue}, which is ${comparisonText} ${metric.threshold}`,
-			details: metric,
-		};
+		const testViolation = ViolationFactory.from(metric);
+		return { message: testViolation.message, details: testViolation.details };
 	}
 
+	/** @deprecated Use ViolationFactory.from() instead */
 	private static fromViolatingFile(file: ViolatingNode): JestViolation {
-		return {
-			message: `${file.projectedNode.label} should match ${file.checkPattern}`, // TODO we need the negation information
-			details: file,
-		};
+		const testViolation = ViolationFactory.from(file);
+		return { message: testViolation.message, details: testViolation.details };
 	}
 
+	/** @deprecated Use ViolationFactory.from() instead */
 	private static fromViolatingEdge(edge: ViolatingEdge): JestViolation {
-		return {
-			message: `${edge.projectedEdge.sourceLabel} -> ${edge.projectedEdge.targetLabel} is not allowed`, // TODO we need the negation information
-			details: edge,
-		};
+		const testViolation = ViolationFactory.from(edge);
+		return { message: testViolation.message, details: testViolation.details };
 	}
 
-	private static fromViolatingFileDependency(
-		edge: ViolatingFileDependency
-	): JestViolation {
-		return {
-			message: `${edge.dependency.sourceLabel} -> ${edge.dependency.targetLabel} is not allowed`, // TODO we need the negation information
-			details: edge,
-		};
+	/** @deprecated Use ViolationFactory.from() instead */
+	private static fromViolatingFileDependency(edge: ViolatingFileDependency): JestViolation {
+		const testViolation = ViolationFactory.from(edge);
+		return { message: testViolation.message, details: testViolation.details };
 	}
 
+	/** @deprecated Use ViolationFactory.from() instead */
 	private static fromViolatingCycle(cycle: ViolatingCycle): JestViolation {
-		let cycleText = cycle.cycle[0].sourceLabel;
-		cycle.cycle.forEach((c) => {
-			cycleText += ' -> ' + c.targetLabel;
-		});
-		return {
-			message: `Found cycle: ${cycleText}`, // TODO we need the negation information
-			details: cycle,
-		};
+		const testViolation = ViolationFactory.from(cycle);
+		return { message: testViolation.message, details: testViolation.details };
 	}
 }
 
@@ -109,24 +81,27 @@ export class JestResultFactory {
 		shouldNotPass: boolean,
 		violations: JestViolation[]
 	): JestResult {
-		let info = shouldNotPass ? 'expected to not pass\n' : 'expected to pass\n';
-		if (violations.length > 0) {
-			violations.forEach((e) => {
-				info += `${e.message}\n${JSON.stringify(e.details)}\n\n`;
-			});
-			return { pass: false, message: () => info };
-		}
-		return { pass: true, message: () => info };
+		// Use the generic ResultFactory and convert to Jest format
+		const testViolations = violations.map(v => ({ message: v.message, details: v.details }));
+		const result = ResultFactory.result(shouldNotPass, testViolations);
+		return {
+			pass: result.pass,
+			message: result.message,
+		};
 	}
 
 	public static error(message: string): JestResult {
-		return { pass: false, message: () => message };
+		const result = ResultFactory.error(message);
+		return {
+			pass: result.pass,
+			message: result.message,
+		};
 	}
 }
 
 export function extendJestMatchers() {
 	expect.extend({
-		async toPassAsync(checkable: Checkable) {
+		async toPassAsync(checkable: Checkable): Promise<JestResult> {
 			if (!checkable) {
 				return JestResultFactory.error(
 					'expected something checkable as an argument for expect()'

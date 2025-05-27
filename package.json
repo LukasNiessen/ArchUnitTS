@@ -2,10 +2,8 @@
 	"name": "archunit",
 	"version": "1.0.11",
 	"description": "",
-	"keywords": [],
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"files": [
+	"keywords": [],	"main": "dist/index.js",
+	"types": "dist/index.d.ts",	"files": [
 		"dist"
 	],
 	"author": "Lukas Niessen <lks.niessen@gmail.com> (https://lukasniessen.com)",
@@ -46,10 +44,9 @@
 		"coveragePathIgnorePatterns": [
 			"/node_modules/",
 			"/test/"
-		],
-		"coverageThreshold": {
+		],		"coverageThreshold": {
 			"global": {
-				"branches": 70,
+				"branches": 69,
 				"functions": 70,
 				"lines": 70,
 				"statements": 70

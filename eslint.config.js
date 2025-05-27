@@ -9,11 +9,11 @@ import globals from 'globals';
 export default [
 	js.configs.recommended,
 	{
-		files: ['**/*.ts', '**/*.tsx'],
-		languageOptions: {
+		files: ['**/*.ts', '**/*.tsx'],		languageOptions: {
 			globals: {
 				...globals.node,
 				...globals.jest,
+				...globals.jasmine,
 			},
 			parser: typescriptParser,
 			parserOptions: {
