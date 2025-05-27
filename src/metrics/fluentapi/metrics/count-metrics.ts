@@ -20,6 +20,7 @@ import { ClassInfo } from '../../extraction/interface';
 import { projectToMetricResults } from '../../projection/project-metrics';
 import { MetricsBuilder } from '../metrics';
 import { MetricComparison } from '../types';
+import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
 
 /**
  * File-level metric violation
@@ -306,6 +307,36 @@ export class CountMetricsBuilder {
 			rootNames: parsedConfig.fileNames,
 			options: parsedConfig.options,
 		});
+	}
+
+	/**
+	 * Export count metrics summary as HTML file
+	 */
+	public async exportAsHTML(
+		outputPath?: string,
+		options?: Partial<ExportOptions>
+	): Promise<void> {
+		const { MetricsExporter } = await import('../export-utils');
+		const summary = await this.summary();
+
+		const projectSummary: ProjectMetricsSummary = {
+			count: summary,
+		};
+
+		// Set default output path if not provided
+		const defaultPath = path.join('dist', 'count-metrics-report.html');
+		const finalOutputPath = outputPath || defaultPath;
+
+		const exportOptions = {
+			outputPath: finalOutputPath.endsWith('.html')
+				? finalOutputPath
+				: finalOutputPath + '.html',
+			title: 'Count Metrics Report',
+			includeTimestamp: true,
+			...options,
+		};
+
+		await MetricsExporter.exportAsHTML(projectSummary, exportOptions);
 	}
 }
 

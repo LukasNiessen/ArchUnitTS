@@ -17,6 +17,8 @@ import { Metric } from '../../extraction/interface';
 import { projectToMetricResults } from '../../projection/project-metrics';
 import { MetricsBuilder } from '../metrics';
 import { MetricComparison } from '../types';
+import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
+import * as path from 'path';
 
 /**
  * Project summary for LCOM metrics
@@ -73,9 +75,9 @@ export class LCOMMetricsBuilder {
 	}
 
 	/**
-	 * Get project-wide LCOM metrics summary
+	 * Calculate comprehensive LCOM metrics summary
 	 */
-	public async getProjectSummary(): Promise<LCOMMetricsSummary> {
+	public async summary(): Promise<LCOMMetricsSummary> {
 		// Extract class information from the codebase
 		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
 
@@ -161,6 +163,36 @@ export class LCOMMetricsBuilder {
 			averageLCOMStar: Math.max(0, sumLCOMStar / totalClasses),
 			highCohesionClassCount: highCohesionCount,
 		};
+	}
+
+	/**
+	 * Export LCOM metrics summary as HTML file
+	 */
+	public async exportAsHTML(
+		outputPath?: string,
+		options?: Partial<ExportOptions>
+	): Promise<void> {
+		const { MetricsExporter } = await import('../export-utils');
+		const summary = await this.summary();
+
+		const projectSummary: ProjectMetricsSummary = {
+			lcom: summary,
+		};
+
+		// Set default output path if not provided
+		const defaultPath = path.join('dist', 'lcom-metrics-report.html');
+		const finalOutputPath = outputPath || defaultPath;
+
+		const exportOptions = {
+			outputPath: finalOutputPath.endsWith('.html')
+				? finalOutputPath
+				: finalOutputPath + '.html',
+			title: 'LCOM Metrics Report',
+			includeTimestamp: true,
+			...options,
+		};
+
+		await MetricsExporter.exportAsHTML(projectSummary, exportOptions);
 	}
 }
 

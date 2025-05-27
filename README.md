@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🏗️ ArchUnitTS
+# ArchUnitTS - Architecture Testing
 
-**Powerful TypeScript Architecture Testing Library**
+![ArchUnitTS Logo](/assets/logo-round.png)
 
 [![npm version](https://img.shields.io/npm/v/archunit.svg)](https://www.npmjs.com/package/archunit)
 [![npm downloads](https://img.shields.io/npm/dm/archunit.svg)](https://www.npmjs.com/package/archunit)
@@ -555,3 +555,5 @@ Made with 💚 by the ArchUnitTS team
 ---
 
 TODO: mention the big scope, eg not only file and folder based like most ts arch testing libararies, but you can test class wise, method wise, field wise, even line wise.
+
+TODO: mention due to the fact that export functionality is so customizable, you can include a cd process in your pipeline to deploy it to github/lab pages for example.

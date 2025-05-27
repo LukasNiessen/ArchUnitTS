@@ -120,9 +120,7 @@ describe('Distance metrics integration test', () => {
 	describe('Project-wide distance metrics', () => {
 		it('should calculate project summary metrics', async () => {
 			// Get project summary for distance metrics
-			const projectSummary = await metrics(mockProjectPath)
-				.distance()
-				.getProjectSummary();
+			const projectSummary = await metrics(mockProjectPath).distance().summary();
 
 			// Verify we have valid project metrics
 			expect(projectSummary).toBeDefined();

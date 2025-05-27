@@ -7,7 +7,7 @@ describe('LCOM metrics project summary', () => {
 
 	it('should calculate project-wide LCOM metrics summary', async () => {
 		// Get project summary for LCOM metrics
-		const projectSummary = await metrics(mockProjectPath).lcom().getProjectSummary();
+		const projectSummary = await metrics(mockProjectPath).lcom().summary();
 
 		// Verify we have valid project metrics
 		expect(projectSummary).toBeDefined();

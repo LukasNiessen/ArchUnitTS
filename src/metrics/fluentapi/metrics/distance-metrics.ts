@@ -11,6 +11,8 @@ import {
 } from '../../calculation/distance';
 import { extractEnhancedClassInfo } from '../../extraction/extract-class-info';
 import { MetricComparison } from '../types';
+import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
+import * as path from 'path';
 
 /**
  * Project summary for distance metrics
@@ -135,11 +137,41 @@ export class DistanceMetricsBuilder {
 	}
 
 	/**
-	 * Get project-wide distance metrics summary
+	 * Calculate comprehensive distance metrics summary
 	 */
-	public async getProjectSummary(): Promise<DistanceMetricsSummary> {
+	public async summary(): Promise<DistanceMetricsSummary> {
 		const results = await calculateDistanceMetricsForProject(this.tsConfigFilePath);
 		return results.projectSummary;
+	}
+
+	/**
+	 * Export distance metrics summary as HTML file
+	 */
+	public async exportAsHTML(
+		outputPath?: string,
+		options?: Partial<ExportOptions>
+	): Promise<void> {
+		const { MetricsExporter } = await import('../export-utils');
+		const summary = await this.summary();
+
+		const projectSummary: ProjectMetricsSummary = {
+			distance: summary,
+		};
+
+		// Set default output path if not provided
+		const defaultPath = path.join('dist', 'distance-metrics-report.html');
+		const finalOutputPath = outputPath || defaultPath;
+
+		const exportOptions = {
+			outputPath: finalOutputPath.endsWith('.html')
+				? finalOutputPath
+				: finalOutputPath + '.html',
+			title: 'Distance Metrics Report',
+			includeTimestamp: true,
+			...options,
+		};
+
+		await MetricsExporter.exportAsHTML(projectSummary, exportOptions);
 	}
 }
 
