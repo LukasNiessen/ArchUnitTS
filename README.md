@@ -12,6 +12,7 @@ Some of the functionality:
 - Check for cyclic dependencies
 - Test for code metrics, eg. coupling and cohesion related ones (eg. LCOM96b)
 - Test whether the project adheres to a UML architecture diagram
+- Automatic integration with popular testing frameworks (Jest, Vitest, Jasmine, Mocha, QUnit, AVA)
 - Much more.
 
 ## Installation
@@ -19,3 +20,21 @@ Some of the functionality:
 ```bash
 npm install archunit --save-dev
 ```
+
+## Testing Framework Integration
+
+ArchUnitTS automatically integrates with your preferred testing framework, providing a seamless testing experience. No additional configuration is required - just import and use:
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { metrics } from 'archunit';
+
+describe('architecture', () => {
+  it('cohesion should be high', async () => {
+    const rule = metrics().lcom().lcom96b().shouldBeBelow(0.5);
+    await expect(rule).toPassAsync();
+  });
+});
+```
+
+Supported frameworks include Jest, Vitest, Jasmine, Mocha, QUnit, and AVA. For detailed documentation on testing framework integration, see the [Testing Framework Integration guide](src/testing/README.md).
