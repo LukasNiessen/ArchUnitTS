@@ -6,10 +6,6 @@ The ArchUnitTS team takes security vulnerabilities seriously. We appreciate your
 
 ### 📧 How to Report
 
-**Please do NOT report security vulnerabilities through public GitHub issues.**
-
-Instead, please report security vulnerabilities by emailing: **security@archunitts.dev**
-
 Include the following information in your report:
 
 - Type of issue (e.g., buffer overflow, SQL injection, cross-site scripting, etc.)
