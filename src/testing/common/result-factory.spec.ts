@@ -6,7 +6,7 @@ describe('ResultFactory', () => {
 		// Mock stdout.isTTY to true to enable colors in tests
 		Object.defineProperty(process.stdout, 'isTTY', {
 			value: true,
-			configurable: true
+			configurable: true,
 		});
 		delete process.env.NO_COLOR;
 		delete process.env.CI;
@@ -32,14 +32,16 @@ describe('ResultFactory', () => {
 			const violations: TestViolation[] = [
 				{
 					message: 'Test violation message',
-					details: { type: 'test' }
-				}
+					details: { type: 'test' },
+				},
 			];
 
 			const result = ResultFactory.result(false, violations);
 
 			expect(result.pass).toBe(false);
-			expect(result.message()).toContain('Architecture rule failed with 1 violation:');
+			expect(result.message()).toContain(
+				'Architecture rule failed with 1 violation:'
+			);
 			expect(result.message()).toContain('1.');
 			expect(result.message()).toContain('Test violation message');
 		});
@@ -48,22 +50,24 @@ describe('ResultFactory', () => {
 			const violations: TestViolation[] = [
 				{
 					message: 'First violation',
-					details: { type: 'test1' }
+					details: { type: 'test1' },
 				},
 				{
 					message: 'Second violation',
-					details: { type: 'test2' }
+					details: { type: 'test2' },
 				},
 				{
 					message: 'Third violation',
-					details: { type: 'test3' }
-				}
+					details: { type: 'test3' },
+				},
 			];
 
 			const result = ResultFactory.result(false, violations);
 
 			expect(result.pass).toBe(false);
-			expect(result.message()).toContain('Architecture rule failed with 3 violations:');
+			expect(result.message()).toContain(
+				'Architecture rule failed with 3 violations:'
+			);
 			expect(result.message()).toContain('1.');
 			expect(result.message()).toContain('First violation');
 			expect(result.message()).toContain('2.');
@@ -76,8 +80,8 @@ describe('ResultFactory', () => {
 			const violations: TestViolation[] = [
 				{
 					message: 'Test message',
-					details: {}
-				}
+					details: {},
+				},
 			];
 
 			const result = ResultFactory.result(false, violations);
@@ -116,14 +120,16 @@ describe('ResultFactory', () => {
 			const violations: TestViolation[] = [
 				{
 					message: 'Test violation',
-					details: {}
-				}
+					details: {},
+				},
 			];
 
 			const result = ResultFactory.result(false, violations);
 
 			expect(result.pass).toBe(false);
-			expect(result.message()).toContain('Architecture rule failed with 1 violation:');
+			expect(result.message()).toContain(
+				'Architecture rule failed with 1 violation:'
+			);
 			expect(result.message()).toContain('Test violation');
 			expect(result.message()).not.toContain('\x1b['); // No ANSI codes
 		});

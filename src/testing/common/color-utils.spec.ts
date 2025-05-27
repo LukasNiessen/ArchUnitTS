@@ -6,7 +6,7 @@ describe('ColorUtils', () => {
 			// Mock stdout.isTTY to true to enable colors in tests
 			Object.defineProperty(process.stdout, 'isTTY', {
 				value: true,
-				configurable: true
+				configurable: true,
 			});
 			// Clear environment variables that disable colors
 			delete process.env.NO_COLOR;
@@ -107,7 +107,7 @@ describe('ColorUtils', () => {
 		it('should disable colors when stdout is not a TTY', () => {
 			Object.defineProperty(process.stdout, 'isTTY', {
 				value: false,
-				configurable: true
+				configurable: true,
 			});
 			const result = ColorUtils.blue('test');
 			expect(result).toBe('test');
@@ -119,7 +119,7 @@ describe('ColorUtils', () => {
 		beforeEach(() => {
 			Object.defineProperty(process.stdout, 'isTTY', {
 				value: true,
-				configurable: true
+				configurable: true,
 			});
 			delete process.env.NO_COLOR;
 			delete process.env.CI;
@@ -156,7 +156,7 @@ describe('ColorUtils', () => {
 		beforeEach(() => {
 			Object.defineProperty(process.stdout, 'isTTY', {
 				value: true,
-				configurable: true
+				configurable: true,
 			});
 			delete process.env.NO_COLOR;
 			delete process.env.CI;
