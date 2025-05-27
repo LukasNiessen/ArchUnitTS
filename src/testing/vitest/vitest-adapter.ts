@@ -3,7 +3,7 @@ import { ResultFactory, TestResult } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 
 interface VitestExpectExtension {
-	toPassAsync(): TestResult;
+	toPassAsync(): Promise<TestResult>;
 }
 
 // Only declare module augmentation if vitest types are available

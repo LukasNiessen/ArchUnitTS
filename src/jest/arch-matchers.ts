@@ -15,7 +15,7 @@ declare global {
 	namespace jest {
 		// tslint:disable-next-line:interface-name
 		interface Matchers<R> {
-			toPassAsync(): R;
+			toPassAsync(): Promise<R>;
 		}
 	}
 }

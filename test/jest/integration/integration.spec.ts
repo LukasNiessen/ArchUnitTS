@@ -7,8 +7,7 @@ describe('Integration test', () => {
 			.inFolder('services')
 			.should()
 			.matchPattern('.*Service\\.ts');
-
 		// Changed to toPassAsync because it should pass the test
-		expect(rule).toPassAsync();
+		await expect(rule).toPassAsync();
 	});
 });
