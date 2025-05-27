@@ -8,10 +8,19 @@ import { gatherRegexMatchingViolations } from '../assertion/matching-files';
 import { Violation } from '../../common/assertion/violation';
 import { gatherCycleViolations } from '../assertion/free-of-cycles';
 import { gatherDependOnFileViolations } from '../assertion/depend-on-files';
+import {
+	gatherCustomFileViolations,
+	CustomFileCondition,
+} from '../assertion/custom-file-logic';
+
+// Re-export types for external use
+export type { FileInfo, CustomFileCondition } from '../assertion/custom-file-logic';
 
 export const projectFiles = (tsConfigFilePath?: string): FileConditionBuilder => {
 	return new FileConditionBuilder(tsConfigFilePath);
 };
+
+export const files = projectFiles;
 
 export class FileConditionBuilder {
 	constructor(readonly tsConfigFilePath?: string) {}
@@ -98,6 +107,19 @@ export class PositiveMatchPatternFileConditionBuilder {
 
 	public dependOnFiles(): DependOnFileConditionBuilder {
 		return new DependOnFileConditionBuilder(this);
+	}
+
+	// Custom logic support
+	public adhereTo(
+		condition: CustomFileCondition,
+		message: string
+	): CustomFileCheckableCondition {
+		return new CustomFileCheckableCondition(
+			this.filesShouldCondition.fileCondition.tsConfigFilePath,
+			condition,
+			message,
+			this.filesShouldCondition.patterns
+		);
 	}
 }
 
@@ -203,6 +225,32 @@ export class MatchPatternFileCondition implements Checkable {
 			this.pattern,
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
 			this.matchPatternFileConditionBuilder.isNegated
+		);
+	}
+}
+
+// Custom logic checkable condition for files domain
+export class CustomFileCheckableCondition implements Checkable {
+	constructor(
+		readonly tsConfigFilePath?: string,
+		readonly condition?: CustomFileCondition,
+		readonly message?: string,
+		readonly patterns?: string[]
+	) {}
+
+	public async check(): Promise<Violation[]> {
+		if (!this.condition) {
+			return [];
+		}
+
+		const graph = await extractGraph(this.tsConfigFilePath);
+		const projectedNodes = projectToNodes(graph);
+
+		return gatherCustomFileViolations(
+			projectedNodes,
+			this.patterns || [],
+			this.condition,
+			this.message || 'Custom file condition failed'
 		);
 	}
 }
