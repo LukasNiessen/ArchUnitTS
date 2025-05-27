@@ -551,3 +551,7 @@ MIT © [Lukas Niessen](https://github.com/LukasNiessen)
 Made with 💚 by the ArchUnitTS team
 
 </div>
+
+---
+
+TODO: mention the big scope, eg not only file and folder based like most ts arch testing libararies, but you can test class wise, method wise, field wise, even line wise.
