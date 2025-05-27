@@ -289,85 +289,6 @@ test('should follow custom business rules', async () => {
 
 ## 🔧 Configuration
 
-### Basic Setup
-
-Create an `archunit.config.js` file in your project root:
-
-```javascript
-module.exports = {
-	// TypeScript configuration
-	tsconfig: './tsconfig.json',
-
-	// Folders to analyze
-	include: ['src/**/*.ts', 'lib/**/*.ts'],
-	exclude: ['**/*.test.ts', '**/*.spec.ts', 'dist/**'],
-
-	// Error output options
-	coloredOutput: true,
-	clickableFilePaths: true,
-	maxViolationsToShow: 10,
-
-	// Performance options
-	parallelProcessing: true,
-	cacheEnabled: true,
-};
-```
-
-### Advanced Configuration
-
-```javascript
-module.exports = {
-	// Multiple TypeScript projects
-	projects: [
-		{ tsconfig: './frontend/tsconfig.json', name: 'Frontend' },
-		{ tsconfig: './backend/tsconfig.json', name: 'Backend' },
-	],
-
-	// Custom rules
-	rules: {
-		maxCyclomaticComplexity: 8,
-		maxLinesOfCode: 250,
-		maxDependencies: 15,
-	},
-
-	// Layer definitions
-	layers: {
-		controllers: ['**/controllers/**'],
-		services: ['**/services/**'],
-		repositories: ['**/repositories/**'],
-	},
-
-	// Dependency rules
-	layerDependencies: {
-		controllers: ['services', 'types'],
-		services: ['repositories', 'types'],
-		repositories: ['types'],
-	},
-};
-```
-
----
-
-## 📈 Performance & Benchmarks
-
-ArchUnitTS is optimized for speed and can analyze large codebases efficiently:
-
-| Project Size | Files | Analysis Time | Memory Usage |
-| ------------ | ----- | ------------- | ------------ |
-| Small        | <100  | <1s           | <50MB        |
-| Medium       | 500   | 2-3s          | ~100MB       |
-| Large        | 1000  | 5-8s          | ~200MB       |
-| Enterprise   | 5000+ | 15-30s        | ~500MB       |
-
-**Performance Tips:**
-
-- Enable caching in configuration
-- Use parallel processing for large projects
-- Exclude unnecessary files (tests, build output)
-- Use specific folder targeting when possible
-
----
-
 ## 🛠️ API Reference
 
 ### Core API
@@ -551,6 +472,10 @@ MIT © [Lukas Niessen](https://github.com/LukasNiessen)
 Made with 💚 by the ArchUnitTS team
 
 </div>
+
+## TODOs
+
+- Add a config file, eg archunit.config.js or archunit.rc
 
 ---
 

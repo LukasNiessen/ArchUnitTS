@@ -59,10 +59,30 @@ export class ViolationFactory {
 		};
 	}
 	private static fromViolatingEdge(edge: ViolatingEdge): TestViolation {
-		const message = `${ColorUtils.formatViolationType('Slice dependency violation')}:
-   From: ${ColorUtils.formatFilePath(`${edge.projectedEdge.sourceLabel}:1:1`)}
-   To: ${ColorUtils.formatFilePath(`${edge.projectedEdge.targetLabel}:1:1`)}
+		// Extract actual file paths from cumulatedEdges for more detailed reporting
+		const actualFiles = edge.projectedEdge.cumulatedEdges.map((e) => ({
+			source: e.source,
+			target: e.target,
+			importKinds: e.importKinds,
+		}));
+
+		// Create a comprehensive violation message
+		let message = `${ColorUtils.formatViolationType('Slice dependency violation')}:
+   From slice: ${ColorUtils.formatFilePath(`${edge.projectedEdge.sourceLabel}:1:1`)}
+   To slice: ${ColorUtils.formatFilePath(`${edge.projectedEdge.targetLabel}:1:1`)}
    Rule: ${ColorUtils.formatRule('This dependency is not allowed')}`;
+
+		// Add detailed file-level information if available
+		if (actualFiles.length > 0) {
+			message += `\n\n   ${ColorUtils.formatViolationType('Violating dependencies:')}`;
+			actualFiles.forEach((file, index) => {
+				const importInfo =
+					file.importKinds && file.importKinds.length > 0
+						? ` (${file.importKinds.join(', ')})`
+						: '';
+				message += `\n   ${index + 1}. ${ColorUtils.formatFilePath(`${file.source}:1:1`)} → ${ColorUtils.formatFilePath(`${file.target}:1:1`)}${importInfo}`;
+			});
+		}
 
 		return {
 			message,
@@ -76,10 +96,29 @@ export class ViolationFactory {
 			? 'This dependency should not exist'
 			: 'This dependency violates the architecture rule';
 
-		const message = `${ColorUtils.formatViolationType('File dependency violation')}:
-   From: ${ColorUtils.formatFilePath(`${edge.dependency.sourceLabel}:1:1`)}
-   To: ${ColorUtils.formatFilePath(`${edge.dependency.targetLabel}:1:1`)}
+		// Extract actual file paths from cumulatedEdges for more detailed reporting
+		const actualFiles = edge.dependency.cumulatedEdges.map((e) => ({
+			source: e.source,
+			target: e.target,
+			importKinds: e.importKinds,
+		}));
+
+		let message = `${ColorUtils.formatViolationType('File dependency violation')}:
+   From pattern: ${ColorUtils.formatFilePath(`${edge.dependency.sourceLabel}:1:1`)}
+   To pattern: ${ColorUtils.formatFilePath(`${edge.dependency.targetLabel}:1:1`)}
    Rule: ${ColorUtils.formatRule(ruleDescription)}`;
+
+		// Add detailed file-level information if available
+		if (actualFiles.length > 0) {
+			message += `\n\n   ${ColorUtils.formatViolationType('Violating dependencies:')}`;
+			actualFiles.forEach((file, index) => {
+				const importInfo =
+					file.importKinds && file.importKinds.length > 0
+						? ` (${file.importKinds.join(', ')})`
+						: '';
+				message += `\n   ${index + 1}. ${ColorUtils.formatFilePath(`${file.source}:1:1`)} → ${ColorUtils.formatFilePath(`${file.target}:1:1`)}${importInfo}`;
+			});
+		}
 
 		return {
 			message,
@@ -97,9 +136,29 @@ export class ViolationFactory {
 			)
 			.join(` ${ColorUtils.gray('→')} `);
 
-		const message = `${ColorUtils.formatViolationType('Circular dependency detected')}:
+		let message = `${ColorUtils.formatViolationType('Circular dependency detected')}:
    Cycle: ${coloredCycle}
    Rule: ${ColorUtils.formatRule('Circular dependencies are not allowed')}`;
+
+		// Add detailed file-level information for each edge in the cycle
+		const hasDetailedFiles = cycle.cycle.some(
+			(edge) => edge.cumulatedEdges && edge.cumulatedEdges.length > 0
+		);
+		if (hasDetailedFiles) {
+			message += `\n\n   ${ColorUtils.formatViolationType('Detailed cycle dependencies:')}`;
+			cycle.cycle.forEach((edge, index) => {
+				if (edge.cumulatedEdges && edge.cumulatedEdges.length > 0) {
+					message += `\n   ${index + 1}. ${ColorUtils.formatFilePath(`${edge.sourceLabel}:1:1`)} → ${ColorUtils.formatFilePath(`${edge.targetLabel}:1:1`)}`;
+					edge.cumulatedEdges.forEach((file, fileIndex) => {
+						const importInfo =
+							file.importKinds && file.importKinds.length > 0
+								? ` (${file.importKinds.join(', ')})`
+								: '';
+						message += `\n      ${String.fromCharCode(97 + fileIndex)}. ${ColorUtils.formatFilePath(`${file.source}:1:1`)} → ${ColorUtils.formatFilePath(`${file.target}:1:1`)}${importInfo}`;
+					});
+				}
+			});
+		}
 
 		return {
 			message,
