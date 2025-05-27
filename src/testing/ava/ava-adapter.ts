@@ -1,3 +1,4 @@
+/*
 import { Checkable } from '../../common/fluentapi/checkable';
 import { ViolationFactory } from '../common/violation-factory';
 
@@ -30,3 +31,4 @@ export async function checkArchRule(checkable: Checkable): Promise<string[]> {
 	const testViolations = violations.map((v) => ViolationFactory.from(v));
 	return testViolations.map((v) => v.message);
 }
+*/

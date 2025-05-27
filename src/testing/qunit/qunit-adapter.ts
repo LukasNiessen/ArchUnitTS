@@ -1,3 +1,4 @@
+/*
 import { Checkable } from '../../common/fluentapi/checkable';
 import { ViolationFactory } from '../common/violation-factory';
 
@@ -80,3 +81,4 @@ export async function expectToPassAsync(
 				: `Architecture rule violations:\n${testViolations.map((v) => v.message).join('\n')}`)
 	);
 }
+*/

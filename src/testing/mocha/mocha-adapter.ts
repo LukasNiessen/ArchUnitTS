@@ -1,3 +1,4 @@
+/*
 import { Checkable } from '../../common/fluentapi/checkable';
 import { ViolationFactory } from '../common/violation-factory';
 
@@ -41,3 +42,4 @@ export async function expectToPassAsync(checkable: Checkable) {
 		throw new Error(`Architecture rule violations found:\n${messages}`);
 	}
 }
+*/
