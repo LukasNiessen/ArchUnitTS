@@ -7,6 +7,7 @@ import {
 import { ClassFilter } from '../extraction/interface';
 import { DistanceMetricsBuilder } from './distance-metrics';
 import { LCOMMetricsBuilder } from './lcom-metrics';
+import { CountMetricsBuilder } from './count-metrics';
 
 /**
  * Entry point for code metrics analysis.
@@ -69,11 +70,17 @@ export class MetricsBuilder {
 	public lcom(): LCOMMetricsBuilder {
 		return new LCOMMetricsBuilder(this);
 	}
-
 	/**
 	 * Configure distance metrics (Abstractness, Instability, Distance from Main Sequence)
 	 */
 	public distance(): DistanceMetricsBuilder {
 		return new DistanceMetricsBuilder(this.tsConfigFilePath);
+	}
+
+	/**
+	 * Configure count metrics (Lines of Code, Methods, Fields, etc.)
+	 */
+	public count(): CountMetricsBuilder {
+		return new CountMetricsBuilder(this);
 	}
 }

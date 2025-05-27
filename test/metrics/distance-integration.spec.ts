@@ -116,7 +116,7 @@ describe('Distance metrics integration test', () => {
 		});
 	});
 
-	// not really useful tests
+	// smoke test suite
 	describe('Project-wide distance metrics', () => {
 		it('should calculate project summary metrics', async () => {
 			// Get project summary for distance metrics
