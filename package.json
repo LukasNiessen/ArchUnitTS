@@ -17,7 +17,6 @@
 	"engines": {
 		"node": ">=14.0.0"
 	},
-	"type": "module",
 	"scripts": {
 		"lint": "eslint src",
 		"clean": "rimraf dist",
@@ -34,9 +33,21 @@
 		"test:prod": "npm run lint && npm run test -- --coverage --no-cache"
 	},
 	"jest": {
-		"testURL": "http://localhost/",
+		"preset": "ts-jest/presets/default-esm",
+		"extensionsToTreatAsEsm": [
+			".ts"
+		],
+		"testEnvironmentOptions": {
+			"url": "http://localhost/"
+		},
 		"transform": {
-			".(ts|tsx)": "ts-jest"
+			".(ts|tsx)": [
+				"ts-jest",
+				{
+					"useESM": true,
+					"tsconfig": "tsconfig.test.json"
+				}
+			]
 		},
 		"testRegex": "(/(test|src)/.*\\.(test|spec))\\.(ts|tsx)$",
 		"moduleFileExtensions": [

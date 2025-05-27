@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"moduleResolution": "node",
 		"target": "es2020",
-		"module": "es2020",
+		"module": "commonjs",
 		"lib": ["es2020"],
 		"jsx": "preserve",
 		"strict": true,
