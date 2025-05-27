@@ -65,9 +65,6 @@ Here's how the auto-detection works (simplified from `auto-detect.ts`):
 extendJestMatchers(); // Only sets up if Jest is available
 extendJasmineMatchers(); // Only sets up if Jasmine is available
 extendVitestMatchers(); // Only sets up if Vitest is available
-extendMochaMatchers(); // Only sets up if Mocha is available
-extendQUnitMatchers(); // Only sets up if QUnit is available
-extendAvaMatchers(); // Only sets up if Ava is available
 ```
 
 ### TypeScript Type Declaration Extension
@@ -158,6 +155,7 @@ describe('Architecture Tests', () => {
 
 ```typescript
 import { describe, it } from 'mocha';
+import { strict as assert } from 'assert';
 import { projectFiles } from 'archunit';
 
 describe('Architecture Tests', () => {
@@ -168,8 +166,8 @@ describe('Architecture Tests', () => {
 			.dependOnFiles()
 			.inFolder('src/presentation');
 
-		// With Mocha, you can use the global toPassAsync function that's automatically injected
-		await toPassAsync(rule);
+		const violations = await rule.check();
+		assert.equal(violations.length, 0, 'Architecture rule violated');
 	});
 });
 ```
@@ -186,9 +184,8 @@ QUnit.test('architecture test', async (assert) => {
 		.dependOnFiles()
 		.inFolder('src/presentation');
 
-	// QUnit integration provides this global helper
-	await toPassAsync(rule);
-	assert.ok(true, 'Architecture rule passed');
+	const violations = await rule.check();
+	assert.equal(violations.length, 0, 'Architecture rule should pass');
 });
 ```
 

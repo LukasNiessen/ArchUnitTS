@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🔧 Improved
 
 - **Error Formatting**: Complete rewrite of `ViolationFactory` and `ResultFactory` for better UX
-- **Test Framework Integration**: Enhanced Jest, Vitest, Mocha integration with colorful output
+- **Test Framework Integration**: Enhanced Jest, Vitest integration with colorful output
 - **Violation Messages**: Structured error messages with proper context and actionable information
 - **Coverage**: Improved test coverage for error handling components
 
@@ -72,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ✨ Added
 
 - Complete API redesign with fluent interface
-- Support for multiple testing frameworks (Jest, Vitest, Mocha, etc.)
+- Support for multiple testing frameworks (Jest, Vitest, Jasmine, etc.)
 - Advanced code metrics (LCOM, coupling, cohesion)
 - Comprehensive cycle detection
 - File pattern matching capabilities

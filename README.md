@@ -127,6 +127,21 @@ _Click on file paths to jump directly to the issue in your IDE!_
 - **Async/Await Support** - Modern async testing patterns
 - **Parallel Execution** - Fast test execution with parallel processing
 
+### 📋 Example Projects
+
+Get started quickly with complete example projects for your favorite testing framework:
+
+- 🚀 **[Vitest Example](https://github.com/LukasNiessen/ArchUnitTS-Vitest-Example)** - Complete Vitest setup with architecture tests
+- ⚡ **[Jest Example](https://github.com/LukasNiessen/ArchUnitTS-Jest-Example)** - Full Jest integration examples
+- 🔬 **[Jasmine Example](https://github.com/LukasNiessen/ArchUnitTS-Jasmine-Example)** - Jasmine testing framework integration
+
+Each example includes:
+
+- ✅ Complete project setup and configuration
+- 🧪 Real-world architecture test examples
+- 📚 Best practices and patterns
+- 🚀 Ready-to-run test suites
+
 ---
 
 ## 📚 Examples
@@ -329,46 +344,6 @@ module.exports = {
 		repositories: ['types'],
 	},
 };
-```
-
----
-
-## 🧪 Testing Framework Integration
-
-### Jest
-
-```javascript
-// jest.config.js
-module.exports = {
-	setupFilesAfterEnv: ['<rootDir>/archunit.setup.js'],
-};
-
-// archunit.setup.js
-import 'archunit/jest';
-```
-
-### Vitest
-
-```javascript
-// vite.config.js
-export default {
-	test: {
-		setupFiles: ['./archunit.setup.js'],
-	},
-};
-
-// archunit.setup.js
-import 'archunit/vitest';
-```
-
-### Mocha
-
-```javascript
-// test/mocha.opts
---require archunit/mocha
-
-// Or in your test file
-import 'archunit/mocha';
 ```
 
 ---
