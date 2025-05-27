@@ -5,6 +5,7 @@ import { ViolatingCycle } from '../../files/assertion/free-of-cycles';
 import { ViolatingFileDependency } from '../../files/assertion/depend-on-files';
 import { MetricViolation } from '../../metrics/assertion/metric-thresholds';
 import { TestViolation } from './result-factory';
+import { ColorUtils } from './color-utils';
 
 class UnknownTestViolation implements TestViolation {
 	details: Object = Object();
@@ -32,48 +33,85 @@ export class ViolationFactory {
 			return this.fromMetricViolation(violation);
 		}
 		return new UnknownTestViolation(violation);
-	}
+	}	private static fromMetricViolation(metric: MetricViolation): TestViolation {
+		const comparisonText = this.getComparisonDescription(metric.comparison);
+		const message = `${ColorUtils.formatViolationType('Metric violation')} in class '${ColorUtils.cyan(metric.className)}':
+   File: ${ColorUtils.formatFilePath(`${metric.filePath}:1:1`)}
+   Metric: ${ColorUtils.formatMetricValue(metric.metricName)}
+   Actual value: ${ColorUtils.formatMetricValue(metric.metricValue.toString())}
+   Expected: ${ColorUtils.formatRule(`${comparisonText} ${metric.threshold}`)}`;
 
-	private static fromMetricViolation(metric: MetricViolation): TestViolation {
-		const comparisonText =
-			metric.comparison === 'below' ? 'not below threshold' : 'not above threshold';
 		return {
-			message: `${metric.className} has ${metric.metricName} value of ${metric.metricValue}, which is ${comparisonText} ${metric.threshold}`,
+			message,
 			details: metric,
 		};
-	}
+	}	private static fromViolatingFile(file: ViolatingNode): TestViolation {
+		const action = file.isNegated ? 'should not match' : 'should match';
+		const message = `${ColorUtils.formatViolationType('File pattern violation')}:
+   File: ${ColorUtils.formatFilePath(`${file.projectedNode.label}:1:1`)}
+   Rule: ${ColorUtils.formatRule(`${action} pattern '${file.checkPattern}'`)}`;
 
-	private static fromViolatingFile(file: ViolatingNode): TestViolation {
 		return {
-			message: `${file.projectedNode.label} should match ${file.checkPattern}`,
+			message,
 			details: file,
 		};
-	}
+	}	private static fromViolatingEdge(edge: ViolatingEdge): TestViolation {
+		const message = `${ColorUtils.formatViolationType('Slice dependency violation')}:
+   From: ${ColorUtils.formatFilePath(`${edge.projectedEdge.sourceLabel}:1:1`)}
+   To: ${ColorUtils.formatFilePath(`${edge.projectedEdge.targetLabel}:1:1`)}
+   Rule: ${ColorUtils.formatRule('This dependency is not allowed')}`;
 
-	private static fromViolatingEdge(edge: ViolatingEdge): TestViolation {
 		return {
-			message: `${edge.projectedEdge.sourceLabel} -> ${edge.projectedEdge.targetLabel} is not allowed`,
+			message,
 			details: edge,
 		};
-	}
-
-	private static fromViolatingFileDependency(
+	}	private static fromViolatingFileDependency(
 		edge: ViolatingFileDependency
 	): TestViolation {
+		const ruleDescription = edge.isNegated
+			? 'This dependency should not exist'
+			: 'This dependency violates the architecture rule';
+
+		const message = `${ColorUtils.formatViolationType('File dependency violation')}:
+   From: ${ColorUtils.formatFilePath(`${edge.dependency.sourceLabel}:1:1`)}
+   To: ${ColorUtils.formatFilePath(`${edge.dependency.targetLabel}:1:1`)}
+   Rule: ${ColorUtils.formatRule(ruleDescription)}`;
+
 		return {
-			message: `${edge.dependency.sourceLabel} -> ${edge.dependency.targetLabel} is not allowed`,
+			message,
 			details: edge,
+		};
+	}	private static fromViolatingCycle(cycle: ViolatingCycle): TestViolation {
+		// Make each file in the cycle clickable with colors
+		const coloredCycle = cycle.cycle
+			.map((edge) => ColorUtils.formatFilePath(`${edge.sourceLabel}:1:1`))
+			.concat(ColorUtils.formatFilePath(`${cycle.cycle[cycle.cycle.length - 1].targetLabel}:1:1`))
+			.join(` ${ColorUtils.gray('→')} `);
+
+		const message = `${ColorUtils.formatViolationType('Circular dependency detected')}:
+   Cycle: ${coloredCycle}
+   Rule: ${ColorUtils.formatRule('Circular dependencies are not allowed')}`;
+
+		return {
+			message,
+			details: cycle,
 		};
 	}
 
-	private static fromViolatingCycle(cycle: ViolatingCycle): TestViolation {
-		let cycleText = cycle.cycle[0].sourceLabel;
-		cycle.cycle.forEach((c) => {
-			cycleText += ' -> ' + c.targetLabel;
-		});
-		return {
-			message: `Found cycle: ${cycleText}`,
-			details: cycle,
-		};
+	private static getComparisonDescription(comparison: string): string {
+		switch (comparison) {
+			case 'below':
+				return 'should be below';
+			case 'below-equal':
+				return 'should be below or equal to';
+			case 'above':
+				return 'should be above';
+			case 'above-equal':
+				return 'should be above or equal to';
+			case 'equal':
+				return 'should be equal to';
+			default:
+				return 'should be';
+		}
 	}
 }
