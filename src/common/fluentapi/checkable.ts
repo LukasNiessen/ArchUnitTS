@@ -1,5 +1,5 @@
-import { Violation } from "../assertion/violation"
+import { Violation } from '../assertion/violation';
 
 export interface Checkable {
-  check(): Promise<Violation[]>
+	check(): Promise<Violation[]>;
 }

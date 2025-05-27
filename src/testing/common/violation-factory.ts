@@ -33,7 +33,8 @@ export class ViolationFactory {
 			return this.fromMetricViolation(violation);
 		}
 		return new UnknownTestViolation(violation);
-	}	private static fromMetricViolation(metric: MetricViolation): TestViolation {
+	}
+	private static fromMetricViolation(metric: MetricViolation): TestViolation {
 		const comparisonText = this.getComparisonDescription(metric.comparison);
 		const message = `${ColorUtils.formatViolationType('Metric violation')} in class '${ColorUtils.cyan(metric.className)}':
    File: ${ColorUtils.formatFilePath(`${metric.filePath}:1:1`)}
@@ -45,7 +46,8 @@ export class ViolationFactory {
 			message,
 			details: metric,
 		};
-	}	private static fromViolatingFile(file: ViolatingNode): TestViolation {
+	}
+	private static fromViolatingFile(file: ViolatingNode): TestViolation {
 		const action = file.isNegated ? 'should not match' : 'should match';
 		const message = `${ColorUtils.formatViolationType('File pattern violation')}:
    File: ${ColorUtils.formatFilePath(`${file.projectedNode.label}:1:1`)}
@@ -55,7 +57,8 @@ export class ViolationFactory {
 			message,
 			details: file,
 		};
-	}	private static fromViolatingEdge(edge: ViolatingEdge): TestViolation {
+	}
+	private static fromViolatingEdge(edge: ViolatingEdge): TestViolation {
 		const message = `${ColorUtils.formatViolationType('Slice dependency violation')}:
    From: ${ColorUtils.formatFilePath(`${edge.projectedEdge.sourceLabel}:1:1`)}
    To: ${ColorUtils.formatFilePath(`${edge.projectedEdge.targetLabel}:1:1`)}
@@ -65,7 +68,8 @@ export class ViolationFactory {
 			message,
 			details: edge,
 		};
-	}	private static fromViolatingFileDependency(
+	}
+	private static fromViolatingFileDependency(
 		edge: ViolatingFileDependency
 	): TestViolation {
 		const ruleDescription = edge.isNegated
@@ -81,11 +85,16 @@ export class ViolationFactory {
 			message,
 			details: edge,
 		};
-	}	private static fromViolatingCycle(cycle: ViolatingCycle): TestViolation {
+	}
+	private static fromViolatingCycle(cycle: ViolatingCycle): TestViolation {
 		// Make each file in the cycle clickable with colors
 		const coloredCycle = cycle.cycle
 			.map((edge) => ColorUtils.formatFilePath(`${edge.sourceLabel}:1:1`))
-			.concat(ColorUtils.formatFilePath(`${cycle.cycle[cycle.cycle.length - 1].targetLabel}:1:1`))
+			.concat(
+				ColorUtils.formatFilePath(
+					`${cycle.cycle[cycle.cycle.length - 1].targetLabel}:1:1`
+				)
+			)
 			.join(` ${ColorUtils.gray('→')} `);
 
 		const message = `${ColorUtils.formatViolationType('Circular dependency detected')}:

@@ -90,7 +90,8 @@ export class PositiveSliceCondition implements Checkable {
 	) {}
 
 	public async check(): Promise<Violation[]> {
-		const graph = await this.positiveConditionBuilder.sliceConditionBuilder.graphProvider();
+		const graph =
+			await this.positiveConditionBuilder.sliceConditionBuilder.graphProvider();
 		const filtered = this.positiveConditionBuilder.ignoreExternals
 			? graph.filter((edge) => !edge.external)
 			: graph;

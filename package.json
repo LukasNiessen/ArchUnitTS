@@ -1,21 +1,65 @@
 {
 	"name": "archunit",
 	"version": "2.1.6",
-	"description": "",
-	"keywords": [],
+	"description": "ArchUnit TypeScript is an architecture testing library, to specify and assert architecture rules in your TypeScript app",
+	"keywords": [
+		"architecture",
+		"testing",
+		"typescript",
+		"code-quality",
+		"dependency-analysis",
+		"circular-dependencies",
+		"clean-code",
+		"architectural-testing",
+		"static-analysis",
+		"code-standards",
+		"jest",
+		"vitest",
+		"mocha",
+		"testing-framework",
+		"software-architecture",
+		"technical-debt",
+		"code-metrics",
+		"linting",
+		"developer-tools",
+		"archunit"
+	],
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [
 		"dist"
 	],
-	"author": "Lukas Niessen <lks.niessen@gmail.com> (https://lukasniessen.com)",
+	"author": {
+		"name": "Lukas Niessen",
+		"email": "lks.niessen@gmail.com",
+		"url": "https://lukasniessen.com"
+	},
+	"contributors": [
+		{
+			"name": "Lukas Niessen",
+			"email": "lks.niessen@gmail.com",
+			"url": "https://lukasniessen.com"
+		}
+	],
+	"maintainers": [
+		{
+			"name": "Lukas Niessen",
+			"email": "lks.niessen@gmail.com",
+			"url": "https://lukasniessen.com"
+		}
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/LukasNiessen/ArchUnitTS.git"
 	},
+	"bugs": {
+		"url": "https://github.com/LukasNiessen/ArchUnitTS/issues"
+	},
+	"homepage": "https://github.com/LukasNiessen/ArchUnitTS#readme",
 	"license": "MIT",
 	"engines": {
-		"node": ">=14.0.0"
+		"node": ">=14.0.0",
+		"npm": ">=6.0.0"
 	},
 	"scripts": {
 		"lint": "eslint src",
