@@ -1,9 +1,7 @@
 # ArchUnitTS - Architecture Testing
 
 <div align="center" name="top">
-
-![ArchUnitTS Logo](/assets/logo-round.png)
-
+<img align="center" src="assets/logo.png" width="150" height="150" style="margin-bottom: 20px; border-radius: 30px" alt="ArchUnitTS Logo">
 </div>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -19,7 +17,7 @@ _Inspired by the amazing ArchUnit library; we are not affiliated with ArchUnit._
 
 [Documentation](https://github.com/LukasNiessen/ArchUnitTS#readme) • [Quickstart](#quickstart) • [Examples](#examples) • [Features TODO](FEATURES.md) • [Contributing](CONTRIBUTING.md)
 
-## ⚡ Quickstart: 5 Minutes
+## ⚡ Quickstart, 5 Minutes
 
 ### 1️⃣ Installation
 
@@ -37,10 +35,10 @@ Note that we use _toPassAsync()_. This is special syntax we have added for _Jest
 import { projectFiles, metrics } from 'archunit';
 
 /**
- * We will ensure that:
- * 1. No circular dependencies exist
- * 2. Our layered architecture is respected
- * 3. Simple rules regarding code metrics
+ * We ensure that:
+ * 1. No circular dependencies exist,
+ * 2. Our layered architecture is respected,
+ * 3. Basic code metric rules are met.
  */
 describe('Architecture Rules', () => {
 	it('should not have circular dependencies', async () => {
@@ -122,101 +120,58 @@ test:
 
 Last note, if you don't want violations to make your tests fail but just print a warning, see this(TODO) section.
 
-## Beautiful Error Messages ✨
+## 🎬 Demo
 
-When tests fail, you get helpful, colorful output with clickable file paths:
+TODO: add video here! Make sure the video does not end up in dist when compiling the library!
 
-```
-❌ Architecture rule failed with 2 violations:
+## 🐹 Use Cases
 
-1. 🔗 Circular dependency detected:
-   Cycle: src/services/UserService.ts:1:1 → src/controllers/UserController.ts:1:1 → src/services/UserService.ts:1:1
-   Rule: Circular dependencies are not allowed
+We have many common uses cases covered in our examples folder. See this list for some of them.
 
-2. 📁 File dependency violation:
-   From: src/services/PaymentService.ts:1:1
-   To: src/controllers/PaymentController.ts:1:1
-   Rule: This dependency violates the architecture rule
+**Layered Architecture:**
 
-      Architecture rule failed with 2 violations:
+- Express BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/layered-architecture/express/README.md)
 
-    1. Metric violation in class 'NegatedMatchPatternFileConditionBuilder':
-       File: C:/Users/niesselu/Desktop/Playground/ArchUnitTS/src/files/fluentapi/files.ts:1:1
-       Metric: LCOM96b
-       Actual value: 1
-       Expected: should be below 1
-```
+- Fastify BackEnd using a UML Diagram: click here (TODO-add-Link: subfolder of examples. Eg examples/layered-architecture/fastify-uml/README.md)
 
-_Click on file paths to jump directly to the issue in your IDE!_
+- Angular FrontEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/layered-architecture/angular/README.md)
 
----
+**Domain Partitioning:**
 
-## 🎯 Core Modules
+- Express MicroServices using Nx: click here (TODO-add-Link: subfolder of examples. Eg examples/micro-services/express/README.md)
 
-ArchUnitTS provides comprehensive architecture testing capabilities through specialized modules:
+    - TODO: is this possible with ArchUnitTS, todo domain partitioning checks in Nx?
 
-| Module         | Description                                                               | Status    | Links                                                            |
-| -------------- | ------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------- |
-| **📁 Files**   | File and folder dependency rules, naming conventions, import restrictions | ✅ Stable | [`src/files/`](src/files/) • [README](src/files/README.md)       |
-| **📊 Metrics** | Code quality metrics including count, LCOM, and distance metrics          | ✅ Stable | [`src/metrics/`](src/metrics/) • [README](src/metrics/README.md) |
-| **🏗️ Slices**  | Architecture slicing, UML diagram generation, layer validation            | ✅ Stable | [`src/slices/`](src/slices/) • [README](src/slices/README.md)    |
-| **🧪 Testing** | Universal test framework integration (Jest, Vitest, Mocha, etc.)          | ✅ Stable | [`src/testing/`](src/testing/) • [README](src/testing/README.md) |
-| **⚙️ Common**  | Shared utilities, error handling, and core abstractions                   | ✅ Stable | [`src/common/`](src/common/)                                     |
+- Modular monlith, Deno BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/domain-partitioning/deno/README.md)
 
-### Module Details
+- React MicroFrontEnds using Nx: click here (TODO-add-Link: subfolder of examples. Eg examples/micro-frontends/react/README.md)
+    - TODO: is this possible with ArchUnitTS, todo domain partitioning checks in Nx?
 
-#### 📁 Files Module
+**Clean Architecture:**
 
-- **🔄 Circular Dependency Detection** - Find complex dependency cycles across your codebase
-- **🏛️ Layer Dependencies** - Enforce clean architecture layers (controllers → services → repositories)
-- **🚧 Module Boundaries** - Prevent unwanted cross-module dependencies
-- **🚫 Import Restrictions** - Control what can import what
-- **📝 Naming Conventions** - Enforce consistent file and folder naming
-- **📍 Location Rules** - Ensure files are in the correct directories
+- NestJS BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/clean-architecture/nestjs/README.md)
 
-#### 📊 Metrics Module
+- React FrontEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/clean-architecture/react/README.md)
 
-- **🔢 Count Metrics** - Lines of code, methods, fields, classes, interfaces, functions
-- **🎯 LCOM Metrics** - Lack of Cohesion of Methods (LCOM1-5, LCOM96a/b, LCOM\*)
-- **📏 Distance Metrics** - Abstractness, instability, distance from main sequence
-- **🔗 Coupling Analysis** - Measure and limit code coupling
-- **⚡ Complexity Rules** - Limit cyclomatic complexity
-- **📋 Export Functionality** - Generate HTML reports with customizable styling
+**Hexagonal Architecture:**
 
-#### 🏗️ Slices Module
+- Express BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/hexagonal-architecture/express/README.md)
 
-- **🎨 Architecture Slicing** - Define and validate architectural slices
-- **🎯 UML Generation** - Generate PlantUML diagrams from code structure
-- **🏛️ Layer Validation** - Ensure proper layered architecture
-- **🗺️ Dependency Mapping** - Visualize and validate component relationships
+TODO: add more?
 
-#### 🧪 Testing Module
+## 🐲 Example Repositories
 
-- **🔧 Universal Compatibility** - Works with Jest, Vitest, Mocha, Jasmine, AVA, QUnit
-- **✨ Custom Matchers** - Rich assertion library for architecture tests
-- **⚡ Async/Await Support** - Modern async testing patterns
-- **🎯 Auto-Detection** - Automatically detects and configures for your test framework
+Here are a few repositories with fully functioning examples that use ArchUnitTS to ensure architectural rules:
 
-### 📋 Example Projects
+- **[Vitest Example](https://github.com/LukasNiessen/ArchUnitTS-Vitest-Example)**: Complete Vitest setup with architecture tests
+- **[Jest Example](https://github.com/LukasNiessen/ArchUnitTS-Jest-Example)**: Full Jest integration examples
+- **[Jasmine Example](https://github.com/LukasNiessen/ArchUnitTS-Jasmine-Example)**: Jasmine testing framework integration
 
-Get started quickly with complete example projects for your favorite testing framework:
+## 📙 Features
 
-- 🚀 **[Vitest Example](https://github.com/LukasNiessen/ArchUnitTS-Vitest-Example)** - Complete Vitest setup with architecture tests
-- ⚡ **[Jest Example](https://github.com/LukasNiessen/ArchUnitTS-Jest-Example)** - Full Jest integration examples
-- 🔬 **[Jasmine Example](https://github.com/LukasNiessen/ArchUnitTS-Jasmine-Example)** - Jasmine testing framework integration
+TODO. make this section thorough, complete and well done!
 
-Each example includes:
-
-- ✅ Complete project setup and configuration
-- 🧪 Real-world architecture test examples
-- 📚 Best practices and patterns
-- 🚀 Ready-to-run test suites
-
----
-
-## 📚 Examples
-
-### 1. 🔄 Circular Dependencies
+### Circular Dependencies
 
 ```typescript
 import { projectFiles } from 'archunit';
@@ -355,7 +310,32 @@ test('should follow custom business rules', async () => {
 });
 ```
 
----
+## Beautiful Error Messages ✨
+
+When tests fail, you get helpful, colorful output with clickable file paths:
+
+```
+❌ Architecture rule failed with 2 violations:
+
+1. 🔗 Circular dependency detected:
+   Cycle: src/services/UserService.ts:1:1 → src/controllers/UserController.ts:1:1 → src/services/UserService.ts:1:1
+   Rule: Circular dependencies are not allowed
+
+2. 📁 File dependency violation:
+   From: src/services/PaymentService.ts:1:1
+   To: src/controllers/PaymentController.ts:1:1
+   Rule: This dependency violates the architecture rule
+
+      Architecture rule failed with 2 violations:
+
+    1. Metric violation in class 'NegatedMatchPatternFileConditionBuilder':
+       File: C:/Users/niesselu/Desktop/Playground/ArchUnitTS/src/files/fluentapi/files.ts:1:1
+       Metric: LCOM96b
+       Actual value: 1
+       Expected: should be below 1
+```
+
+_Click on file paths to jump directly to the issue in your IDE!_
 
 ## 📖 API Reference
 
@@ -419,6 +399,10 @@ expect(await rule.check()).to.be.true;
 expect(await rule.getViolations()).to.have.length(0);
 ```
 
+### UML Diagrams
+
+TODO
+
 ### Advanced API
 
 #### Custom Rules
@@ -445,36 +429,46 @@ if (!result.passed) {
 }
 ```
 
----
+## 🔲 Core Modules
+
+ArchUnitTS has the following core modules.
+
+| Module      | Description                          | Status       | Links                                                                            |
+| ----------- | ------------------------------------ | ------------ | -------------------------------------------------------------------------------- |
+| **Files**   | File and folder based rules          | Stable       | [`src/files/`](src/files/) • [README](src/files/README.md)                       |
+| **Metrics** | Code quality metrics                 | Stable       | [`src/metrics/`](src/metrics/) • [README](src/metrics/README.md)                 |
+| **Slices**  | Architecture slicing                 | Stable       | [`src/slices/`](src/slices/) • [README](src/slices/README.md)                    |
+| **Testing** | Universal test framework integration | Stable       | [`src/testing/`](src/testing/) • [README](src/testing/README.md)                 |
+| **Common**  | Shared utilities                     | Stable       | [`src/common/`](src/common/)                                                     |
+| **Reports** | Generate reports                     | Experimental | [`src/metrics/fluentapi/export-utils.ts`](src/metrics/fluentapi/export-utils.ts) |
+
+## ℹ️ FAQ
+
+TODO
+
+## 👥 Maintainers
+
+TODO
 
 ## 🤝 Community & Support
 
-### 🆘 Getting Help
+### Getting Help
 
-- **📚 Documentation**: [GitHub Wiki](https://github.com/LukasNiessen/ArchUnitTS/wiki)
-- **💡 Examples**: [Example Repository](https://github.com/LukasNiessen/ArchUnitTS-Examples)
-- **🐛 Issues**: [Report bugs or request features](https://github.com/LukasNiessen/ArchUnitTS/issues)
-- **💬 Discussions**: [GitHub Discussions](https://github.com/LukasNiessen/ArchUnitTS/discussions)
+TODO
 
-### 🔥 Popular Use Cases
+- **Documentation**: [GitHub Wiki](https://github.com/LukasNiessen/ArchUnitTS/wiki)
+- **Examples**: [Example Repository](https://github.com/LukasNiessen/ArchUnitTS-Examples)
+- **Issues**: [Report bugs or request features](https://github.com/LukasNiessen/ArchUnitTS/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/LukasNiessen/ArchUnitTS/discussions)
 
-- **🏗️ Clean Architecture Enforcement** - Ensure layers don't violate boundaries
-- **🏢 Microservices Boundaries** - Prevent cross-service dependencies
-- **✅ Code Quality Gates** - Automated architecture compliance in CI/CD
-- **🔄 Legacy Code Migration** - Track and improve architectural debt
-- **👥 Team Onboarding** - Document and enforce architectural decisions
-
-### 💝 Show Your Support
+### Show Your Support
 
 If ArchUnitTS helps your project, please consider:
 
 - ⭐ Starring the repository
 - 🐛 Reporting issues you encounter
-- 💡 Suggesting new features
-- 🤝 Contributing code or documentation
-- 💰 Sponsoring the project
-
----
+- 💭 Suggesting new features
+- ⌨️ Contributing code or documentation
 
 ## 🔄 Migration Guide
 
@@ -518,26 +512,12 @@ Here’s how you can get community support:
 
 MIT © [Lukas Niessen](https://github.com/LukasNiessen)
 
----
-
-## 🙏 Acknowledgments
-
-- Inspired by [ArchUnit](https://www.archunit.org/) - The original architecture testing library for Java
-- Built with ❤️ for the TypeScript and JavaScript community
-- Special thanks to all [contributors](https://github.com/LukasNiessen/ArchUnitTS/graphs/contributors)
-
 ## ⭐ Stars
 
 [![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#Fosowl/agenticSeek&Date)
 
----
-
 <div align="center">
-
 **[⬆ Back to Top](#top)**
-
-Made with 💚 by the ArchUnitTS team
-
 </div>
 
 ---
