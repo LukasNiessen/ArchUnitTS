@@ -1,4 +1,6 @@
 import { metrics } from '../../src/metrics/fluentapi/metrics';
+// Import auto-detection to enable Jest matchers
+import '../../src/testing/setup/auto-detect';
 
 // Mock the extract class info to provide some test classes with known LCOM values
 jest.mock('../../src/metrics/extraction/extract-class-info', () => {
@@ -89,6 +91,17 @@ describe('LCOM metrics integration test', () => {
 		expect(classNames).toContain('LowCohesionClass');
 		expect(classNames).toContain('MediumCohesionClass');
 	});
+
+	it('should not detect violations if LCOM is high', async () => {
+		const rule = metrics().lcom().lcom96b().shouldBeBelowOrEqual(1);
+		await expect(rule).toPassAsync();
+	});
+
+	it('should create lines of code condition with threshold', async () => {
+		const rule = metrics().count().linesOfCode().shouldBeBelow(1500);
+		await expect(rule).toPassAsync();
+	});
+
 	it('should find violations for classes with poor cohesion', async () => {
 		const violations = await metrics()
 			.lcom()
