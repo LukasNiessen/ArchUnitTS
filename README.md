@@ -13,15 +13,15 @@
 
 Enforce architecture rules in TypeScript and JavaScript projects. Check for dependency directions, detect circular dependencies, enforce coding standards and much more. Integrates with every testing framework. Set it up and add it to your CI/CD pipeline in less than 15 min.
 
-[Documentation](https://github.com/LukasNiessen/ArchUnitTS#readme) • [Quickstart](#quickstart) • [Examples](#examples) • [Features TODO](FEATURES.md) • [Contributing](CONTRIBUTING.md)
-
-Measured by GitHub stars, we are the **#1 architecture testing library for TypeScript and JavaScript**. 💚
+Measured by GitHub stars, we are the #1 architecture testing library for TypeScript and JavaScript. 💚
 
 _Inspired by the amazing ArchUnit library; we are not affiliated with ArchUnit._
 
+[Documentation](https://github.com/LukasNiessen/ArchUnitTS#readme) • [Quickstart](#quickstart) • [Examples](#examples) • [Features TODO](FEATURES.md) • [Contributing](CONTRIBUTING.md)
+
 ## ⚡ Quickstart: 5 Minutes
 
-### 1️⃣ Install
+### 1️⃣ Installation
 
 ```bash
 npm i archunit -D
@@ -31,14 +31,14 @@ npm i archunit -D
 
 Simply add tests to your existing test suites. Here is an example using Jest.
 
-Note that we use _toPassAsync()_. This is a special syntax we have added for _Jest, Vitest_ and _Jasmine_. However, ArchUnitTS works with any testing framework that exists.
+Note that we use _toPassAsync()_. This is special syntax we have added for _Jest, Vitest_ and _Jasmine_. However, ArchUnitTS works with any testing framework that exists.
 
 ```typescript
 import { projectFiles, metrics } from 'archunit';
 
 /**
  * We will ensure that:
- * 1. No cyclic dependencies exist
+ * 1. No circular dependencies exist
  * 2. Our layered architecture is respected
  * 3. Simple rules regarding code metrics
  */
@@ -98,12 +98,12 @@ it('should generate HTML reports', () => {
 	const countMetrics = metrics().count();
 	const lcomMetrics = metrics().lcom();
 
-	// saves HTML report files to /reports. You can specify the destination and
-	// even provide custom CSS.
+	// saves HTML report files to /reports
+	// You can specify the destination and even provide custom CSS
 	await lcomMetrics.exportAsHTML();
 	await countMetrics.exportAsHTML();
 
-	// added assertion so we get no warnings about an empty test
+	// empty assertion so we dont get warnings about an empty test
 	expect(0).toBe(0);
 });
 ```
@@ -357,23 +357,6 @@ test('should follow custom business rules', async () => {
 
 ---
 
-## ⚙️ Configuration
-
-Create an `archunit.config.js` file for advanced customization:
-
-```javascript
-// archunit.config.js
-module.exports = {
-	tsConfigPath: './tsconfig.json',
-	excludePatterns: ['**/*.spec.ts', '**/node_modules/**'],
-	reportOutput: './dist/architecture-report',
-	enableMetrics: true,
-	enableSlicing: true,
-};
-```
-
----
-
 ## 📖 API Reference
 
 ### Core API
@@ -517,23 +500,6 @@ projectFiles('tsconfig.json')
 	.inFolder('controllers');
 ```
 
-### 🔧 From ESLint Rules
-
-Replace complex ESLint import rules with clear architecture tests:
-
-```typescript
-// Instead of complex ESLint config
-// Replace with clear architecture test
-test('services should not import from UI layer', async () => {
-	const rule = projectFiles('tsconfig.json')
-		.inFolder('services')
-		.should()
-		.notImport(['react', 'react-dom', '@mui/*']);
-
-	await expect(rule).toPass();
-});
-```
-
 ---
 
 ## 🤍 Support
@@ -542,9 +508,9 @@ If you find a bug, please submit an [issue on GitHub](https://github.com/LukasNi
 
 Here’s how you can get community support:
 
-* Ask a question in our [Slack Community](TODO).
-* Join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions).
-* Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag.
+- Ask a question in our [Slack Community](TODO).
+- Join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions).
+- Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag.
 
 ---
 
