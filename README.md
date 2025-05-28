@@ -1,21 +1,22 @@
 # ArchUnitTS - Architecture Testing
 
 <div align="center" name="top">
-<img align="center" src="assets/logo.png" width="150" height="150" style="margin-bottom: 20px; border-radius: 30px" alt="ArchUnitTS Logo">
-</div>
+	<img align="center" src="assets/logo-rounded.png" width="150" height="150" alt="ArchUnitTS Logo">
+
+<br>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://img.shields.io/npm/v/archunit.svg)](https://www.npmjs.com/package/archunit)
 [![npm downloads](https://img.shields.io/npm/dm/archunit.svg)](https://www.npmjs.com/package/archunit)
 [![GitHub stars](https://img.shields.io/github/stars/LukasNiessen/ArchUnitTS.svg)](https://github.com/LukasNiessen/ArchUnitTS)
 
-Enforce architecture rules in TypeScript and JavaScript projects. Check for dependency directions, detect circular dependencies, enforce coding standards and much more. Integrates with every testing framework. Set it up and add it to your CI/CD pipeline in less than 15 min.
+</div>
 
-Measured by GitHub stars, we are the #1 architecture testing library for TypeScript and JavaScript. 💚
+Enforce architecture rules in TypeScript and JavaScript projects. Check for dependency directions, detect circular dependencies, enforce coding standards and much more. Integrates with every testing framework. Setup and pipeline integration takes less than 5 min.
 
-_Inspired by the amazing ArchUnit library; we are not affiliated with ArchUnit._
+The #1 architecture testing library for TS and JS measured by GitHub stars! 💚 _Inspired by the amazing ArchUnit library; we are not affiliated with ArchUnit._
 
-[Documentation](https://github.com/LukasNiessen/ArchUnitTS#readme) • [Quickstart](#quickstart) • [Examples](#examples) • [Features TODO](FEATURES.md) • [Contributing](CONTRIBUTING.md)
+[Documentation TODO](#readme) • [Use Cases](#-use-cases) • [Examples](#examples) • [Features TODO](FEATURES.md) • [Contributing](CONTRIBUTING.md)
 
 ## ⚡ Quickstart, 5 Minutes
 
@@ -461,8 +462,6 @@ TODO
 - **Issues**: [Report bugs or request features](https://github.com/LukasNiessen/ArchUnitTS/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/LukasNiessen/ArchUnitTS/discussions)
 
-### Show Your Support
-
 If ArchUnitTS helps your project, please consider:
 
 - ⭐ Starring the repository
@@ -506,15 +505,11 @@ Here’s how you can get community support:
 - Join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions).
 - Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag.
 
----
+[![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#Fosowl/agenticSeek&Date)
 
 ## 📄 License
 
 MIT © [Lukas Niessen](https://github.com/LukasNiessen)
-
-## ⭐ Stars
-
-[![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#Fosowl/agenticSeek&Date)
 
 <div align="center">
 **[⬆ Back to Top](#top)**
