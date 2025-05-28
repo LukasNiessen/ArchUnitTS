@@ -451,6 +451,18 @@ test('services should not import from UI layer', async () => {
 
 ---
 
+## 🤍 Support
+
+If you find a bug, please submit an [issue on GitHub](https://github.com/LukasNiessen/ArchUnitTS/issues/new/choose).
+
+Here’s how you can get community support:
+
+* Ask a question in our [Slack Community](TODO).
+* Join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions).
+* Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag.
+
+---
+
 ## 📄 License
 
 MIT © [Lukas Niessen](https://github.com/LukasNiessen)
