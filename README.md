@@ -120,7 +120,7 @@ test:
 
 ## 🎬 Demo
 
-TODO: add video here! Make sure the video does not end up in dist when compiling the library!
+https://github.com/user-attachments/assets/5f6c8548-4cf2-4cdc-a2ef-8aca02c9045a
 
 ## 🐹 Use Cases
 
