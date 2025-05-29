@@ -22,13 +22,30 @@ export const gatherDependOnFileViolations = (
 	if (objectPatterns.length === 0 && subjectPatterns.length === 0) {
 		throw new UserError('object and subject patterns must be set');
 	}
+
 	const violatingEdgesFilter = isNegated
-		? (edge: ProjectedEdge) =>
-				matchingAllPatterns(edge.sourceLabel, objectPatterns) &&
-				matchingAllPatterns(edge.targetLabel, subjectPatterns)
-		: (edge: ProjectedEdge) =>
-				!matchingAllPatterns(edge.sourceLabel, objectPatterns) ||
-				!matchingAllPatterns(edge.targetLabel, subjectPatterns);
+		? (edge: ProjectedEdge) => {
+				const sourceMatches = matchingAllPatterns(
+					edge.sourceLabel,
+					objectPatterns
+				);
+				const targetMatches = matchingAllPatterns(
+					edge.targetLabel,
+					subjectPatterns
+				);
+				return sourceMatches && targetMatches;
+			}
+		: (edge: ProjectedEdge) => {
+				const sourceMatches = matchingAllPatterns(
+					edge.sourceLabel,
+					objectPatterns
+				);
+				const targetMatches = matchingAllPatterns(
+					edge.targetLabel,
+					subjectPatterns
+				);
+				return !sourceMatches || !targetMatches;
+			};
 
 	return projectedEdges
 		.filter(violatingEdgesFilter)

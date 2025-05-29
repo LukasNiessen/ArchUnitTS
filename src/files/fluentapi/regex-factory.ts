@@ -10,7 +10,6 @@ export class RegexFactory {
 
 	public static folderMatcher(folder: string): string {
 		const escapedFolder = this.escapeRegex(folder);
-		return `.*/${escapedFolder}/.*`;
+		return `.*/?${escapedFolder}/.*`;
 	}
 }
-// WATCH-INP
