@@ -111,7 +111,7 @@ In your `gitlab-ci.yml`:
 ```yml
 test:
   script:
-	  - npm test
+    - npm test
   artifacts:
     when: always
     paths:
