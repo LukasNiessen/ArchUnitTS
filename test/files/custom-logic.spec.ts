@@ -22,7 +22,7 @@ describe('Custom File Logic', () => {
 			.should()
 			.adhereTo((file: FileInfo) => {
 				// Custom logic: TypeScript files should contain export statements
-				return file.content.includes('desc');
+				return file.content.includes('export');
 			}, 'TypeScript files should export functionality')
 			.check();
 

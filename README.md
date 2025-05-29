@@ -1,7 +1,7 @@
 # ArchUnitTS - Architecture Testing
 
 <div align="center" name="top">
-	<img align="center" src="assets/logo-rounded.png" width="150" height="150" alt="ArchUnitTS Logo">
+  <img align="center" src="assets/logo-rounded.png" width="150" height="150" alt="ArchUnitTS Logo">
 
 <p></p> <!-- spacing -->
 
@@ -37,8 +37,8 @@ import { projectFiles, metrics } from 'archunit';
 it('should not have circular dependencies', async () => {
 	const rule = projectFiles().inFolder('src').should().haveNoCycles();
 
-	// toPassAsync is special syntax support we added for
-	// Jest, Vitest and Jasmine but ArchUnitTS works with any testing framework
+	// toPassAsync is syntax support we added for Jest, Vitest
+	// and Jasmine, but ArchUnitTS works with any testing framework
 	await expect(rule).toPassAsync();
 });
 ```
@@ -109,12 +109,12 @@ In your `gitlab-ci.yml`:
 
 ```yml
 test:
-    script:
-        - npm test
-    artifacts:
-        when: always
-        paths:
-            - reports
+  script:
+	  - npm test
+  artifacts:
+    when: always
+    paths:
+		  - reports
 ```
 
 ## 🎬 Demo
@@ -137,12 +137,13 @@ Many common uses cases are covered in our examples folder. Here is an overview.
 
 - Express MicroServices using Nx: click here (TODO-add-Link: subfolder of examples. Eg examples/micro-services/express/README.md)
 
-    - TODO: is this possible with ArchUnitTS, todo domain partitioning checks in Nx?
+- TODO: is this possible with ArchUnitTS, todo domain partitioning checks in Nx?
 
 - Modular monlith, Deno BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/domain-partitioning/deno/README.md)
 
 - React MicroFrontEnds using Nx: click here (TODO-add-Link: subfolder of examples. Eg examples/micro-frontends/react/README.md)
-    - TODO: is this possible with ArchUnitTS, todo domain partitioning checks in Nx?
+
+- TODO: is this possible with ArchUnitTS, todo domain partitioning checks in Nx?
 
 **Clean Architecture:**
 
@@ -153,6 +154,10 @@ Many common uses cases are covered in our examples folder. Here is an overview.
 **Hexagonal Architecture:**
 
 - Express BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/hexagonal-architecture/express/README.md)
+
+**MVP:**
+
+- Spring BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/mvp/spring/README.md)
 
 ## 🐲 Example Repositories
 
@@ -202,9 +207,9 @@ it('business layer should not depend on presentation', async () => {
 ```typescript
 it('should follow naming patterns', async () => {
 	const rule = projectFiles()
-		.inFolder('controllers')
+		.inFolder('services')
 		.should()
-		.matchPattern('.*Controller.ts');
+		.matchPattern('.*Service.*\\.ts');
 	await expect(rule).toPassAsync();
 });
 ```
@@ -228,7 +233,17 @@ it('should count methods per class', async () => {
 });
 
 it('should limit statements per file', async () => {
-	const rule = metrics().count().statements().shouldBeBelow(100);
+	const rule = metrics().count().statements().shouldBeBelowOrEqual(100);
+	await expect(rule).toPassAsync();
+});
+
+it('should have 3 fields per Data class', async () => {
+	const rule = metrics()
+		.forClassesMatching(/.*Data.*/)
+		.count()
+		.fieldCount()
+		.shouldBe(3);
+
 	await expect(rule).toPassAsync();
 });
 ```
@@ -245,6 +260,26 @@ it('should stay close to main sequence', async () => {
 	const rule = metrics().distance().distanceFromMainSequence().shouldBeBelow(0.3);
 	await expect(rule).toPassAsync();
 });
+```
+
+### Custom Rules
+
+You can define your own custom rules.
+
+```typescript
+const ruleDesc = 'TypeScript files should export functionality';
+const myCustomRule = (file: FileInfo) => {
+	// TypeScript files should contain export statements
+	return file.content.includes('export');
+};
+
+const violations = await projectFiles()
+	.matchingPattern('**/*.ts')
+	.should()
+	.adhereTo(myCustomRule, ruleDesc)
+	.check();
+
+expect(violations).toStrictEqual([]);
 ```
 
 ### Custom Metrics
@@ -275,10 +310,7 @@ it('should adhere to UML diagram', async () => {
   [controllers] --> [services]
 @enduml`;
 
-	const rule = slicesOfProject()
-		.definedBy('src/(**)/')
-		.should()
-		.adhereToDiagram(diagram);
+	const rule = slicesOfProject().definedBy('src/(**)/').should().adhereToDiagram(diagram);
 	await expect(rule).toPassAsync();
 });
 
@@ -324,7 +356,7 @@ it('should target specific files', async () => {
 
 ### Export & Reporting
 
-Generate beautiful HTML reports for your metrics:
+Generate beautiful HTML reports for your metrics. _Note that this features is in beta._
 
 ```typescript
 // Export count metrics report
@@ -354,30 +386,11 @@ await MetricsExporter.exportComprehensiveAsHTML(undefined, {
 });
 ```
 
-## Beautiful Error Messages ✨
+## 🔎 Informative Error Messages
 
-When tests fail, you get helpful, colorful output with clickable file paths:
+When tests fail, you get helpful, colorful output with clickable file paths.
 
-```
-❌ Architecture rule failed with 2 violations:
-
-1. 🔗 Circular dependency detected:
-   Cycle: src/services/UserService.ts:1:1 → src/controllers/UserController.ts:1:1 → src/services/UserService.ts:1:1
-   Rule: Circular dependencies are not allowed
-
-2. 📁 File dependency violation:
-   From: src/services/PaymentService.ts:1:1
-   To: src/controllers/PaymentController.ts:1:1
-   Rule: This dependency violates the architecture rule
-
-      Architecture rule failed with 2 violations:
-
-    1. Metric violation in class 'NegatedMatchPatternFileConditionBuilder':
-       File: C:/Users/niesselu/Desktop/Playground/ArchUnitTS/src/files/fluentapi/files.ts:1:1
-       Metric: LCOM96b
-       Actual value: 1
-       Expected: should be below 1
-```
+https://github.com/user-attachments/assets/04b26afb-53e9-4507-ba24-c8308b3a7922
 
 _Click on file paths to jump directly to the issue in your IDE!_
 
