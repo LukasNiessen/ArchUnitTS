@@ -3,7 +3,7 @@
 <div align="center" name="top">
   <img align="center" src="assets/logo-rounded.png" width="150" height="150" alt="ArchUnitTS Logo">
 
-<!-- A spacer -->
+<!-- spacer -->
 <p></p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
