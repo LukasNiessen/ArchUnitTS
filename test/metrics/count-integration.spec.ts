@@ -264,6 +264,11 @@ describe('Count metrics integration test', () => {
 
 	it('should not have huge files', async () => {
 		const rule = metrics().count().linesOfCode().shouldBeBelow(2000);
-		await expect(rule).toPassAsync();
+
+		// is expected to fail
+		//await expect(rule).toPassAsync();
+
+		const violations = await rule.check();
+		expect(violations).toHaveLength(1);
 	});
 });

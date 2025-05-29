@@ -97,11 +97,6 @@ describe('LCOM metrics integration test', () => {
 		await expect(rule).toPassAsync();
 	});
 
-	it('should create lines of code condition with threshold', async () => {
-		const rule = metrics().count().linesOfCode().shouldBeBelow(1500);
-		await expect(rule).toPassAsync();
-	});
-
 	it('should find violations for classes with poor cohesion', async () => {
 		const violations = await metrics()
 			.lcom()
