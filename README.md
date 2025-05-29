@@ -17,7 +17,7 @@ Enforce architecture rules in TypeScript and JavaScript projects. Check for depe
 The #1 architecture testing library for TS and JS measured by GitHub stars! 💚  
 _Inspired by the amazing ArchUnit library but we are not affiliated with ArchUnit._
 
-[Documentation TODO](#readme) • [Use Cases](#-use-cases) • [Examples](#examples) • [Features TODO](FEATURES.md) • [Contributing](CONTRIBUTING.md)
+[Documentation TODO](#readme) • [Use Cases](#-use-cases) • [Examples](#examples) • [Features](FEATURES.md) • [Contributing](CONTRIBUTING.md)
 
 ## ⚡ 5 min Quickstart
 
@@ -97,10 +97,10 @@ it('should generate HTML reports', () => {
 	const lcomMetrics = metrics().lcom();
 
 	// Saves HTML report files to /reports
-	await lcomMetrics.exportAsHTML();
 	await countMetrics.exportAsHTML();
+	await lcomMetrics.exportAsHTML();
 
-	// So we get no warnings about an empty test
+	// So we get no warning about an empty test
 	expect(0).toBe(0);
 });
 ```
@@ -163,6 +163,8 @@ Here are a few repositories with fully functioning examples that use ArchUnitTS 
 - **[Jasmine Example](https://github.com/LukasNiessen/ArchUnitTS-Jasmine-Example)**: Jasmine testing framework integration
 
 ## Features
+
+This is an overview of you can do with ArchUnitTS.
 
 ### Circular Dependencies
 
@@ -518,7 +520,9 @@ File-based rules analyze import relationships between files, while class-based r
 ### Maintainers
 
 • **[LukasNiessen](https://github.com/LukasNiessen)** - Creator and main maintainer
-• **[janMagnusHeimann](https://github.com/janMagnusHeimann)** - Maintainer  
+
+• **[janMagnusHeimann](https://github.com/janMagnusHeimann)** - Maintainer
+
 • **[draugang](https://github.com/draugang)** - Maintainer
 
 ### Contributors
@@ -564,6 +568,10 @@ If ArchUnitTS helps your project, please consider:
 ---
 
 ## 📝 TODO Items
+
+- TODO: add technical deep dive section
+
+- TODO: add comparison to other TS libraries. as a table probably
 
 - TODO: Add a config file, eg archunit.config.js or archunit.rc
 
