@@ -15,35 +15,37 @@
 Enforce architecture rules in TypeScript and JavaScript projects. Check for dependency directions, detect circular dependencies, enforce coding standards and much more. Integrates with every testing framework. Very simple setup and pipeline integration.
 
 The #1 architecture testing library for TS and JS measured by GitHub stars! 💚  
-_Inspired by the amazing ArchUnit library; we are not affiliated with ArchUnit._
+_Inspired by the amazing ArchUnit library but we are not affiliated with ArchUnit._
 
 [Documentation TODO](#readme) • [Use Cases](#-use-cases) • [Examples](#examples) • [Features TODO](FEATURES.md) • [Contributing](CONTRIBUTING.md)
 
 ## ⚡ 5 min Quickstart
 
-### 1️⃣ Installation
+### Installation
 
 ```bash
 npm i archunit -D
 ```
 
-### 2️⃣ Add tests
+### Add tests
 
-Simply add tests to your existing test suites. Here is an example using Jest.
+Simply add tests to your existing test suites. The following is an example using Jest. First we ensure that we have no circular dependencies.
 
 ```typescript
 import { projectFiles, metrics } from 'archunit';
 
-// 1. Ensure that we have no circular dependencies
 it('should not have circular dependencies', async () => {
 	const rule = projectFiles().inFolder('src').should().haveNoCycles();
 
-	// toPassAsync is special syntax support we have added for
-	// Jest, Vitest and Jasmine. However, ArchUnitTS works with any testing framework
+	// toPassAsync is special syntax support we added for
+	// Jest, Vitest and Jasmine but ArchUnitTS works with any testing framework
 	await expect(rule).toPassAsync();
 });
+```
 
-// 2. Ensure that our layered architecture is respected
+Next we ensure that our layered architecture is respected.
+
+```typescript
 it('presentation layer should not depend on database layer', async () => {
 	const rule = projectFiles()
 		.inFolder('src/presentation')
@@ -65,21 +67,25 @@ it('business layer should not depend on database layer', async () => {
 });
 
 // More layers ...
+```
 
-// Now we ensure some basic code metric rules
-it('should not allow classes with low cohesion', async () => {
-	// We use the LCOM metric (lack of cohesion of methods)
-	const rule = metrics().lcom().lcom96b().shouldBeBelow(0.5);
-	await expect(rule).toPassAsync();
-});
+Lastly we ensure that some basic code metric rules are met.
 
+```typescript
 it('should not contain too large files', () => {
 	const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
 	await expect(rule).toPassAsync();
 });
+
+it('should only have classes with high cohesion', async () => {
+	// LCOM metric (lack of cohesion of methods)
+	// Low LCOM means high cohesion
+	const rule = metrics().lcom().lcom96b().shouldBeBelow(0.3);
+	await expect(rule).toPassAsync();
+});
 ```
 
-### 3️⃣ CI Integration
+### CI Integration
 
 These tests will run automatically in your testing setup, for example in your CI pipeline, so that's basically it. This setup ensures that the architectural rules you have defined are always adhered to! 🌻🐣
 
@@ -91,7 +97,6 @@ it('should generate HTML reports', () => {
 	const lcomMetrics = metrics().lcom();
 
 	// Saves HTML report files to /reports
-	// You can specify the destination and even provide custom CSS
 	await lcomMetrics.exportAsHTML();
 	await countMetrics.exportAsHTML();
 
@@ -118,7 +123,7 @@ TODO: add video here! Make sure the video does not end up in dist when compiling
 
 ## 🐹 Use Cases
 
-We have many common uses cases covered in our examples folder. See this list for some of them.
+Many common uses cases are covered in our examples folder. Here is an overview.
 
 **Layered Architecture:**
 
@@ -449,57 +454,27 @@ TODO
 
 ## 🤝 Community & Support
 
-### Getting Help
+- If you find a bug, please submit an [issue on GitHub](https://github.com/LukasNiessen/ArchUnitTS/issues/new/choose).
 
-TODO
+- Join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions).
 
-- **Documentation**: [GitHub Wiki](https://github.com/LukasNiessen/ArchUnitTS/wiki)
-- **Examples**: [Example Repository](https://github.com/LukasNiessen/ArchUnitTS-Examples)
-- **Issues**: [Report bugs or request features](https://github.com/LukasNiessen/ArchUnitTS/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/LukasNiessen/ArchUnitTS/discussions)
+- Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag.
+
+- Documentation: [GitHub Wiki](https://github.com/LukasNiessen/ArchUnitTS/wiki)
+
+- Examples: [Example Repository](https://github.com/LukasNiessen/ArchUnitTS-Examples)
+
+- Issues: [Report bugs or request features](https://github.com/LukasNiessen/ArchUnitTS/issues)
 
 If ArchUnitTS helps your project, please consider:
 
-- ⭐ Starring the repository
-- 🐛 Reporting issues you encounter
-- 💭 Suggesting new features
-- ⌨️ Contributing code or documentation
+- Starring the repository ⭐
 
-## 🔄 Migration Guide
+- Suggesting new features 💭
 
-### 📦 From ArchUnit (Java)
+- Contributing code or documentation ⌨️
 
-If you're familiar with ArchUnit for Java, the concepts are very similar:
-
-```java
-// Java ArchUnit
-ArchRuleDefinition.classes()
-  .that().resideInAPackage("..service..")
-  .should().notDependOnClassesThat()
-  .resideInAPackage("..controller..");
-```
-
-```typescript
-// ArchUnitTS equivalent
-projectFiles('tsconfig.json')
-	.inFolder('services')
-	.should()
-	.notDependOn()
-	.files()
-	.inFolder('controllers');
-```
-
----
-
-## 🤍 Support
-
-If you find a bug, please submit an [issue on GitHub](https://github.com/LukasNiessen/ArchUnitTS/issues/new/choose).
-
-Here’s how you can get community support:
-
-- Ask a question in our [Slack Community](TODO).
-- Join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions).
-- Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag.
+### Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#Fosowl/agenticSeek&Date)
 
@@ -507,22 +482,11 @@ Here’s how you can get community support:
 
 MIT © [Lukas Niessen](https://github.com/LukasNiessen)
 
-<div align="center">
-**[⬆ Back to Top](#top)**
-</div>
-
 ---
 
-## 🚀 Advanced Features
-
-ArchUnitTS goes beyond simple file and folder testing. Unlike most TypeScript architecture testing libraries, it provides comprehensive analysis capabilities:
-
-- **🔍 Multi-Level Analysis** - Test at file, class, method, field, and even line levels
-- **📊 Comprehensive Metrics** - LCOM cohesion metrics, distance metrics, count metrics
-- **🎨 Visual Documentation** - Generate UML diagrams and architecture visualizations
-- **📋 Export Capabilities** - Create HTML reports deployable to GitHub/GitLab Pages
-- **⚙️ Custom Rules** - Define complex business-specific architectural rules
-- **⚡ Performance Optimized** - Efficient analysis of large codebases
+<p align="center">
+  <a href="#top"><strong>⬆ Back to Top</strong></a>
+</p>
 
 ---
 
