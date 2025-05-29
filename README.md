@@ -4,7 +4,7 @@
   <img align="center" src="assets/logo-rounded.png" width="150" height="150" alt="ArchUnitTS Logo">
 
 <!-- A spacer -->
-<p>&nbsp;</p>
+<p></p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://img.shields.io/npm/v/archunit.svg)](https://www.npmjs.com/package/archunit)
