@@ -395,104 +395,9 @@ https://github.com/user-attachments/assets/04b26afb-53e9-4507-ba24-c8308b3a7922
 
 _Click on file paths to jump directly to the issue in your IDE._
 
-## No Failing Tests?
+## 🏈 Architecture Fitness Functions
 
-TODO
-Last note, if you don't want violations to make your tests fail but just print a warning, see this(TODO) section.
-
-## 📖 API Reference
-
-TODO: a lot if incorrect here!! Rework this entire thing or maybe remove it!
-
-### Core API
-
-#### `projectFiles(tsconfigPath?: string)`
-
-Creates a file selector for architecture testing.
-
-```typescript
-const files = projectFiles('./tsconfig.json');
-```
-
-#### File Selectors
-
-```typescript
-// Select by folder
-.inFolder('src/services')
-.inFolders(['src/services', 'src/controllers'])
-
-// Select by pattern
-.matching('**/*Service.ts')
-.matching(/.*Controller\.ts$/)
-
-// Select by name
-.named('UserService.ts')
-.namedMatching(/.*Service\.ts$/)
-```
-
-#### Architecture Rules
-
-```typescript
-// Dependency rules
-.should().beFreeOfCycles()
-.should().notDependOn().files().inFolder('controllers')
-.should().onlyDependOn().files().inFolders(['types', 'utils'])
-
-// Naming rules
-.should().haveFilenameMatching(/.*Service\.ts$/)
-.should().beNamed('index.ts')
-
-// Import rules
-.should().notImport(['lodash', 'moment'])
-.should().onlyImport(['react', 'react-dom'])
-
-// Complexity rules
-.should().haveCyclomaticComplexityLessThan(10)
-.should().haveLinesOfCodeLessThan(300)
-```
-
-#### Custom Matchers
-
-```typescript
-// Jest/Vitest
-await expect(rule).toPass();
-await expect(rule).toFail();
-await expect(rule).toHaveViolations(2);
-
-// Mocha/Chai
-expect(await rule.check()).to.be.true;
-expect(await rule.getViolations()).to.have.length(0);
-```
-
-### UML Diagrams
-
-TODO
-
-### Advanced API
-
-#### Custom Rules
-
-```typescript
-import { Rule, FileSet } from 'archunit';
-
-class CustomRule extends Rule {
-	async check(files: FileSet): Promise<boolean> {
-		// Your custom logic here
-		return true;
-	}
-}
-```
-
-#### Violation Handling
-
-```typescript
-const result = await rule.check();
-if (!result.passed) {
-	for (const violation of result.violations) {
-		console.log(`${violation.file}: ${violation.message}`);
-	}
-}
-```
+The features of ArchUnitTS can very well be used as architectural fitness functions. See [here](https://www.thoughtworks.com/en-de/insights/articles/fitness-function-driven-development) for more information about that topic.
 
 ## 🔲 Core Modules
 
@@ -509,7 +414,7 @@ ArchUnitTS has the following core modules.
 
 ## 🦊 Contributing
 
-We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but we have proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed. See more in [Contributing](CONTRIBUTING.md).
+We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but with proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed. See more in [Contributing](CONTRIBUTING.md).
 
 ## ℹ️ FAQ
 
@@ -545,27 +450,18 @@ TODO: add picture of all contributors
 
 ## 🤝 Community & Support
 
-- If you find a bug, please submit an [issue on GitHub](https://github.com/LukasNiessen/ArchUnitTS/issues/new/choose).
-
-- Join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions).
-
-- Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag.
-
-- Documentation: [GitHub Wiki](https://github.com/LukasNiessen/ArchUnitTS/wiki)
-
-- Examples: [Example Repository](https://github.com/LukasNiessen/ArchUnitTS-Examples)
-
-- Issues: [Report bugs or request features](https://github.com/LukasNiessen/ArchUnitTS/issues)
+If you find a bug, please submit an [issue on GitHub](https://github.com/LukasNiessen/ArchUnitTS/issues/new/choose).  
+For discussions, you can join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions).  
+Questions? Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag.  
+For more information, see the documentation: TODO (website)
 
 If ArchUnitTS helps your project, please consider:
 
-- Starring the repository ⭐
-
+- Starring the repository 💚
 - Suggesting new features 💭
-
 - Contributing code or documentation ⌨️
 
-### Star History
+## ⭐ Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#Fosowl/agenticSeek&Date)
 
