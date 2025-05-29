@@ -36,11 +36,11 @@ Simply add tests to your existing test suites. The following is an example using
 import { projectFiles, metrics } from 'archunit';
 
 it('should not have circular dependencies', async () => {
-	const rule = projectFiles().inFolder('src').should().haveNoCycles();
+&ensp;const rule = projectFiles().inFolder('src').should().haveNoCycles();
 
-	// toPassAsync is syntax support we added for Jest, Vitest
-	// and Jasmine, but ArchUnitTS works with any testing framework
-	await expect(rule).toPassAsync();
+&ensp;// toPassAsync is syntax support we added for Jest, Vitest
+&ensp;// and Jasmine, but ArchUnitTS works with any testing framework
+&ensp;await expect(rule).toPassAsync();
 });
 ```
 
