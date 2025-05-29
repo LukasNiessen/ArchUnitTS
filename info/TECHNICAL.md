@@ -6,7 +6,7 @@
 
 <p></p>
 
-This document provides a comprehensive technical overview of how ArchUnitTS works under the hood.
+This document provides a technical overview of how ArchUnitTS works under the hood.
 
 ## 🏗️ Architecture Overview
 
@@ -38,12 +38,6 @@ ArchUnitTS is built on top of the TypeScript Compiler, Node's File System and mo
 The heart of ArchUnitTS lies in `src/common/extraction/extract-graph.ts`. This module transforms TypeScript source code into a navigable dependency graph using the TypeScript Compiler API.
 
 #### TypeScript Compiler API Integration
-
-```typescript
-// Creates a TypeScript program with proper configuration
-const program = ts.createProgram(fileNames, compilerOptions, host);
-const typeChecker = program.getTypeChecker();
-```
 
 **Key TypeScript APIs Used:**
 
