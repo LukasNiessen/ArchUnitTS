@@ -64,9 +64,9 @@
 	"scripts": {
 		"lint": "eslint src",
 		"clean": "rimraf dist",
-		"patchpub": "tsc && npm version patch && npm publish",
-		"minorpub": "tsc && npm version minor && npm publish",
-		"majorpub": "tsc && npm version major && npm publish",
+		"patchpub": "npm run clean && tsc && npm version patch && npm publish",
+		"minorpub": "npm run clean && tsc && npm version minor && npm publish",
+		"majorpub": "npm run clean && tsc && npm version major && npm publish",
 		"build": "tsc",
 		"docs": "typedoc --entryPointStrategy expand src",
 		"format": "prettier --ignore-path .gitignore --write '**/*.ts*'",

@@ -7,6 +7,9 @@ import { normalizeWindowsPaths } from '../util/path-utils';
 import { ImportPathsResolver } from '@zerollup/ts-helpers';
 import { determineImportKinds } from '../util/import-kinds-helper';
 
+// Constant to control whether node_modules files should be excluded from the graph
+const EXCLUDE_NODE_MODULES = true;
+
 export const guessLocationOfTsconfig = (): string | undefined => {
 	return guessLocationOfTsconfigRecursively('.');
 };
@@ -58,6 +61,10 @@ const getProjectFiles = (
 };
 
 const graphCache: Map<string | undefined, Promise<Edge[]>> = new Map();
+
+export const clearGraphCache = (): void => {
+	graphCache.clear();
+};
 
 export const extractGraph = async (configFileName?: string): Promise<Edge[]> => {
 	const cachedResult = graphCache.get(configFileName);
@@ -141,6 +148,15 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 
 				const { resolvedFileName, isExternalLibraryImport } = resolvedModule;
 				const normalizedTargetFileName = path.relative(rootDir, resolvedFileName);
+
+				// Skip node_modules files if configured so
+				if (
+					EXCLUDE_NODE_MODULES &&
+					(resolvedFileName.includes('node_modules') ||
+						normalizedTargetFileName.includes('node_modules'))
+				) {
+					return;
+				}
 
 				const importKinds = determineImportKinds(x);
 
