@@ -3,7 +3,7 @@
 <div align="center" name="top">
 	<img align="center" src="assets/logo-rounded.png" width="150" height="150" alt="ArchUnitTS Logo">
 
-<br>
+<p></p> <!-- spacing -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://img.shields.io/npm/v/archunit.svg)](https://www.npmjs.com/package/archunit)
@@ -75,7 +75,7 @@ it('should not allow classes with low cohesion', async () => {
 
 it('should not contain too large files', () => {
 	const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
-	expect(rule).toPassAsync();
+	await expect(rule).toPassAsync();
 });
 ```
 
@@ -90,17 +90,17 @@ it('should generate HTML reports', () => {
 	const countMetrics = metrics().count();
 	const lcomMetrics = metrics().lcom();
 
-	// saves HTML report files to /reports
+	// Saves HTML report files to /reports
 	// You can specify the destination and even provide custom CSS
 	await lcomMetrics.exportAsHTML();
 	await countMetrics.exportAsHTML();
 
-	// empty assertion so we dont get warnings about an empty test
+	// So we get no warnings about an empty test
 	expect(0).toBe(0);
 });
 ```
 
-In you `gitlab-ci.yml`:
+In your `gitlab-ci.yml`:
 
 ```yml
 test:
