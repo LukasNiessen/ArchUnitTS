@@ -69,7 +69,7 @@ it('business layer should not depend on database layer', async () => {
 // More layers ...
 ```
 
-Lastly we ensure that some basic code metric rules are met.
+Lastly we ensure that some code metric rules are met.
 
 ```typescript
 it('should not contain too large files', () => {
@@ -154,8 +154,6 @@ Many common uses cases are covered in our examples folder. Here is an overview.
 
 - Express BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/hexagonal-architecture/express/README.md)
 
-TODO: add more?
-
 ## 🐲 Example Repositories
 
 Here are a few repositories with fully functioning examples that use ArchUnitTS to ensure architectural rules:
@@ -164,146 +162,193 @@ Here are a few repositories with fully functioning examples that use ArchUnitTS 
 - **[Jest Example](https://github.com/LukasNiessen/ArchUnitTS-Jest-Example)**: Full Jest integration examples
 - **[Jasmine Example](https://github.com/LukasNiessen/ArchUnitTS-Jasmine-Example)**: Jasmine testing framework integration
 
-## 📙 Features
-
-TODO. make this section thorough, complete and well done!
+## Features
 
 ### Circular Dependencies
 
 ```typescript
-import { projectFiles } from 'archunit';
-
-// Test for any circular dependencies
-test('should be free of circular dependencies', async () => {
-	const rule = projectFiles('tsconfig.json').should().beFreeOfCycles();
-
-	await expect(rule).toPass();
-});
-
-// Test specific folders only
-test('services should be free of cycles', async () => {
-	const rule = projectFiles('tsconfig.json')
-		.inFolder('src/services')
-		.should()
-		.beFreeOfCycles();
-
-	await expect(rule).toPass();
+it('services should be free of cycles', async () => {
+	const rule = projectFiles().inFolder('src/services').should().haveNoCycles();
+	await expect(rule).toPassAsync();
 });
 ```
 
-### 2. 🏗️ Layer Dependencies
+### Layer Dependencies
 
 ```typescript
-// Clean Architecture: Controllers → Services → Repositories
-test('should respect clean architecture layers', async () => {
-	// Controllers can depend on services
-	const controllerRule = projectFiles('tsconfig.json')
+it('should respect clean architecture layers', async () => {
+	const rule = projectFiles()
+		.inFolder('src/presentation')
+		.shouldNot()
+		.dependOnFiles()
+		.inFolder('src/database');
+	await expect(rule).toPassAsync();
+});
+
+it('business layer should not depend on presentation', async () => {
+	const rule = projectFiles()
+		.inFolder('src/business')
+		.shouldNot()
+		.dependOnFiles()
+		.inFolder('src/presentation');
+	await expect(rule).toPassAsync();
+});
+```
+
+### Naming Conventions
+
+```typescript
+it('should follow naming patterns', async () => {
+	const rule = projectFiles()
 		.inFolder('controllers')
 		.should()
-		.onlyDependOn()
-		.files()
-		.inFolders(['services', 'types', 'utils']);
-
-	await expect(controllerRule).toPass();
-
-	// Services cannot depend on controllers
-	const serviceRule = projectFiles('tsconfig.json')
-		.inFolder('services')
-		.should()
-		.notDependOn()
-		.files()
-		.inFolder('controllers');
-
-	await expect(serviceRule).toPass();
+		.matchPattern('.*Controller.ts');
+	await expect(rule).toPassAsync();
 });
 ```
 
-### 3. 📁 Naming Conventions
+### Code Metrics
 
 ```typescript
-// Enforce naming patterns
-test('should follow naming conventions', async () => {
-	// Services must end with 'Service'
-	const serviceNaming = projectFiles('tsconfig.json')
-		.inFolder('services')
-		.should()
-		.haveFilenameMatching(/.*Service\.ts$/);
+it('should not contain too large files', async () => {
+	const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
+	await expect(rule).toPassAsync();
+});
 
-	await expect(serviceNaming).toPass();
+it('should have high class cohesion', async () => {
+	const rule = metrics().lcom().lcom96b().shouldBeBelow(0.3);
+	await expect(rule).toPassAsync();
+});
 
-	// Controllers must end with 'Controller'
-	const controllerNaming = projectFiles('tsconfig.json')
-		.inFolder('controllers')
-		.should()
-		.haveFilenameMatching(/.*Controller\.ts$/);
+it('should count methods per class', async () => {
+	const rule = metrics().count().methodCount().shouldBeBelow(20);
+	await expect(rule).toPassAsync();
+});
 
-	await expect(controllerNaming).toPass();
+it('should limit statements per file', async () => {
+	const rule = metrics().count().statements().shouldBeBelow(100);
+	await expect(rule).toPassAsync();
 });
 ```
 
-### 4. 🚫 Import Restrictions
+### Distance Metrics
 
 ```typescript
-// Prevent specific imports
-test('should not use deprecated modules', async () => {
-	const rule = projectFiles('tsconfig.json')
-		.should()
-		.notImport(['lodash', 'moment'])
-		.because('Use native alternatives or date-fns instead');
-
-	await expect(rule).toPass();
+it('should maintain proper coupling', async () => {
+	const rule = metrics().distance().couplingFactor().shouldBeBelow(0.5);
+	await expect(rule).toPassAsync();
 });
 
-// Restrict internal imports
-test('components should not access database directly', async () => {
-	const rule = projectFiles('tsconfig.json')
-		.inFolder('components')
-		.should()
-		.notImport(['pg', 'mysql2', 'mongoose'])
-		.because('Components should use services for data access');
-
-	await expect(rule).toPass();
+it('should stay close to main sequence', async () => {
+	const rule = metrics().distance().distanceFromMainSequence().shouldBeBelow(0.3);
+	await expect(rule).toPassAsync();
 });
 ```
 
-### 5. 📊 Complexity Rules
+### Custom Metrics
+
+You can define your own metrics as well.
 
 ```typescript
-// Control code complexity
-test('should maintain low complexity', async () => {
-	const rule = projectFiles('tsconfig.json')
-		.should()
-		.haveCyclomaticComplexityLessThan(10)
-		.because('Complex functions are hard to test and maintain');
-
-	await expect(rule).toPass();
-});
-
-// Limit file size
-test('should keep files reasonably sized', async () => {
-	const rule = projectFiles('tsconfig.json')
-		.should()
-		.haveLinesOfCodeLessThan(300)
-		.because('Large files are difficult to understand');
-
-	await expect(rule).toPass();
+it('should have a nice method field ratio', async () => {
+	const rule = metrics()
+		.customMetric(
+			'methodFieldRatio',
+			'Ratio of methods to fields',
+			(classInfo) => classInfo.methods.length / Math.max(classInfo.fields.length, 1)
+		)
+		.shouldBeBelowOrEqual(10);
+	await expect(rule).toPassAsync();
 });
 ```
 
-### 6. 🎨 Custom Rules
+### Architecture Slices
 
 ```typescript
-// Create custom architecture rules
-test('should follow custom business rules', async () => {
-	const rule = projectFiles('tsconfig.json')
-		.matching('**/payment/**')
-		.should()
-		.onlyAccessClassesThat()
-		.haveNameMatching(/Payment.*/)
-		.orHaveAnnotation('PaymentSafe')
-		.because('Payment code must be isolated for security');
+it('should adhere to UML diagram', async () => {
+	const diagram = `
+@startuml
+  component [controllers]
+  component [services]
+  [controllers] --> [services]
+@enduml`;
 
-	await expect(rule).toPass();
+	const rule = slicesOfProject()
+		.definedBy('src/(**)/')
+		.should()
+		.adhereToDiagram(diagram);
+	await expect(rule).toPassAsync();
+});
+
+it('should not contain forbidden dependencies', async () => {
+	const rule = slicesOfProject()
+		.definedBy('src/(**)/')
+		.shouldNot()
+		.containDependency('services', 'controllers');
+	await expect(rule).toPassAsync();
+});
+```
+
+### Filtering and Targeting
+
+```typescript
+it('should filter by folder pattern', async () => {
+	const rule = metrics()
+		.inFolder(/src\/services/)
+		.count()
+		.methodCount()
+		.shouldBeBelow(15);
+	await expect(rule).toPassAsync();
+});
+
+it('should filter by class pattern', async () => {
+	const rule = metrics()
+		.forClassesMatching(/.*Service$/)
+		.lcom()
+		.lcom96b()
+		.shouldBeBelow(0.5);
+	await expect(rule).toPassAsync();
+});
+
+it('should target specific files', async () => {
+	const rule = metrics()
+		.forFile('user-service.ts')
+		.count()
+		.linesOfCode()
+		.shouldBeBelow(200);
+	await expect(rule).toPassAsync();
+});
+```
+
+### Export & Reporting
+
+Generate beautiful HTML reports for your metrics:
+
+```typescript
+// Export count metrics report
+await metrics().count().exportAsHTML('reports/count-metrics.html', {
+	title: 'Count Metrics Dashboard',
+	includeTimestamp: true,
+});
+
+// Export LCOM cohesion metrics report
+await metrics().lcom().exportAsHTML('reports/lcom-metrics.html', {
+	title: 'Code Cohesion Analysis',
+	includeTimestamp: false,
+});
+
+// Export distance metrics report
+await metrics().distance().exportAsHTML('reports/distance-metrics.html');
+```
+
+```typescript
+// Export comprehensive report with all metrics
+import { MetricsExporter } from 'archunitts';
+
+await MetricsExporter.exportComprehensiveAsHTML(undefined, {
+	outputPath: 'reports/comprehensive-metrics.html',
+	title: 'Complete Architecture Metrics Dashboard',
+	customCss: '.metric-card { border-radius: 8px; }',
 });
 ```
 
@@ -340,6 +385,8 @@ TODO
 Last note, if you don't want violations to make your tests fail but just print a warning, see this(TODO) section.
 
 ## 📖 API Reference
+
+TODO: a lot if incorrect here!! Rework this entire thing or maybe remove it!
 
 ### Core API
 
@@ -444,13 +491,39 @@ ArchUnitTS has the following core modules.
 | **Common**  | Shared utilities                     | Stable       | [`src/common/`](src/common/)                                                     |
 | **Reports** | Generate reports                     | Experimental | [`src/metrics/fluentapi/export-utils.ts`](src/metrics/fluentapi/export-utils.ts) |
 
+## 🦊 Contributing
+
+We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but we have proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed. See more in [Contributing](CONTRIBUTING.md).
+
 ## ℹ️ FAQ
 
-TODO
+**Q: What TypeScript/JavaScript testing frameworks are supported?**
+
+ArchUnitTS works with Jest, Jasmine, Vitest, Mocha, and any other testing framework. We have added special syntax support for Jest, Jasmine and Vitest, namely `toPassAsync` but, as said, ArchUnitTS works with any existing testing framework.
+
+**Q: Can I use ArchUnitTS with JavaScript projects?**
+
+Yes! While ArchUnitTS is built for TypeScript, it works with JavaScript projects too. You'll get the most benefit with TypeScript due to better static analysis capabilities.
+
+**Q: How do I handle false positives in architecture rules?**
+
+Use the filtering and targeting capabilities to exclude specific files or patterns. You can filter by file paths, class names, or custom predicates to fine-tune your rules.
+
+**Q: What's the difference between file-based and class-based rules?**
+
+File-based rules analyze import relationships between files, while class-based rules examine dependencies between classes and their members. Choose based on your architecture validation needs.
 
 ## 👥 Maintainers
 
-TODO
+### Maintainers
+
+• **[LukasNiessen](https://github.com/LukasNiessen)** - Creator and main maintainer
+• **[janMagnusHeimann](https://github.com/janMagnusHeimann)** - Maintainer  
+• **[draugang](https://github.com/draugang)** - Maintainer
+
+### Contributors
+
+TODO: add picture of all contributors
 
 ## 🤝 Community & Support
 
@@ -480,7 +553,7 @@ If ArchUnitTS helps your project, please consider:
 
 ## 📄 License
 
-MIT © [Lukas Niessen](https://github.com/LukasNiessen)
+**MIT**
 
 ---
 
