@@ -387,6 +387,8 @@ await MetricsExporter.exportComprehensiveAsHTML(undefined, {
 });
 ```
 
+The export functionality can be customized, for example by specifying an output path and custom CSS. Thanks to this, it's also very easy to include generated reports into your deploy process of, let's say, your GitHub page or GitLab page.
+
 ## 🔎 Informative Error Messages
 
 When tests fail, you get helpful, colorful output with clickable file paths.
@@ -411,6 +413,10 @@ ArchUnitTS has the following core modules.
 | **Testing** | Universal test framework integration | Stable       | [`src/testing/`](src/testing/) • [README](src/testing/README.md)                 |
 | **Common**  | Shared utilities                     | Stable       | [`src/common/`](src/common/)                                                     |
 | **Reports** | Generate reports                     | Experimental | [`src/metrics/fluentapi/export-utils.ts`](src/metrics/fluentapi/export-utils.ts) |
+
+## 🕵️ Technical Deep Dive
+
+How does ArchUnitTS work? See [here](info/TECHNICAL.md) for a deep dive!
 
 ## 🦊 Contributing
 
@@ -483,13 +489,5 @@ If ArchUnitTS helps your project, please consider:
 
 - TODO: Add a config file, eg archunit.config.js or archunit.rc
 
-- TODO: mention the big scope, eg not only file and folder based like most ts arch testing libararies, but you can test class wise, method wise, field wise, even line wise.
-
-- TODO: mention due to the fact that export functionality is so customizable, you can include a cd process in your pipeline to deploy it to github/lab pages for example.
-
 - TODO: create and website, add to top (
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) stuff) and replace links, e.g. doc link, to website
-
-- TODO: add technical breakdown.
-
-- TODO: add quickstart where we: Set it up and add it to your CI/CD pipeline in less than 15 min. Gitlab ci or github actions in the example.
