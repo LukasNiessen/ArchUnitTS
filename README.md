@@ -69,7 +69,7 @@ it('business layer should not depend on database layer', async () => {
 // More layers ...
 ```
 
-Lastly we ensure that some basic code metric rules are met.
+Lastly we ensure that some code metric rules are met.
 
 ```typescript
 it('should not contain too large files', () => {
@@ -154,8 +154,6 @@ Many common uses cases are covered in our examples folder. Here is an overview.
 
 - Express BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/hexagonal-architecture/express/README.md)
 
-TODO: add more?
-
 ## 🐲 Example Repositories
 
 Here are a few repositories with fully functioning examples that use ArchUnitTS to ensure architectural rules:
@@ -166,7 +164,7 @@ Here are a few repositories with fully functioning examples that use ArchUnitTS 
 
 ## 📙 Features
 
-TODO. make this section thorough, complete and well done!
+X-TODO. THis section should be complete, its not complete yet. But also, the examples are bad. Theyre just supposed to show what the library is capable of, so leave out imports and the like. Also no emojis here. Also no test(...), use it(...). Also many of the examples are just wrong. So remove them all and instead rewrite them! And add the missing functionality. At C:\Users\niesselu\Desktop\Playground\ArchUnitTS\test you can find the functionality.
 
 ### Circular Dependencies
 
@@ -444,13 +442,32 @@ ArchUnitTS has the following core modules.
 | **Common**  | Shared utilities                     | Stable       | [`src/common/`](src/common/)                                                     |
 | **Reports** | Generate reports                     | Experimental | [`src/metrics/fluentapi/export-utils.ts`](src/metrics/fluentapi/export-utils.ts) |
 
+## 🦊 Contributing
+
+We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but we have proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed. See more in [Contributing](CONTRIBUTING.md).
+
 ## ℹ️ FAQ
 
-TODO
+X-TODO: add some FAQ here. No emojis. The style should be simple, as follows:
+**Q: Why Deepseek R1 over other models?**
+
+Deepseek R1 excels at reasoning and tool use for its size. We think it’s a solid fit for our needs other models work fine, but Deepseek is our primary pick.
+
+**Q: I get an error running `cli.py`. What do I do?**
+
+Ensure local is running (`ollama serve`), your `config.ini` matches your provider, and dependencies are installed. If none work feel free to raise an issue.
+
+Come up with questions and answers yourself that match this library.
 
 ## 👥 Maintainers
 
-TODO
+### Maintainers
+
+X-TODO: add LukasNiessen as the creator and main maintainer, janMagnusHeimann and draugang as a normal maintainer. Make it bullet point with links but no emojis.
+
+### Contributors
+
+TODO: add picture of all contributors
 
 ## 🤝 Community & Support
 
@@ -480,7 +497,7 @@ If ArchUnitTS helps your project, please consider:
 
 ## 📄 License
 
-MIT © [Lukas Niessen](https://github.com/LukasNiessen)
+**MIT**
 
 ---
 
