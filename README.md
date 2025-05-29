@@ -36,11 +36,11 @@ Simply add tests to your existing test suites. The following is an example using
 import { projectFiles, metrics } from 'archunit';
 
 it('should not have circular dependencies', async () => {
-&ensp;const rule = projectFiles().inFolder('src').should().haveNoCycles();
+  const rule = projectFiles().inFolder('src').should().haveNoCycles();
 
-&ensp;// toPassAsync is syntax support we added for Jest, Vitest
-&ensp;// and Jasmine, but ArchUnitTS works with any testing framework
-&ensp;await expect(rule).toPassAsync();
+  // toPassAsync is syntax support we added for Jest, Vitest
+  // and Jasmine, but ArchUnitTS works with any testing framework
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -48,23 +48,23 @@ Next we ensure that our layered architecture is respected.
 
 ```typescript
 it('presentation layer should not depend on database layer', async () => {
-	const rule = projectFiles()
-		.inFolder('src/presentation')
-		.shouldNot()
-		.dependOnFiles()
-		.inFolder('src/database');
+  const rule = projectFiles()
+    .inFolder('src/presentation')
+    .shouldNot()
+    .dependOnFiles()
+    .inFolder('src/database');
 
-	await expect(rule).toPassAsync();
+  await expect(rule).toPassAsync();
 });
 
 it('business layer should not depend on database layer', async () => {
-	const rule = projectFiles()
-		.inFolder('src/business')
-		.shouldNot()
-		.dependOnFiles()
-		.inFolder('src/database');
+  const rule = projectFiles()
+    .inFolder('src/business')
+    .shouldNot()
+    .dependOnFiles()
+    .inFolder('src/database');
 
-	await expect(rule).toPassAsync();
+  await expect(rule).toPassAsync();
 });
 
 // More layers ...
@@ -74,15 +74,15 @@ Lastly we ensure that some code metric rules are met.
 
 ```typescript
 it('should not contain too large files', () => {
-	const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
-	await expect(rule).toPassAsync();
+  const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
+  await expect(rule).toPassAsync();
 });
 
 it('should only have classes with high cohesion', async () => {
-	// LCOM metric (lack of cohesion of methods)
-	// Low LCOM means high cohesion
-	const rule = metrics().lcom().lcom96b().shouldBeBelow(0.3);
-	await expect(rule).toPassAsync();
+  // LCOM metric (lack of cohesion of methods)
+  // Low LCOM means high cohesion
+  const rule = metrics().lcom().lcom96b().shouldBeBelow(0.3);
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -94,15 +94,15 @@ Additionally, you can generate reports and save them as artifacts. Here's a simp
 
 ```typescript
 it('should generate HTML reports', () => {
-	const countMetrics = metrics().count();
-	const lcomMetrics = metrics().lcom();
+  const countMetrics = metrics().count();
+  const lcomMetrics = metrics().lcom();
 
-	// Saves HTML report files to /reports
-	await countMetrics.exportAsHTML();
-	await lcomMetrics.exportAsHTML();
+  // Saves HTML report files to /reports
+  await countMetrics.exportAsHTML();
+  await lcomMetrics.exportAsHTML();
 
-	// So we get no warning about an empty test
-	expect(0).toBe(0);
+  // So we get no warning about an empty test
+  expect(0).toBe(0);
 });
 ```
 
@@ -176,8 +176,8 @@ This is an overview of you can do with ArchUnitTS.
 
 ```typescript
 it('services should be free of cycles', async () => {
-	const rule = projectFiles().inFolder('src/services').should().haveNoCycles();
-	await expect(rule).toPassAsync();
+  const rule = projectFiles().inFolder('src/services').should().haveNoCycles();
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -185,21 +185,21 @@ it('services should be free of cycles', async () => {
 
 ```typescript
 it('should respect clean architecture layers', async () => {
-	const rule = projectFiles()
-		.inFolder('src/presentation')
-		.shouldNot()
-		.dependOnFiles()
-		.inFolder('src/database');
-	await expect(rule).toPassAsync();
+  const rule = projectFiles()
+    .inFolder('src/presentation')
+    .shouldNot()
+    .dependOnFiles()
+    .inFolder('src/database');
+  await expect(rule).toPassAsync();
 });
 
 it('business layer should not depend on presentation', async () => {
-	const rule = projectFiles()
-		.inFolder('src/business')
-		.shouldNot()
-		.dependOnFiles()
-		.inFolder('src/presentation');
-	await expect(rule).toPassAsync();
+  const rule = projectFiles()
+    .inFolder('src/business')
+    .shouldNot()
+    .dependOnFiles()
+    .inFolder('src/presentation');
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -207,11 +207,11 @@ it('business layer should not depend on presentation', async () => {
 
 ```typescript
 it('should follow naming patterns', async () => {
-	const rule = projectFiles()
-		.inFolder('services')
-		.should()
-		.matchPattern('.*Service.*\\.ts');
-	await expect(rule).toPassAsync();
+  const rule = projectFiles()
+    .inFolder('services')
+    .should()
+    .matchPattern('.*Service.*\\.ts');
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -219,33 +219,33 @@ it('should follow naming patterns', async () => {
 
 ```typescript
 it('should not contain too large files', async () => {
-	const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
-	await expect(rule).toPassAsync();
+  const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
+  await expect(rule).toPassAsync();
 });
 
 it('should have high class cohesion', async () => {
-	const rule = metrics().lcom().lcom96b().shouldBeBelow(0.3);
-	await expect(rule).toPassAsync();
+  const rule = metrics().lcom().lcom96b().shouldBeBelow(0.3);
+  await expect(rule).toPassAsync();
 });
 
 it('should count methods per class', async () => {
-	const rule = metrics().count().methodCount().shouldBeBelow(20);
-	await expect(rule).toPassAsync();
+  const rule = metrics().count().methodCount().shouldBeBelow(20);
+  await expect(rule).toPassAsync();
 });
 
 it('should limit statements per file', async () => {
-	const rule = metrics().count().statements().shouldBeBelowOrEqual(100);
-	await expect(rule).toPassAsync();
+  const rule = metrics().count().statements().shouldBeBelowOrEqual(100);
+  await expect(rule).toPassAsync();
 });
 
 it('should have 3 fields per Data class', async () => {
-	const rule = metrics()
-		.forClassesMatching(/.*Data.*/)
-		.count()
-		.fieldCount()
-		.shouldBe(3);
+  const rule = metrics()
+    .forClassesMatching(/.*Data.*/)
+    .count()
+    .fieldCount()
+    .shouldBe(3);
 
-	await expect(rule).toPassAsync();
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -253,13 +253,13 @@ it('should have 3 fields per Data class', async () => {
 
 ```typescript
 it('should maintain proper coupling', async () => {
-	const rule = metrics().distance().couplingFactor().shouldBeBelow(0.5);
-	await expect(rule).toPassAsync();
+  const rule = metrics().distance().couplingFactor().shouldBeBelow(0.5);
+  await expect(rule).toPassAsync();
 });
 
 it('should stay close to main sequence', async () => {
-	const rule = metrics().distance().distanceFromMainSequence().shouldBeBelow(0.3);
-	await expect(rule).toPassAsync();
+  const rule = metrics().distance().distanceFromMainSequence().shouldBeBelow(0.3);
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -270,15 +270,15 @@ You can define your own custom rules.
 ```typescript
 const ruleDesc = 'TypeScript files should export functionality';
 const myCustomRule = (file: FileInfo) => {
-	// TypeScript files should contain export statements
-	return file.content.includes('export');
+  // TypeScript files should contain export statements
+  return file.content.includes('export');
 };
 
 const violations = await projectFiles()
-	.matchingPattern('**/*.ts')
-	.should()
-	.adhereTo(myCustomRule, ruleDesc)
-	.check();
+  .matchingPattern('**/*.ts')
+  .should()
+  .adhereTo(myCustomRule, ruleDesc)
+  .check();
 
 expect(violations).toStrictEqual([]);
 ```
@@ -289,14 +289,14 @@ You can define your own metrics as well.
 
 ```typescript
 it('should have a nice method field ratio', async () => {
-	const rule = metrics()
-		.customMetric(
-			'methodFieldRatio',
-			'Ratio of methods to fields',
-			(classInfo) => classInfo.methods.length / Math.max(classInfo.fields.length, 1)
-		)
-		.shouldBeBelowOrEqual(10);
-	await expect(rule).toPassAsync();
+  const rule = metrics()
+    .customMetric(
+      'methodFieldRatio',
+      'Ratio of methods to fields',
+      (classInfo) => classInfo.methods.length / Math.max(classInfo.fields.length, 1)
+    )
+    .shouldBeBelowOrEqual(10);
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -304,23 +304,23 @@ it('should have a nice method field ratio', async () => {
 
 ```typescript
 it('should adhere to UML diagram', async () => {
-	const diagram = `
+  const diagram = `
 @startuml
   component [controllers]
   component [services]
   [controllers] --> [services]
 @enduml`;
 
-	const rule = slicesOfProject().definedBy('src/(**)/').should().adhereToDiagram(diagram);
-	await expect(rule).toPassAsync();
+  const rule = slicesOfProject().definedBy('src/(**)/').should().adhereToDiagram(diagram);
+  await expect(rule).toPassAsync();
 });
 
 it('should not contain forbidden dependencies', async () => {
-	const rule = slicesOfProject()
-		.definedBy('src/(**)/')
-		.shouldNot()
-		.containDependency('services', 'controllers');
-	await expect(rule).toPassAsync();
+  const rule = slicesOfProject()
+    .definedBy('src/(**)/')
+    .shouldNot()
+    .containDependency('services', 'controllers');
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -328,30 +328,30 @@ it('should not contain forbidden dependencies', async () => {
 
 ```typescript
 it('should filter by folder pattern', async () => {
-	const rule = metrics()
-		.inFolder(/src\/services/)
-		.count()
-		.methodCount()
-		.shouldBeBelow(15);
-	await expect(rule).toPassAsync();
+  const rule = metrics()
+    .inFolder(/src\/services/)
+    .count()
+    .methodCount()
+    .shouldBeBelow(15);
+  await expect(rule).toPassAsync();
 });
 
 it('should filter by class pattern', async () => {
-	const rule = metrics()
-		.forClassesMatching(/.*Service$/)
-		.lcom()
-		.lcom96b()
-		.shouldBeBelow(0.5);
-	await expect(rule).toPassAsync();
+  const rule = metrics()
+    .forClassesMatching(/.*Service$/)
+    .lcom()
+    .lcom96b()
+    .shouldBeBelow(0.5);
+  await expect(rule).toPassAsync();
 });
 
 it('should target specific files', async () => {
-	const rule = metrics()
-		.forFile('user-service.ts')
-		.count()
-		.linesOfCode()
-		.shouldBeBelow(200);
-	await expect(rule).toPassAsync();
+  const rule = metrics()
+    .forFile('user-service.ts')
+    .count()
+    .linesOfCode()
+    .shouldBeBelow(200);
+  await expect(rule).toPassAsync();
 });
 ```
 
@@ -362,14 +362,14 @@ Generate beautiful HTML reports for your metrics. _Note that this features is in
 ```typescript
 // Export count metrics report
 await metrics().count().exportAsHTML('reports/count-metrics.html', {
-	title: 'Count Metrics Dashboard',
-	includeTimestamp: true,
+  title: 'Count Metrics Dashboard',
+  includeTimestamp: true,
 });
 
 // Export LCOM cohesion metrics report
 await metrics().lcom().exportAsHTML('reports/lcom-metrics.html', {
-	title: 'Code Cohesion Analysis',
-	includeTimestamp: false,
+  title: 'Code Cohesion Analysis',
+  includeTimestamp: false,
 });
 
 // Export distance metrics report
@@ -381,9 +381,9 @@ await metrics().distance().exportAsHTML('reports/distance-metrics.html');
 import { MetricsExporter } from 'archunitts';
 
 await MetricsExporter.exportComprehensiveAsHTML(undefined, {
-	outputPath: 'reports/comprehensive-metrics.html',
-	title: 'Complete Architecture Metrics Dashboard',
-	customCss: '.metric-card { border-radius: 8px; }',
+  outputPath: 'reports/comprehensive-metrics.html',
+  title: 'Complete Architecture Metrics Dashboard',
+  customCss: '.metric-card { border-radius: 8px; }',
 });
 ```
 

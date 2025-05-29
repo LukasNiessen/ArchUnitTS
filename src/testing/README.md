@@ -22,16 +22,16 @@ Even without direct integration, ArchUnitTS can be used with any JavaScript/Type
 import { projectFiles } from 'archunit';
 
 test('architecture rule test', async () => {
-	const rule = projectFiles()
-		.inFolder('src/domain')
-		.shouldNot()
-		.dependOnFiles()
-		.inFolder('src/presentation');
+  const rule = projectFiles()
+    .inFolder('src/domain')
+    .shouldNot()
+    .dependOnFiles()
+    .inFolder('src/presentation');
 
-	const violations = await rule.check();
+  const violations = await rule.check();
 
-	// Manually assert that there are no violations
-	assert(violations.length === 0, 'Architecture rule violated');
+  // Manually assert that there are no violations
+  assert(violations.length === 0, 'Architecture rule violated');
 });
 ```
 
@@ -75,11 +75,11 @@ When ArchUnitTS integrates with a testing framework, it extends the framework's 
 
 ```typescript
 declare global {
-	namespace jest {
-		interface Matchers<R> {
-			toPassAsync(): Promise<R>;
-		}
-	}
+  namespace jest {
+    interface Matchers<R> {
+      toPassAsync(): Promise<R>;
+    }
+  }
 }
 ```
 
