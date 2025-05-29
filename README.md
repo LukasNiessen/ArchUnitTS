@@ -389,6 +389,30 @@ await MetricsExporter.exportComprehensiveAsHTML(undefined, {
 
 The export functionality can be customized, for example by specifying an output path and custom CSS. Thanks to this, it's also very easy to include generated reports into your deploy process of, let's say, your GitHub page or GitLab page.
 
+## 📊 Library Comparison
+
+Here's how ArchUnitTS compares to other TypeScript architecture testing libraries:
+
+| Feature                           | **ArchUnitTS**                                    | **ts-arch**           | **arch-unit-ts**   | **ts-arch-unit** |
+| --------------------------------- | ------------------------------------------------- | --------------------- | ------------------ | ---------------- |
+| **API Stability**                 | ✅ Stable                                         | ✅ Stable             | ⚠️ Unstable        | ⚠️ Unstable      |
+| **Circular Dependency Detection** | ✅ Full support                                   | ✅ Basic support      | ❌ Limited         | ❌ No            |
+| **Layer Dependency Rules**        | ✅ Advanced patterns                              | ✅ Basic patterns     | ⚠️ Limited         | ❌ No            |
+| **File Pattern Matching**         | ✅ Glob + Regex                                   | ✅ Basic glob         | ⚠️ Simple patterns | ❌ Basic         |
+| **Code Metrics**                  | ✅ Comprehensive                                  | ❌ No                 | ❌ No              | ❌ No            |
+| **LCOM Cohesion Analysis**        | ✅ Multiple algorithms                            | ❌ No                 | ❌ No              | ❌ No            |
+| **Distance Metrics**              | ✅ Coupling & abstraction                         | ❌ No                 | ❌ No              | ❌ No            |
+| **Custom Rules**                  | ✅ Full support                                   | ❌ No                 | ❌ No              | ❌ No            |
+| **UML Diagram Validation**        | ✅ PlantUML support                               | ❌ No                 | ❌ No              | ❌ No            |
+| **Architecture Slicing**          | ✅ Advanced slicing                               | ❌ No                 | ❌ No              | ❌ No            |
+| **Testing Framework Integration** | ✅ Universal (Jest, Vitest, Jasmine, Mocha, etc.) | ⚠️ Jest only          | ⚠️ Limited         | ⚠️ Basic         |
+| **HTML Report Generation**        | ✅ Rich dashboards                                | ❌ No                 | ❌ No              | ❌ No            |
+| **TypeScript AST Analysis**       | ✅ Deep analysis                                  | ⚠️ Basic              | ⚠️ Limited         | ⚠️ Basic         |
+| **Performance Optimization**      | ✅ Caching + parallel                             | ⚠️ Basic              | ❌ No              | ❌ No            |
+| **Error Messages**                | ✅ Detailed + clickable                           | ⚠️ Basic              | ⚠️ Basic           | ⚠️ Basic         |
+| **Documentation**                 | ✅ Comprehensive                                  | ⚠️ Basic              | ⚠️ Minimal         | ⚠️ Minimal       |
+| **Community Support**             | ✅ Active maintenance                             | ✅ Active maintenance | ❌ Inactive        | ❌ Inactive      |
+
 ## 🔎 Informative Error Messages
 
 When tests fail, you get helpful, colorful output with clickable file paths.
@@ -482,10 +506,6 @@ If ArchUnitTS helps your project, please consider:
 ---
 
 ## 📝 TODO Items
-
-- TODO: add technical deep dive section
-
-- TODO: add comparison to other TS libraries. as a table probably
 
 - TODO: Add a config file, eg archunit.config.js or archunit.rc
 
