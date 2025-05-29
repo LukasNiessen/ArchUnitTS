@@ -120,7 +120,7 @@ test:
 
 ## 🎬 Demo
 
-https://github.com/user-attachments/assets/5f6c8548-4cf2-4cdc-a2ef-8aca02c9045a
+https://github.com/user-attachments/assets/426f7b47-5157-4e92-98a3-f5ab4f7a388a
 
 ## 🐹 Use Cases
 
