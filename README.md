@@ -478,10 +478,13 @@ TODO: add picture of all contributors
 
 ## 🤝 Community & Support
 
-If you find a bug, please submit an [issue on GitHub](https://github.com/LukasNiessen/ArchUnitTS/issues/new/choose).  
-For discussions, you can join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions).  
-Questions? Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag.  
-For more information, see the documentation: TODO (website)
+Found a bug? Want to discuss features?
+
+- Submit an [issue on GitHub](https://github.com/LukasNiessen/ArchUnitTS/issues/new/choose)
+- Join our [GitHub Discussions](https://github.com//LukasNiessen/ArchUnitTS/discussions)
+- Questions? Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag
+- Full documentation on our website [website](TODO)
+- Leave a comment or thoughts on our [X account](https://x.com/ArchUnitTS)
 
 If ArchUnitTS helps your project, please consider:
 
@@ -500,14 +503,7 @@ If ArchUnitTS helps your project, please consider:
 ---
 
 <p align="center">
-  <a href="#top"><strong>⬆ Back to Top</strong></a>
+  <a href="#top"><strong>Go Back to Top</strong></a>
 </p>
 
 ---
-
-## 📝 TODO Items
-
-- TODO: Add a config file, eg archunit.config.js or archunit.rc
-
-- TODO: create and website, add to top (
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) stuff) and replace links, e.g. doc link, to website
