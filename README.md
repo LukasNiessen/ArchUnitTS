@@ -15,10 +15,11 @@
 
 Enforce architecture rules in TypeScript and JavaScript projects. Check for dependency directions, detect circular dependencies, enforce coding standards and much more. Integrates with every testing framework. Very simple setup and pipeline integration.
 
-The #1 architecture testing library for TS and JS measured by GitHub stars! 💚  
+<!--The #1 architecture testing library for TS and JS measured by GitHub stars! 💚  -->
+
 _Inspired by the amazing ArchUnit library but we are not affiliated with ArchUnit._
 
-[Documentation TODO](#readme) • [Use Cases](#-use-cases) • [Examples](#examples) • [Features](FEATURES.md) • [Contributing](CONTRIBUTING.md)
+[Documentation](#readme) • [Use Cases](#-use-cases) • [Examples](#examples) • [Features](#-features) • [Contributing](CONTRIBUTING.md)
 
 ## ⚡ 5 min Quickstart
 
