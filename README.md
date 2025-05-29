@@ -3,7 +3,8 @@
 <div align="center" name="top">
   <img align="center" src="assets/logo-rounded.png" width="150" height="150" alt="ArchUnitTS Logo">
 
-<p></p> <!-- spacing -->
+<!-- A spacer -->
+<p>&nbsp;</p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://img.shields.io/npm/v/archunit.svg)](https://www.npmjs.com/package/archunit)
@@ -392,7 +393,7 @@ When tests fail, you get helpful, colorful output with clickable file paths.
 
 https://github.com/user-attachments/assets/04b26afb-53e9-4507-ba24-c8308b3a7922
 
-_Click on file paths to jump directly to the issue in your IDE!_
+_Click on file paths to jump directly to the issue in your IDE._
 
 ## No Failing Tests?
 
