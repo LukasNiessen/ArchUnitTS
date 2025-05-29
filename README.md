@@ -25,7 +25,7 @@ _Inspired by the amazing ArchUnit library but we are not affiliated with ArchUni
 ### Installation
 
 ```bash
-npm i archunit -D
+npm install archunit --save-dev
 ```
 
 ### Add tests
@@ -115,7 +115,7 @@ test:
   artifacts:
     when: always
     paths:
-		  - reports
+      - reports
 ```
 
 ## 🎬 Demo
