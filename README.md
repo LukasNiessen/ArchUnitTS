@@ -498,7 +498,7 @@ If ArchUnitTS helps your project, please consider:
 
 ## 📄 License
 
-**MIT**
+This project is under the **MIT** license.
 
 ---
 
