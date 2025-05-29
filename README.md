@@ -396,15 +396,15 @@ Here's how ArchUnitTS compares to other TypeScript architecture testing librarie
 | Feature                           | **ArchUnitTS**                                    | **ts-arch**           | **arch-unit-ts**   | **ts-arch-unit** |
 | --------------------------------- | ------------------------------------------------- | --------------------- | ------------------ | ---------------- |
 | **API Stability**                 | ✅ Stable                                         | ✅ Stable             | ⚠️ Unstable        | ⚠️ Unstable      |
-| **Circular Dependency Detection** | ✅ Full support                                   | ✅ Basic support      | ❌ Limited         | ❌ No            |
-| **Layer Dependency Rules**        | ✅ Advanced patterns                              | ✅ Basic patterns     | ⚠️ Limited         | ❌ No            |
-| **File Pattern Matching**         | ✅ Glob + Regex                                   | ✅ Basic glob         | ⚠️ Simple patterns | ❌ Basic         |
+| **Circular Dependency Detection** | ✅ Supported                                      | ✅ Supported          | ❌ Limited         | ❌ No            |
+| **Layer Dependency Rules**        | ✅ Advanced patterns                              | ✅ Advanced patterns  | ⚠️ Limited         | ❌ No            |
+| **File Pattern Matching**         | ✅ Glob + Regex                                   | ✅ Glob + Regex       | ⚠️ Simple patterns | ❌ Basic         |
+| **Custom Rules**                  | ✅ Full support                                   | ❌ No                 | ❌ No              | ❌ No            |
 | **Code Metrics**                  | ✅ Comprehensive                                  | ❌ No                 | ❌ No              | ❌ No            |
 | **LCOM Cohesion Analysis**        | ✅ Multiple algorithms                            | ❌ No                 | ❌ No              | ❌ No            |
 | **Distance Metrics**              | ✅ Coupling & abstraction                         | ❌ No                 | ❌ No              | ❌ No            |
-| **Custom Rules**                  | ✅ Full support                                   | ❌ No                 | ❌ No              | ❌ No            |
-| **UML Diagram Validation**        | ✅ PlantUML support                               | ❌ No                 | ❌ No              | ❌ No            |
-| **Architecture Slicing**          | ✅ Advanced slicing                               | ❌ No                 | ❌ No              | ❌ No            |
+| **UML Diagram Validation**        | ✅ Supported                                      | ✅ Supported          | ❌ No              | ❌ No            |
+| **Architecture Slicing**          | ✅ Supported                                      | ✅ Supported          | ❌ No              | ❌ No            |
 | **Testing Framework Integration** | ✅ Universal (Jest, Vitest, Jasmine, Mocha, etc.) | ⚠️ Jest only          | ⚠️ Limited         | ⚠️ Basic         |
 | **HTML Report Generation**        | ✅ Rich dashboards                                | ❌ No                 | ❌ No              | ❌ No            |
 | **TypeScript AST Analysis**       | ✅ Deep analysis                                  | ⚠️ Basic              | ⚠️ Limited         | ⚠️ Basic         |
