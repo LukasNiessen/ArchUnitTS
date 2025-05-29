@@ -436,15 +436,13 @@ File-based rules analyze import relationships between files, while class-based r
 
 ## 👥 Maintainers
 
-### Maintainers
-
 • **[LukasNiessen](https://github.com/LukasNiessen)** - Creator and main maintainer
 
 • **[janMagnusHeimann](https://github.com/janMagnusHeimann)** - Maintainer
 
 • **[draugang](https://github.com/draugang)** - Maintainer
 
-### Contributors
+## 💟 Contributors
 
 TODO: add picture of all contributors
 
