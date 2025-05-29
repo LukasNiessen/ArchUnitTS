@@ -4,6 +4,7 @@ import { ViolatingEdge } from '../../slices/assertion/admissible-edges';
 import { ViolatingCycle } from '../../files/assertion/free-of-cycles';
 import { ViolatingFileDependency } from '../../files/assertion/depend-on-files';
 import { MetricViolation } from '../../metrics/assertion/metric-thresholds';
+import { FileCountViolation } from '../../metrics/fluentapi/metrics/count-metrics';
 import { TestViolation } from './result-factory';
 import { ColorUtils } from './color-utils';
 
@@ -32,6 +33,9 @@ export class ViolationFactory {
 		if (violation instanceof MetricViolation) {
 			return this.fromMetricViolation(violation);
 		}
+		if (violation instanceof FileCountViolation) {
+			return this.fromFileCountViolation(violation);
+		}
 		return new UnknownTestViolation(violation);
 	}
 	private static fromMetricViolation(metric: MetricViolation): TestViolation {
@@ -45,6 +49,19 @@ export class ViolationFactory {
 		return {
 			message,
 			details: metric,
+		};
+	}
+	private static fromFileCountViolation(violation: FileCountViolation): TestViolation {
+		const comparisonText = this.getComparisonDescription(violation.comparison);
+		const message = `${ColorUtils.formatViolationType('File count violation')}:
+   File: ${ColorUtils.formatFilePath(`${violation.filePath}:1:1`)}
+   Metric: ${ColorUtils.formatMetricValue(violation.metricName)}
+   Actual value: ${ColorUtils.formatMetricValue(violation.metricValue.toString())}
+   Expected: ${ColorUtils.formatRule(`${comparisonText} ${violation.threshold}`)}`;
+
+		return {
+			message,
+			details: violation,
 		};
 	}
 	private static fromViolatingFile(file: ViolatingNode): TestViolation {

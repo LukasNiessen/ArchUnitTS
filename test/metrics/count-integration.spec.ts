@@ -261,4 +261,9 @@ describe('Count metrics integration test', () => {
 			}
 		});
 	});
+
+	it('should not have huge files', async () => {
+		const rule = metrics().count().linesOfCode().shouldBeBelow(2000);
+		await expect(rule).toPassAsync();
+	});
 });
