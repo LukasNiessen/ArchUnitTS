@@ -168,7 +168,7 @@ Here are a few repositories with fully functioning examples that use ArchUnitTS 
 - **[Jest Example](https://github.com/LukasNiessen/ArchUnitTS-Jest-Example)**: Full Jest integration examples
 - **[Jasmine Example](https://github.com/LukasNiessen/ArchUnitTS-Jasmine-Example)**: Jasmine testing framework integration
 
-## Features
+## 🐣 Features
 
 This is an overview of you can do with ArchUnitTS.
 
