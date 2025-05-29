@@ -416,7 +416,7 @@ ArchUnitTS has the following core modules.
 
 ## 🕵️ Technical Deep Dive
 
-How does ArchUnitTS work? See [here](info/TECHNICAL.md) for a deep dive!
+How does ArchUnitTS work under the hood? See [here](info/TECHNICAL.md) for a deep dive!
 
 ## 🦊 Contributing
 
