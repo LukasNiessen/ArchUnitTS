@@ -3,7 +3,7 @@
 <div align="center" name="top">
 	<img align="center" src="assets/logo-rounded.png" width="150" height="150" alt="ArchUnitTS Logo">
 
-<br>
+<p></p> <!-- spacing -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://img.shields.io/npm/v/archunit.svg)](https://www.npmjs.com/package/archunit)
@@ -12,13 +12,14 @@
 
 </div>
 
-Enforce architecture rules in TypeScript and JavaScript projects. Check for dependency directions, detect circular dependencies, enforce coding standards and much more. Integrates with every testing framework. Setup and pipeline integration takes less than 5 min.
+Enforce architecture rules in TypeScript and JavaScript projects. Check for dependency directions, detect circular dependencies, enforce coding standards and much more. Integrates with every testing framework. Very simple setup and pipeline integration.
 
-The #1 architecture testing library for TS and JS measured by GitHub stars! 💚 _Inspired by the amazing ArchUnit library; we are not affiliated with ArchUnit._
+The #1 architecture testing library for TS and JS measured by GitHub stars! 💚  
+_Inspired by the amazing ArchUnit library; we are not affiliated with ArchUnit._
 
 [Documentation TODO](#readme) • [Use Cases](#-use-cases) • [Examples](#examples) • [Features TODO](FEATURES.md) • [Contributing](CONTRIBUTING.md)
 
-## ⚡ Quickstart, 5 Minutes
+## ⚡ 5 min Quickstart
 
 ### 1️⃣ Installation
 
@@ -30,65 +31,57 @@ npm i archunit -D
 
 Simply add tests to your existing test suites. Here is an example using Jest.
 
-Note that we use _toPassAsync()_. This is special syntax we have added for _Jest, Vitest_ and _Jasmine_. However, ArchUnitTS works with any testing framework that exists.
-
 ```typescript
 import { projectFiles, metrics } from 'archunit';
 
-/**
- * We ensure that:
- * 1. No circular dependencies exist,
- * 2. Our layered architecture is respected,
- * 3. Basic code metric rules are met.
- */
-describe('Architecture Rules', () => {
-	it('should not have circular dependencies', async () => {
-		const rule = projectFiles().inFolder('src').should().haveNoCycles();
-		await expect(rule).toPassAsync();
-	});
+// 1. Ensure that we have no circular dependencies
+it('should not have circular dependencies', async () => {
+	const rule = projectFiles().inFolder('src').should().haveNoCycles();
 
-	describe('Layered Architecture Rules', () => {
-		it('presentation layer should not depend on database layer', async () => {
-			const rule = projectFiles()
-				.inFolder('src/presentation')
-				.shouldNot()
-				.dependOnFiles()
-				.inFolder('src/database');
+	// toPassAsync is special syntax support we have added for
+	// Jest, Vitest and Jasmine. However, ArchUnitTS works with any testing framework
+	await expect(rule).toPassAsync();
+});
 
-			await expect(rule).toPassAsync();
-		});
+// 2. Ensure that our layered architecture is respected
+it('presentation layer should not depend on database layer', async () => {
+	const rule = projectFiles()
+		.inFolder('src/presentation')
+		.shouldNot()
+		.dependOnFiles()
+		.inFolder('src/database');
 
-		it('business layer should not depend on database layer', async () => {
-			const rule = projectFiles()
-				.inFolder('src/business')
-				.shouldNot()
-				.dependOnFiles()
-				.inFolder('src/database');
+	await expect(rule).toPassAsync();
+});
 
-			await expect(rule).toPassAsync();
-		});
+it('business layer should not depend on database layer', async () => {
+	const rule = projectFiles()
+		.inFolder('src/business')
+		.shouldNot()
+		.dependOnFiles()
+		.inFolder('src/database');
 
-		// More layers...
-	});
+	await expect(rule).toPassAsync();
+});
 
-	describe('Code Metric Rules', () => {
-		it('should not allow classes with low cohesion', async () => {
-			// We use the LCOM metric (lack of cohesion of methods)
-			const rule = metrics().lcom().lcom96b().shouldBeBelow(0.5);
-			await expect(rule).toPassAsync();
-		});
+// More layers ...
 
-		it('should not contain too large files', () => {
-			const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
-			expect(rule).toPassAsync();
-		});
-	});
+// Now we ensure some basic code metric rules
+it('should not allow classes with low cohesion', async () => {
+	// We use the LCOM metric (lack of cohesion of methods)
+	const rule = metrics().lcom().lcom96b().shouldBeBelow(0.5);
+	await expect(rule).toPassAsync();
+});
+
+it('should not contain too large files', () => {
+	const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
+	await expect(rule).toPassAsync();
 });
 ```
 
 ### 3️⃣ CI Integration
 
-That's basically it. These tests will run automatically in your testing setup, for example in your CI pipeline. This ensures that the architectural rules you have defined are always adhered to! 🌻🐣
+These tests will run automatically in your testing setup, for example in your CI pipeline, so that's basically it. This setup ensures that the architectural rules you have defined are always adhered to! 🌻🐣
 
 Additionally, you can generate reports and save them as artifacts. Here's a simple example using GitLab CI. _Note that reports are in beta._
 
@@ -97,17 +90,17 @@ it('should generate HTML reports', () => {
 	const countMetrics = metrics().count();
 	const lcomMetrics = metrics().lcom();
 
-	// saves HTML report files to /reports
+	// Saves HTML report files to /reports
 	// You can specify the destination and even provide custom CSS
 	await lcomMetrics.exportAsHTML();
 	await countMetrics.exportAsHTML();
 
-	// empty assertion so we dont get warnings about an empty test
+	// So we get no warnings about an empty test
 	expect(0).toBe(0);
 });
 ```
 
-In you `gitlab-ci.yml`:
+In your `gitlab-ci.yml`:
 
 ```yml
 test:
@@ -118,8 +111,6 @@ test:
         paths:
             - reports
 ```
-
-Last note, if you don't want violations to make your tests fail but just print a warning, see this(TODO) section.
 
 ## 🎬 Demo
 
@@ -337,6 +328,11 @@ When tests fail, you get helpful, colorful output with clickable file paths:
 ```
 
 _Click on file paths to jump directly to the issue in your IDE!_
+
+## No Failing Tests?
+
+TODO
+Last note, if you don't want violations to make your tests fail but just print a warning, see this(TODO) section.
 
 ## 📖 API Reference
 
