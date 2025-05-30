@@ -157,9 +157,9 @@ Many common uses cases are covered in our examples folder. Here is an overview.
 
 - Express BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/hexagonal-architecture/express/README.md)
 
-**MVP:**
+**MVC:**
 
-- Spring BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/mvp/spring/README.md)
+- Spring BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/mvc/spring/README.md)
 
 ## 🐲 Example Repositories
 
