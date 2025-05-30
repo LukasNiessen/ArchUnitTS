@@ -390,6 +390,217 @@ await MetricsExporter.exportComprehensiveAsHTML(undefined, {
 
 The export functionality can be customized, for example by specifying an output path and custom CSS. Thanks to this, it's also very easy to include generated reports into your deploy process of, let's say, your GitHub page or GitLab page.
 
+## 🎯 Pattern Matching
+
+ArchUnitTS provides powerful pattern matching capabilities for file selection and validation. You can use different matching strategies depending on your needs.
+
+### Basic Pattern Matching
+
+Use the legacy `matchPattern()` method for regex-based pattern matching:
+
+```typescript
+it('should match controller files', async () => {
+  const violations = await projectFiles()
+    .inFolder('controllers')
+    .should()
+    .matchPattern('.*Controller.ts')
+    .check();
+
+  expect(violations).toEqual([]);
+});
+```
+
+### Enhanced Pattern Matching
+
+The enhanced API provides more precise control over how patterns are matched:
+
+#### Filename-Only Matching
+
+Match patterns against filenames only (recommended for most use cases):
+
+```typescript
+it('should enforce service naming convention', async () => {
+  // This will flag files that don't start with "Service"
+  const violations = await projectFiles()
+    .inFolder('services')
+    .should()
+    .matchFilename('Service*') // Glob pattern: matches Service.ts, ServiceA.ts, ServiceB.ts
+    .check();
+
+  expect(violations).toHaveLength(1); // CoolService.ts should be flagged
+  expect(violations[0].projectedNode.label).toBe('src/services/CoolService.ts');
+});
+```
+
+#### Path Matching
+
+Match patterns against full file paths:
+
+```typescript
+it('should match specific path patterns', async () => {
+  const violations = await projectFiles()
+    .should()
+    .matchPath('src/services/User*.ts') // Matches full path pattern
+    .check();
+
+  expect(violations).toEqual([]);
+});
+```
+
+#### Substring Matching
+
+Find files containing specific substrings:
+
+```typescript
+it('should find files containing specific terms', async () => {
+  const violations = await projectFiles()
+    .shouldNot()
+    .containInFilename('Test') // Files shouldn't contain "Test" in filename
+    .check();
+
+  expect(violations).toEqual([]);
+});
+```
+
+### Pattern Types
+
+ArchUnitTS supports multiple pattern types:
+
+#### 1. Glob Patterns (Recommended)
+
+Use shell-style wildcards for intuitive pattern matching:
+
+```typescript
+// Wildcard patterns
+.matchFilename('Service*')        // Matches: Service.ts, ServiceA.ts, ServiceImpl.ts
+.matchFilename('*Controller.ts')  // Matches: UserController.ts, AdminController.ts
+.matchFilename('Test?.spec.ts')   // Matches: TestA.spec.ts, TestB.spec.ts (single char)
+.matchFilename('*Util*')          // Matches: StringUtil.ts, DateUtils.ts, MathUtility.ts
+
+// Path patterns
+.matchPath('src/*/services/*.ts') // Matches service files in any module
+.matchPath('**/*Service.ts')      // Matches service files anywhere in project
+```
+
+#### 2. Regular Expressions
+
+Use RegExp objects for complex pattern matching:
+
+```typescript
+// Regex patterns
+.matchFilename(/^Service.*\.ts$/)     // Matches files starting with "Service"
+.matchFilename(/.*\.(test|spec)\.ts$/) // Matches test files
+.matchPath(/^src\/components\/.*\.tsx?$/) // Matches component files
+
+// Case-insensitive matching
+.matchFilename(/service/i)            // Matches regardless of case
+```
+
+#### 3. Literal Strings
+
+Use exact string matching:
+
+```typescript
+// Exact filename matching
+.matchFilename('UserService.ts')      // Matches exactly "UserService.ts"
+
+// Substring matching
+.containInFilename('Service')         // Contains "Service" anywhere in filename
+```
+
+### Matching Options
+
+Each pattern matching method supports different options:
+
+#### Target Options
+
+- `filename` - Match against filename only (default for `matchFilename()`)
+- `path` - Match against full relative path (default for `matchPath()`)
+
+#### Matching Mode Options
+
+- `exact` - Pattern must match exactly (default for most methods)
+- `partial` - Pattern can match as substring (default for `containInFilename()`)
+
+### Advanced Examples
+
+#### Complex File Selection
+
+```typescript
+it('should validate complex file patterns', async () => {
+  // Multiple conditions
+  const violations = await projectFiles()
+    .inFolder('src')
+    .should()
+    .matchFilename(/^[A-Z].*Service\.ts$/) // PascalCase services
+    .check();
+
+  // Combined patterns
+  const componentViolations = await projectFiles()
+    .matchingPattern('src/components/**')
+    .should()
+    .matchFilename('*.component.tsx')
+    .check();
+
+  expect(violations).toEqual([]);
+  expect(componentViolations).toEqual([]);
+});
+```
+
+#### Architectural Validation
+
+```typescript
+it('should enforce layered architecture naming', async () => {
+  // Controllers should follow naming convention
+  const controllerViolations = await projectFiles()
+    .inFolder('controllers')
+    .should()
+    .matchFilename('*Controller.ts')
+    .check();
+
+  // Services should follow naming convention
+  const serviceViolations = await projectFiles()
+    .inFolder('services')
+    .should()
+    .matchFilename('*Service.ts')
+    .check();
+
+  // Repositories should follow naming convention
+  const repoViolations = await projectFiles()
+    .inFolder('repositories')
+    .should()
+    .matchFilename('*Repository.ts')
+    .check();
+
+  expect(controllerViolations).toEqual([]);
+  expect(serviceViolations).toEqual([]);
+  expect(repoViolations).toEqual([]);
+});
+```
+
+#### Test File Organization
+
+```typescript
+it('should enforce test file conventions', async () => {
+  // Unit tests should end with .spec.ts
+  const unitTestViolations = await projectFiles()
+    .inFolder('tests/unit')
+    .should()
+    .matchFilename('*.spec.ts')
+    .check();
+
+  // Integration tests should end with .integration.ts
+  const integrationTestViolations = await projectFiles()
+    .inFolder('tests/integration')
+    .should()
+    .matchFilename('*.integration.ts')
+    .check();
+
+  expect(unitTestViolations).toEqual([]);
+  expect(integrationTestViolations).toEqual([]);
+});
+```
+
 ## 📊 Library Comparison
 
 Here's how ArchUnitTS compares to other TypeScript architecture testing libraries:
