@@ -4,7 +4,7 @@ Thanks for contributing!
 
 ## Setup
 
-- Fork & clone: `git clone https://github.com/YOUR_USERNAME/ArchUnitTS.git`
+- Fork & clone: `git clone https://github.com/LukasNiessen/ArchUnitTS.git`
 - Install: `npm install`
 - Test: `npm test`
 - Build: `npm run build`
