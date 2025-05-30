@@ -66,7 +66,7 @@ describe('Integration test', () => {
 		const violations = await projectFiles(
 			path.resolve(__dirname, 'samples', 'absoluteimports', 'tsconfig.json')
 		)
-			.matching('src/components/ATest')
+			.inFolder('src/components/ATest')
 			.shouldNot()
 			.dependOnFiles()
 			.matchingPattern('src/components/BTest')
@@ -102,7 +102,7 @@ describe('Integration test', () => {
 	});
 
 	it('checks for cycles', async () => {
-		const violations = await files.matching('.*').should().haveNoCycles().check();
+		const violations = await files.inFolder('src').should().haveNoCycles().check();
 
 		expect(violations).toMatchObject([
 			{

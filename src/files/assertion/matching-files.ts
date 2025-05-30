@@ -2,6 +2,7 @@ import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedNode } from '../../common/projection/project-nodes';
 import { Pattern, EnhancedPattern, matchesPattern } from './pattern-matching';
+import { ProjectedEdge } from '../../common/projection/project-edges';
 
 export class ViolatingNode implements Violation {
 	public checkPattern: string;
@@ -26,11 +27,18 @@ export class ViolatingNode implements Violation {
 export class EmptyTestViolation implements Violation {
 	public patterns: (string | RegExp)[];
 	public message: string;
+	public isNegated: boolean;
+	public dependency?: ProjectedEdge;
 
-	constructor(patterns: (string | RegExp)[], customMessage?: string) {
+	constructor(
+		patterns: (string | RegExp)[],
+		customMessage?: string,
+		isNegated = false
+	) {
 		this.patterns = patterns;
 		this.message =
 			customMessage || `No files found matching pattern(s): ${patterns.join(', ')}`;
+		this.isNegated = isNegated;
 	}
 }
 

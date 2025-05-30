@@ -430,9 +430,6 @@ export class DependOnFileConditionBuilder {
 	) {}
 
 	/**
-	 * @deprecated Use more specific methods like withName or inFolder
-	 * Specifies dependency on files matching a string pattern.
-	 *
 	 * @param pattern String pattern to match dependency files
 	 * @returns DependOnFileCondition for further chaining or checking
 	 */
@@ -613,7 +610,7 @@ export class DependOnFileCondition implements Checkable {
 	 *
 	 * @returns Promise<Violation[]> Array of violations found during the check
 	 */
-	public async check(): Promise<Violation[]> {
+	public async check(options?: CheckOptions): Promise<Violation[]> {
 		const graph = await extractGraph(
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
 				.filesShouldCondition.fileCondition.tsConfigFilePath
@@ -626,7 +623,8 @@ export class DependOnFileCondition implements Checkable {
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
 				.filesShouldCondition.patterns,
 			this.subjectPatterns,
-			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder.isNegated
+			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder.isNegated,
+			options?.allowEmptyTests || false
 		);
 	}
 }
@@ -668,7 +666,7 @@ export class CycleFreeFileCondition implements Checkable {
 	 *
 	 * @returns Promise<Violation[]> Array of violations representing detected cycles
 	 */
-	public async check(): Promise<Violation[]> {
+	public async check(options?: CheckOptions): Promise<Violation[]> {
 		const graph = await extractGraph(
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
 				.tsConfigFilePath
@@ -678,7 +676,8 @@ export class CycleFreeFileCondition implements Checkable {
 
 		return gatherCycleViolations(
 			projectedEdges,
-			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns
+			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
+			options?.allowEmptyTests || false
 		);
 	}
 }
@@ -788,7 +787,7 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 	 *
 	 * @returns Promise<Violation[]> Array of violations found during the check
 	 */
-	public async check(): Promise<Violation[]> {
+	public async check(options?: CheckOptions): Promise<Violation[]> {
 		const graph = await extractGraph(
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
 				.tsConfigFilePath
@@ -800,7 +799,8 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 			projectedNodes,
 			{ pattern: this.pattern, options: this.options },
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
-			this.matchPatternFileConditionBuilder.isNegated
+			this.matchPatternFileConditionBuilder.isNegated,
+			options?.allowEmptyTests || false
 		);
 	}
 }
@@ -854,7 +854,7 @@ export class CustomFileCheckableCondition implements Checkable {
 	 *
 	 * @returns Promise<Violation[]> Array of violations where custom condition failed
 	 */
-	public async check(): Promise<Violation[]> {
+	public async check(options?: CheckOptions): Promise<Violation[]> {
 		if (!this.condition) {
 			return [];
 		}
@@ -866,7 +866,8 @@ export class CustomFileCheckableCondition implements Checkable {
 			projectedNodes,
 			this.patterns || [],
 			this.condition,
-			this.message || 'Custom file condition failed'
+			this.message || 'Custom file condition failed',
+			options?.allowEmptyTests || false
 		);
 	}
 }

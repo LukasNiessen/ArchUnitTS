@@ -32,7 +32,7 @@ describe('Empty Test Detection', () => {
 		});
 		it('should detect empty test with filename regex matching', async () => {
 			const violations = await projectFiles(tsConfigPath)
-				.matching('nonexistent-pattern-.*')
+				.matchingPattern('nonexistent-pattern-.*')
 				.should()
 				.matchFilename(/.*Service\.ts/)
 				.check();
@@ -65,7 +65,7 @@ describe('Empty Test Detection', () => {
 		});
 		it('should not create violations for filename regex when allowEmptyTests is true', async () => {
 			const violations = await projectFiles(tsConfigPath)
-				.matching('nonexistent-pattern-.*')
+				.matchingPattern('nonexistent-pattern-.*')
 				.should()
 				.matchFilename(/.*Service\.ts/)
 				.check({ allowEmptyTests: true });
