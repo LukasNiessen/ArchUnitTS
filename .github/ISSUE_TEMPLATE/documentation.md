@@ -1,33 +1,26 @@
 ---
-name: 📚 Documentation
+name: Documentation
 about: Request documentation improvements or report documentation issues
 title: '[DOCS] '
-labels: ['documentation', 'good first issue']
+labels: ['documentation']
 assignees: []
 ---
 
-## 📚 Documentation Issue
+# Documentation Issue
 
-**What documentation needs to be improved?**
+Describe what documentation needs to be improved or what's unclear.
+
+## What's Missing
 
 - [ ] README.md
 - [ ] API Documentation
 - [ ] Examples
-- [ ] Architecture Guide
 - [ ] Contributing Guide
-- [ ] Migration Guide
-- [ ] Tutorials
-- [ ] Other: ****\_\_\_****
+- [ ] Other: **\_\_**
 
-## 🔍 Current Issue
+## Suggested Improvement
 
-**What's unclear or missing?**
-A clear description of what documentation is confusing, missing, or needs improvement.
-
-## 💡 Suggested Improvement
-
-**What would make it better?**
-Describe what you think would improve the documentation.
+What would make the documentation better?
 
 ## 📖 Specific Sections
 

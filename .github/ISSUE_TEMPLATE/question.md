@@ -1,33 +1,29 @@
 ---
-name: ❓ Question
+name: Question
 about: Ask a question about using ArchUnitTS
 title: '[QUESTION] '
-labels: ['question', 'needs-response']
+labels: ['question']
 assignees: []
 ---
 
-## ❓ Question
+# Question
 
-**What would you like to know?**
-Ask your question clearly and concisely.
+What would you like to know about ArchUnitTS?
 
-## 🎯 What I'm Trying to Do
+## What I'm Trying to Do
 
-**Describe your goal**
-What are you trying to achieve with ArchUnitTS?
+Describe your goal or what you're trying to achieve.
 
-## 💻 Code Context
-
-**Show us what you've tried**
+## Code Context
 
 ```typescript
-// Your code here
-import { projectFiles } from 'archunit';
-
-// What you're trying to do...
+// Your code here (if applicable)
 ```
 
-## 🌍 Environment
+## Environment
+
+- ArchUnitTS Version: [e.g. 2.1.6]
+- Testing Framework: [e.g. Jest, Vitest]
 
 **Your setup:**
 

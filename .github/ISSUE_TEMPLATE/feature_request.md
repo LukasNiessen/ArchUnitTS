@@ -1,33 +1,30 @@
 ---
-name: ✨ Feature Request
+name: Feature Request
 about: Suggest an idea for ArchUnitTS
 title: '[FEATURE] '
-labels: ['enhancement', 'needs-discussion']
-assignees: ['LukasNiessen']
+labels: ['enhancement']
+assignees: []
 ---
 
-## 🚀 Feature Summary
+# Feature Request
 
-A clear and concise description of what you want to happen.
+Describe the feature you'd like to see added.
 
-## 💡 Motivation
+## Problem
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+What problem does this solve? Is your feature request related to a problem?
 
-## 📝 Detailed Description
+## Proposed Solution
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+How would this feature work? What would the API look like?
 
-## 🎯 Use Case
+```typescript
+// Example usage
+```
 
-**Describe your use case**
-How would this feature be used? What problem does it solve?
+## Use Case
 
-## 💻 Proposed API
-
-**What would the API look like?**
+How would you use this feature in your project?
 
 ```typescript
 // Example of how you envision using this feature
