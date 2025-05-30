@@ -1,5 +1,6 @@
 import { ImportKind } from '../../../src/common/util/import-kinds';
 import { FileConditionBuilder, projectFiles } from '../../../src/files/fluentapi/files';
+import { ViolatingNode } from '../../../src/files/assertion/matching-files';
 import path from 'path';
 
 describe('Integration test', () => {
@@ -37,6 +38,18 @@ describe('Integration test', () => {
 				isNegated: false,
 			},
 		]);
+	});
+
+	it('finds a violation when file does not match service pattern', async () => {
+		const violations = await files
+			.inFolder('services')
+			.should()
+			.matchFilename('Service*')
+			.check();
+		expect(violations).toHaveLength(1);
+		expect((violations[0] as ViolatingNode).projectedNode.label).toBe(
+			'src/services/SService.ts'
+		);
 	});
 
 	it('does find a violation when described as negated rule', async () => {
