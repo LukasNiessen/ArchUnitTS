@@ -6,7 +6,7 @@ import { extractNxGraph } from '../../../src/common/extraction/extract-nx-graph'
 import { Graph } from '../../../src/common/extraction/graph';
 import { projectEdges } from '../../../src/common/projection/project-edges';
 import { gatherPositiveViolations } from '../../../src/slices/assertion/admissible-edges';
-import { slicesOfNxProject, slicesOfProject } from '../../../src/slices/fluentapi/slices';
+import { slicesOfNxProject, projectSlices } from '../../../src/slices/fluentapi/slices';
 import {
 	sliceByFileSuffix,
 	sliceByPattern,
@@ -18,7 +18,7 @@ describe('Integration test', () => {
 		jest.restoreAllMocks();
 	});
 	it('finds simple violations', async () => {
-		const violations = await slicesOfProject(
+		const violations = await projectSlices(
 			__dirname + '/samples/foldersample/tsconfig.json'
 		)
 			.definedBy('src/(**)/')
@@ -82,7 +82,7 @@ describe('Integration test', () => {
   [controllers] --> [services]
 @enduml
         `;
-		const violations = await slicesOfProject(
+		const violations = await projectSlices(
 			__dirname + '/samples/foldersample/tsconfig.json'
 		)
 			.definedBy('src/(**)/')
@@ -114,7 +114,7 @@ describe('Integration test', () => {
 		const exampleConfig = path.resolve(exampleLocation, 'tsconfig.json');
 		const exampleUml = path.resolve(exampleLocation, 'architecture.puml');
 
-		const violations = await slicesOfProject(exampleConfig)
+		const violations = await projectSlices(exampleConfig)
 			.definedBy('src/(**)/')
 			.should()
 			.adhereToDiagramInFile(exampleUml)

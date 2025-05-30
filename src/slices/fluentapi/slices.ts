@@ -14,7 +14,7 @@ import { identity, sliceByPattern } from '../projection/slicing-projections';
 import { MapFunction, projectEdges } from '../../common/projection/project-edges';
 import { Graph } from '../../common/extraction/graph';
 
-export const slicesOfProject = (filename?: string): SliceConditionBuilder => {
+export const projectSlices = (filename?: string): SliceConditionBuilder => {
 	const graphProvider = () => extractGraph(filename);
 	return new SliceConditionBuilder(graphProvider);
 };

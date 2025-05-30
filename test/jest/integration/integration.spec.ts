@@ -6,7 +6,7 @@ describe('Integration test', () => {
 		const rule = projectFiles(__dirname + '/samples/filenamingsample/tsconfig.json')
 			.inFolder('services')
 			.should()
-			.matchPattern('.*Service.*\\.ts');
+			.matchFilename(/.*Service.*\.ts/);
 		await expect(rule).toPassAsync();
 	});
 });

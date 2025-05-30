@@ -5,7 +5,7 @@ export class RegexFactory {
 
 	public static fileNameMatcher(name: string): string {
 		const escapedName = this.escapeRegex(name);
-		return `.*${escapedName}\\.(ts|js)$`;
+		return `.*${escapedName}$`;
 	}
 
 	public static folderMatcher(folder: string): string {

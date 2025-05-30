@@ -1,13 +1,9 @@
 import { extractGraph } from '../../common/extraction/extract-graph';
 import { RegexFactory } from './regex-factory';
-import { Checkable } from '../../common/fluentapi/checkable';
+import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
 import { projectEdges } from '../../common/projection/project-edges';
-import { perEdge, perInternalEdge } from '../../common/projection/edge-projections';
 import { projectToNodes } from '../../common/projection/project-nodes';
-import {
-	gatherRegexMatchingViolationsLegacy,
-	gatherFilenamePatternViolations,
-} from '../assertion/matching-files';
+import { gatherFilenamePatternViolations } from '../assertion/matching-files';
 import { Pattern, PatternMatchingOptions } from '../assertion/pattern-matching';
 import { Violation } from '../../common/assertion/violation';
 import { gatherCycleViolations } from '../assertion/free-of-cycles';
@@ -16,6 +12,7 @@ import {
 	gatherCustomFileViolations,
 	CustomFileCondition,
 } from '../assertion/custom-file-logic';
+import { perEdge, perInternalEdge } from '../../common/projection/edge-projections';
 
 // Re-export types for external use
 export type { FileInfo, CustomFileCondition } from '../assertion/custom-file-logic';
@@ -29,14 +26,79 @@ export const files = projectFiles;
 export class FileConditionBuilder {
 	constructor(readonly tsConfigFilePath?: string) {}
 
-	public matchingPattern(pattern: string): FilesShouldCondition {
+	/**
+	 * This filters all files that match this pattern. The pattern can be a string or a regex. It will internally be converted to a regex.
+	 * Strings can be glob pattern, that is, they can contain * and ?, and this will be treated as it is in a normal RegEx, that is:
+	 * --> * means zero or more chars, excluding /
+	 * --> ? means a single char
+	 *
+	 * For example, if the input is '*component-*.ts':
+	 * - Matches: 'src/cool-components/my-component-a.ts
+	 * - Matches: 'src/cool-components/my-component.ts
+	 * - Matches: 'src/cool-components/component-abc.ts
+	 * - NOT matching: 'src/other-components/my-component.ts    <-- the -* is missing
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * If the input is 'component-?.ts':
+	 * - Matches: 'src/cool-components/component-a.ts
+	 * - Matches: 'src/cool-components/component-b.ts
+	 * - NOT matching: 'src/cool-components/component-abc.ts
+	 * - NOIT matching: 'src/cool-components/my-component-a.ts
+	 *
+	 *
+	 * @param pattern
+	 * @returns
+	 */
+	public matching(pattern: string | RegExp): FilesShouldCondition {
 		return new FilesShouldCondition(this, [pattern]);
 	}
 
+	/**
+	 * Matches all files that have this name. You must include the file extension.
+	 *
+	 * For example, if the input is 'my-component.ts':
+	 * - Matches: 'src/cool-components/my-component.ts
+	 * - Matches: 'src/other-components/my-component.ts
+	 * - NOT matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * However, if the input is 'my-component':
+	 * - NOT matching: 'src/cool-components/my-component.ts
+	 * - NOT matching: 'src/other-components/my-component.ts
+	 * - Matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * @param name
+	 * @returns
+	 */
 	public withName(name: string): FilesShouldCondition {
 		return new FilesShouldCondition(this, [RegexFactory.fileNameMatcher(name)]);
 	}
 
+	/**
+	 * This will return all files that are in a folder as you specified.
+	 * You can specify a path as well though, like so: src/components
+	 *
+	 * What happens is, the input is is converted to: .\*\/?${escapedFolder}/.*
+	 * and we check if a file path matches this or not.
+	 *
+	 * For example, if the input is 'components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - Matches: 'src/domain/helper/components/helper-component.ts    <-- notice /components/ is in the path
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
+	 *
+	 * However, if the input is 'src/components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - NOT Matches: 'src/domain/helper/components/helper-component.ts
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
+	 *
+	 * @param folder string
+	 * @returns
+	 */
 	public inFolder(folder: string): FilesShouldCondition {
 		return new FilesShouldCondition(this, [RegexFactory.folderMatcher(folder)]);
 	}
@@ -45,7 +107,7 @@ export class FileConditionBuilder {
 export class FilesShouldCondition {
 	constructor(
 		readonly fileCondition: FileConditionBuilder,
-		readonly patterns: string[]
+		readonly patterns: (string | RegExp)[]
 	) {}
 
 	public should(): PositiveMatchPatternFileConditionBuilder {
@@ -55,7 +117,7 @@ export class FilesShouldCondition {
 		return new NegatedMatchPatternFileConditionBuilder(this);
 	}
 
-	public matchingPattern(pattern: string): FilesShouldCondition {
+	public matching(pattern: RegExp): FilesShouldCondition {
 		return new FilesShouldCondition(this, [...this.patterns, pattern]);
 	}
 
@@ -79,9 +141,12 @@ export class NegatedMatchPatternFileConditionBuilder {
 
 	constructor(readonly filesShouldCondition: FilesShouldCondition) {}
 
+	/*
+	Dicontinued due to being very clear
 	public matchPattern(pattern: string): MatchPatternFileCondition {
 		return new MatchPatternFileCondition(this, pattern);
 	}
+	*/
 
 	public beInFolder(folder: string): MatchPatternFileCondition {
 		return new MatchPatternFileCondition(this, RegexFactory.folderMatcher(folder));
@@ -91,16 +156,6 @@ export class NegatedMatchPatternFileConditionBuilder {
 		return new DependOnFileConditionBuilder(this);
 	}
 
-	/**
-	 * Match pattern against filename only (not full path) with exact matching
-	 *
-	 * @param pattern - String pattern or RegExp to match filename
-	 * @example
-	 * ```typescript
-	 * files.inFolder('services').shouldNot().matchFilename('Service.ts')
-	 * files.inFolder('services').shouldNot().matchFilename(/^Service.*\.ts$/)
-	 * ```
-	 */
 	public matchFilename(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'filename',
@@ -108,16 +163,6 @@ export class NegatedMatchPatternFileConditionBuilder {
 		});
 	}
 
-	/**
-	 * Match pattern against full relative path with exact matching
-	 *
-	 * @param pattern - String pattern or RegExp to match full path
-	 * @example
-	 * ```typescript
-	 * files.shouldNot().matchPath('src/services/UserService.ts')
-	 * files.shouldNot().matchPath(/^src\/services\/.*Service\.ts$/)
-	 * ```
-	 */
 	public matchPath(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'path',
@@ -125,20 +170,18 @@ export class NegatedMatchPatternFileConditionBuilder {
 		});
 	}
 
-	/**
-	 * Match pattern partially against filename (allows substring matching)
-	 *
-	 * @param pattern - String pattern or RegExp to match within filename
-	 * @example
-	 * ```typescript
-	 * files.inFolder('services').shouldNot().containInFilename('Service')
-	 * ```
-	 */
 	public containInFilename(
 		pattern: string | RegExp
 	): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'filename',
+			matching: 'partial',
+		});
+	}
+
+	public containInPath(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
+		return new EnhancedMatchPatternFileCondition(this, pattern, {
+			target: 'path',
 			matching: 'partial',
 		});
 	}
@@ -149,9 +192,11 @@ export class PositiveMatchPatternFileConditionBuilder {
 
 	constructor(readonly filesShouldCondition: FilesShouldCondition) {}
 
+	/*
 	public matchPattern(pattern: string): MatchPatternFileCondition {
 		return new MatchPatternFileCondition(this, pattern);
 	}
+	*/
 
 	public haveNoCycles(): CycleFreeFileCondition {
 		return new CycleFreeFileCondition(this);
@@ -179,14 +224,10 @@ export class PositiveMatchPatternFileConditionBuilder {
 	}
 
 	/**
-	 * Match pattern against filename only (not full path) with exact matching
+	 * pattern may be a string or Regex. A string can be a glob pattern, X-TODO
 	 *
-	 * @param pattern - String pattern or RegExp to match filename
-	 * @example
-	 * ```typescript
-	 * files.inFolder('services').should().matchFilename('Service.ts')
-	 * files.inFolder('services').should().matchFilename(/^Service.*\.ts$/)
-	 * ```
+	 * @param pattern
+	 * @returns
 	 */
 	public matchFilename(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
@@ -195,16 +236,6 @@ export class PositiveMatchPatternFileConditionBuilder {
 		});
 	}
 
-	/**
-	 * Match pattern against full relative path with exact matching
-	 *
-	 * @param pattern - String pattern or RegExp to match full path
-	 * @example
-	 * ```typescript
-	 * files.should().matchPath('src/services/UserService.ts')
-	 * files.should().matchPath(/^src\/services\/.*Service\.ts$/)
-	 * ```
-	 */
 	public matchPath(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'path',
@@ -212,20 +243,18 @@ export class PositiveMatchPatternFileConditionBuilder {
 		});
 	}
 
-	/**
-	 * Match pattern partially against filename (allows substring matching)
-	 *
-	 * @param pattern - String pattern or RegExp to match within filename
-	 * @example
-	 * ```typescript
-	 * files.inFolder('services').should().containInFilename('Service')
-	 * ```
-	 */
 	public containInFilename(
 		pattern: string | RegExp
 	): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'filename',
+			matching: 'partial',
+		});
+	}
+
+	public containInPath(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
+		return new EnhancedMatchPatternFileCondition(this, pattern, {
+			target: 'path',
 			matching: 'partial',
 		});
 	}
@@ -276,7 +305,7 @@ export class DependOnFileCondition implements Checkable {
 		]);
 	}
 
-	public async check(): Promise<Violation[]> {
+	public async check(options?: CheckOptions): Promise<Violation[]> {
 		const graph = await extractGraph(
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
 				.filesShouldCondition.fileCondition.tsConfigFilePath
@@ -320,7 +349,7 @@ export class MatchPatternFileCondition implements Checkable {
 		readonly pattern: string
 	) {}
 
-	public async check(): Promise<Violation[]> {
+	public async check(_options?: CheckOptions): Promise<Violation[]> {
 		const graph = await extractGraph(
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
 				.tsConfigFilePath
@@ -330,11 +359,12 @@ export class MatchPatternFileCondition implements Checkable {
 
 		// console.log('projectedNodes:', projectedNodes);
 
-		return gatherRegexMatchingViolationsLegacy(
+		return gatherFilenamePatternViolations(
 			projectedNodes,
 			this.pattern,
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
-			this.matchPatternFileConditionBuilder.isNegated
+			this.matchPatternFileConditionBuilder.isNegated,
+			_options?.allowEmptyTests || false
 		);
 	}
 }
@@ -351,7 +381,7 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 		readonly options: PatternMatchingOptions
 	) {}
 
-	public async check(): Promise<Violation[]> {
+	public async check(_options?: CheckOptions): Promise<Violation[]> {
 		const graph = await extractGraph(
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
 				.tsConfigFilePath
@@ -363,7 +393,53 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 			projectedNodes,
 			{ pattern: this.pattern, options: this.options },
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
-			this.matchPatternFileConditionBuilder.isNegated
+			this.matchPatternFileConditionBuilder.isNegated,
+			_options?.allowEmptyTests || false
+		);
+	}
+}
+
+/**
+ * Simple pattern matching condition with explicit matching types
+ */
+export class SimpleMatchFileCondition implements Checkable {
+	constructor(
+		readonly matchPatternFileConditionBuilder:
+			| PositiveMatchPatternFileConditionBuilder
+			| NegatedMatchPatternFileConditionBuilder,
+		readonly pattern: string | RegExp,
+		readonly matchType:
+			| 'filename-exact'
+			| 'filename-contains'
+			| 'filename-regex'
+			| 'path-exact'
+			| 'path-contains'
+			| 'path-regex'
+	) {}
+
+	public async check(options?: CheckOptions): Promise<Violation[]> {
+		const graph = await extractGraph(
+			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
+				.tsConfigFilePath
+		);
+
+		const projectedNodes = projectToNodes(graph);
+
+		// Convert matchType to PatternMatchingOptions
+		const target = this.matchType.startsWith('filename') ? 'filename' : 'path';
+		const matching = this.matchType.includes('contains') ? 'partial' : 'exact';
+
+		// For regex types, use the RegExp directly; for string types, wrap in exact/partial logic
+		const actualPattern = this.matchType.endsWith('regex')
+			? (this.pattern as RegExp)
+			: (this.pattern as string);
+
+		return gatherFilenamePatternViolations(
+			projectedNodes,
+			{ pattern: actualPattern, options: { target, matching } },
+			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
+			this.matchPatternFileConditionBuilder.isNegated,
+			options?.allowEmptyTests || false
 		);
 	}
 }
@@ -374,7 +450,7 @@ export class CustomFileCheckableCondition implements Checkable {
 		readonly tsConfigFilePath?: string,
 		readonly condition?: CustomFileCondition,
 		readonly message?: string,
-		readonly patterns?: string[]
+		readonly patterns?: (string | RegExp)[]
 	) {}
 
 	public async check(): Promise<Violation[]> {

@@ -1,6 +1,6 @@
 import '../index';
 import path from 'path';
-import { slicesOfProject } from '../src/slices/fluentapi/slices';
+import { projectSlices } from '../src/slices/fluentapi/slices';
 import { projectFiles } from '../src/files/fluentapi/files';
 
 describe('architecture', () => {
@@ -10,7 +10,7 @@ describe('architecture', () => {
 		const diagramLocation = path.resolve('test', 'components_inner.puml');
 
 		const rules = ['common', 'files', 'slices', 'metrics'].map((c) => {
-			return slicesOfProject()
+			return projectSlices()
 				.definedBy('src/' + c + '/(**)/')
 				.should()
 				.adhereToDiagramInFile(diagramLocation);

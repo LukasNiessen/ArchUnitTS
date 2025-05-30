@@ -1,5 +1,5 @@
 import { Violation } from '../../common/assertion/violation';
-import { ViolatingNode } from '../../files/assertion/matching-files';
+import { ViolatingNode, EmptyTestViolation } from '../../files/assertion/matching-files';
 import { ViolatingEdge } from '../../slices/assertion/admissible-edges';
 import { ViolatingCycle } from '../../files/assertion/free-of-cycles';
 import { ViolatingFileDependency } from '../../files/assertion/depend-on-files';
@@ -20,6 +20,9 @@ export class ViolationFactory {
 	public static from(violation: Violation): TestViolation {
 		if (violation instanceof ViolatingNode) {
 			return this.fromViolatingFile(violation);
+		}
+		if (violation instanceof EmptyTestViolation) {
+			return this.fromEmptyTestViolation(violation);
 		}
 		if (violation instanceof ViolatingEdge) {
 			return this.fromViolatingEdge(violation);
@@ -73,6 +76,26 @@ export class ViolationFactory {
 		return {
 			message,
 			details: file,
+		};
+	}
+
+	private static fromEmptyTestViolation(emptyTest: EmptyTestViolation): TestViolation {
+		const message = `${ColorUtils.formatViolationType('Empty test violation')}:
+   ${ColorUtils.formatRule('No files found matching the specified pattern(s)')}
+   Patterns: ${ColorUtils.formatMetricValue(emptyTest.patterns.join(', '))}
+   
+   ${ColorUtils.yellow('This usually indicates:')}
+   ${ColorUtils.dim('• Pattern is too restrictive or incorrect')}
+   ${ColorUtils.dim('• Files might not exist in the expected location')}
+   ${ColorUtils.dim('• Test is not actually testing anything')}
+   
+   ${ColorUtils.cyan('To fix:')}
+   ${ColorUtils.dim('• Verify the patterns match existing files')}
+   ${ColorUtils.dim('• Use .check({ allowEmptyTests: true }) to disable this check')}`;
+
+		return {
+			message,
+			details: emptyTest,
 		};
 	}
 	private static fromViolatingEdge(edge: ViolatingEdge): TestViolation {

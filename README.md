@@ -312,12 +312,12 @@ it('should adhere to UML diagram', async () => {
   [controllers] --> [services]
 @enduml`;
 
-  const rule = slicesOfProject().definedBy('src/(**)/').should().adhereToDiagram(diagram);
+  const rule = projectSlices().definedBy('src/(**)/').should().adhereToDiagram(diagram);
   await expect(rule).toPassAsync();
 });
 
 it('should not contain forbidden dependencies', async () => {
-  const rule = slicesOfProject()
+  const rule = projectSlices()
     .definedBy('src/(**)/')
     .shouldNot()
     .containDependency('services', 'controllers');
@@ -394,26 +394,6 @@ The export functionality can be customized, for example by specifying an output 
 
 ArchUnitTS provides powerful pattern matching capabilities for file selection and validation. You can use different matching strategies depending on your needs.
 
-### Basic Pattern Matching
-
-Use the legacy `matchPattern()` method for regex-based pattern matching:
-
-```typescript
-it('should match controller files', async () => {
-  const violations = await projectFiles()
-    .inFolder('controllers')
-    .should()
-    .matchPattern('.*Controller.ts')
-    .check();
-
-  expect(violations).toEqual([]);
-});
-```
-
-### Enhanced Pattern Matching
-
-The enhanced API provides more precise control over how patterns are matched:
-
 #### Filename-Only Matching
 
 Match patterns against filenames only (recommended for most use cases):
@@ -456,6 +436,22 @@ it('should find files containing specific terms', async () => {
   const violations = await projectFiles()
     .shouldNot()
     .containInFilename('Test') // Files shouldn't contain "Test" in filename
+    .check();
+
+  expect(violations).toEqual([]);
+});
+```
+
+### Legacy Pattern Matching
+
+Use the legacy `matchPattern()` method for regex-based pattern matching:
+
+```typescript
+it('should match controller files', async () => {
+  const violations = await projectFiles()
+    .inFolder('controllers')
+    .should()
+    .matchPattern('.*Controller.ts')
     .check();
 
   expect(violations).toEqual([]);

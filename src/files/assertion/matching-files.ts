@@ -1,13 +1,7 @@
 import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedNode } from '../../common/projection/project-nodes';
-import {
-	Pattern,
-	EnhancedPattern,
-	PatternMatchingOptions,
-	matchesPattern,
-	matchesAllPatterns as enhancedMatchesAllPatterns,
-} from './pattern-matching';
+import { Pattern, EnhancedPattern, matchesPattern } from './pattern-matching';
 
 export class ViolatingNode implements Violation {
 	public checkPattern: string;
@@ -26,22 +20,37 @@ export class ViolatingNode implements Violation {
 }
 
 /**
+ * EmptyTestViolation represents a violation when no files are found that match the preconditions
+ * This helps detect tests that don't actually test anything because they match no files
+ */
+export class EmptyTestViolation implements Violation {
+	public patterns: (string | RegExp)[];
+	public message: string;
+
+	constructor(patterns: (string | RegExp)[], customMessage?: string) {
+		this.patterns = patterns;
+		this.message =
+			customMessage || `No files found matching pattern(s): ${patterns.join(', ')}`;
+	}
+}
+
+/**
  * Gather violations for regex pattern matching with enhanced pattern support
  *
  * @param files - Files to check
  * @param checkPattern - Pattern to match files against (can be string, RegExp, or EnhancedPattern)
  * @param preconditionPatterns - Patterns that files must match to be included in the check
  * @param isNegated - Whether this is a negative assertion (files should NOT match)
- * @param patternOptions - Options for how to apply the pattern matching
+ * @param allowEmptyTests - Whether to allow empty tests (no violations for empty file sets)
  * @returns Array of violations found
  */
 export const gatherRegexMatchingViolations = (
 	files: ProjectedNode[],
 	checkPattern: Pattern | EnhancedPattern,
-	preconditionPatterns: string[],
+	preconditionPatterns: (string | RegExp)[],
 	isNegated: boolean,
-	patternOptions?: PatternMatchingOptions
-): ViolatingNode[] => {
+	allowEmptyTests: boolean = false
+): (ViolatingNode | EmptyTestViolation)[] => {
 	const violations: ViolatingNode[] = [];
 
 	// Use legacy matching for precondition patterns to maintain compatibility
@@ -49,8 +58,13 @@ export const gatherRegexMatchingViolations = (
 		matchingAllPatterns(node.label, preconditionPatterns)
 	);
 
+	// Check for empty test if no files match preconditions
+	if (filteredFiles.length === 0 && !allowEmptyTests) {
+		return [new EmptyTestViolation(preconditionPatterns)];
+	}
+
 	filteredFiles.forEach((file) => {
-		const matches = matchesPattern(file.label, checkPattern, patternOptions);
+		const matches = matchesPattern(file.label, checkPattern);
 		const violation = isNegated
 			? checkNegativeViolation(matches, file, checkPattern)
 			: checkPositiveViolation(matches, file, checkPattern);
@@ -85,7 +99,11 @@ function getPatternString(pattern: Pattern | EnhancedPattern): string {
 	if (typeof pattern === 'string') {
 		return pattern;
 	} else if (pattern instanceof RegExp) {
-		return pattern.source;
+		// For display purposes, return the original regex source without double escaping
+		const source = pattern.source;
+		// Remove excessive escaping for common cases
+		const result = source.replace(/\\\\(.)/g, '\\$1');
+		return result;
 	} else {
 		// EnhancedPattern
 		return getPatternString(pattern.pattern);
@@ -93,23 +111,23 @@ function getPatternString(pattern: Pattern | EnhancedPattern): string {
 }
 
 /**
- * Legacy function for backward compatibility - uses partial path matching like before
- * @deprecated Use gatherRegexMatchingViolations with PatternMatchingOptions for better control
- */
+ * Discontinued
 export const gatherRegexMatchingViolationsLegacy = (
 	files: ProjectedNode[],
 	checkPattern: string,
 	preconditionPatterns: string[],
-	isNegated: boolean
-): ViolatingNode[] => {
+	isNegated: boolean,
+	allowEmptyTests: boolean = false
+): (ViolatingNode | EmptyTestViolation)[] => {
 	return gatherRegexMatchingViolations(
 		files,
 		checkPattern,
 		preconditionPatterns,
 		isNegated,
-		{ target: 'path', matching: 'partial' } // Legacy behavior: partial path matching
+		allowEmptyTests
 	);
 };
+*/
 
 /**
  * Enhanced pattern matching with filename-only exact matching (recommended for most use cases)
@@ -126,15 +144,16 @@ export const gatherRegexMatchingViolationsLegacy = (
 export const gatherFilenamePatternViolations = (
 	files: ProjectedNode[],
 	checkPattern: Pattern | EnhancedPattern,
-	preconditionPatterns: string[],
-	isNegated: boolean
-): ViolatingNode[] => {
+	preconditionPatterns: (string | RegExp)[],
+	isNegated: boolean,
+	allowEmptyTests: boolean = false
+): (ViolatingNode | EmptyTestViolation)[] => {
 	return gatherRegexMatchingViolations(
 		files,
 		checkPattern,
 		preconditionPatterns,
 		isNegated,
-		{ target: 'filename', matching: 'exact' }
+		allowEmptyTests
 	);
 };
 
@@ -154,13 +173,14 @@ export const gatherPathPatternViolations = (
 	files: ProjectedNode[],
 	checkPattern: Pattern | EnhancedPattern,
 	preconditionPatterns: string[],
-	isNegated: boolean
-): ViolatingNode[] => {
+	isNegated: boolean,
+	allowEmptyTests: boolean = false
+): (ViolatingNode | EmptyTestViolation)[] => {
 	return gatherRegexMatchingViolations(
 		files,
 		checkPattern,
 		preconditionPatterns,
 		isNegated,
-		{ target: 'path', matching: 'exact' }
+		allowEmptyTests
 	);
 };

@@ -15,7 +15,7 @@ export class ViolatingFileDependency implements Violation {
 
 export const gatherDependOnFileViolations = (
 	projectedEdges: ProjectedEdge[],
-	objectPatterns: string[],
+	objectPatterns: (string | RegExp)[],
 	subjectPatterns: string[],
 	isNegated: boolean
 ): ViolatingFileDependency[] => {

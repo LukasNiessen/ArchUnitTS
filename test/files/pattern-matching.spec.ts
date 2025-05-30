@@ -14,209 +14,6 @@ describe('Pattern Matching', () => {
 		};
 	};
 
-	describe('matchesPattern', () => {
-		describe('string patterns', () => {
-			it('should match filename exactly when target is filename and matching is exact', () => {
-				const file = createProjectedNode('src/services/UserService.ts');
-
-				expect(
-					matchesPattern(file, 'UserService.ts', {
-						target: 'filename',
-						matching: 'exact',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'Service.ts', {
-						target: 'filename',
-						matching: 'exact',
-					})
-				).toBe(false);
-				expect(
-					matchesPattern(file, 'UserService', {
-						target: 'filename',
-						matching: 'exact',
-					})
-				).toBe(false);
-			});
-
-			it('should match filename partially when target is filename and matching is partial', () => {
-				const file = createProjectedNode('src/services/UserService.ts');
-
-				expect(
-					matchesPattern(file, 'UserService', {
-						target: 'filename',
-						matching: 'partial',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'Service', {
-						target: 'filename',
-						matching: 'partial',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, '.ts', {
-						target: 'filename',
-						matching: 'partial',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'Repository', {
-						target: 'filename',
-						matching: 'partial',
-					})
-				).toBe(false);
-			});
-
-			it('should match path exactly when target is path and matching is exact', () => {
-				const file = createProjectedNode('src/services/UserService.ts');
-
-				expect(
-					matchesPattern(file, 'src/services/UserService.ts', {
-						target: 'path',
-						matching: 'exact',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'services/UserService.ts', {
-						target: 'path',
-						matching: 'exact',
-					})
-				).toBe(false);
-				expect(
-					matchesPattern(file, 'UserService.ts', {
-						target: 'path',
-						matching: 'exact',
-					})
-				).toBe(false);
-			});
-
-			it('should match path partially when target is path and matching is partial', () => {
-				const file = createProjectedNode('src/services/UserService.ts');
-
-				expect(
-					matchesPattern(file, 'services', {
-						target: 'path',
-						matching: 'partial',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'Service', {
-						target: 'path',
-						matching: 'partial',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'src/services', {
-						target: 'path',
-						matching: 'partial',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'controllers', {
-						target: 'path',
-						matching: 'partial',
-					})
-				).toBe(false);
-			});
-		});
-
-		describe('regex patterns', () => {
-			it('should match filename with regex when target is filename', () => {
-				const file = createProjectedNode('src/services/UserService.ts');
-
-				expect(
-					matchesPattern(file, /^User.*\.ts$/, {
-						target: 'filename',
-						matching: 'exact',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, /Service/, {
-						target: 'filename',
-						matching: 'partial',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, /^Repository.*\.ts$/, {
-						target: 'filename',
-						matching: 'exact',
-					})
-				).toBe(false);
-			});
-
-			it('should match path with regex when target is path', () => {
-				const file = createProjectedNode('src/services/UserService.ts');
-
-				expect(
-					matchesPattern(file, /services\/.*Service\.ts$/, {
-						target: 'path',
-						matching: 'exact',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, /controllers/, {
-						target: 'path',
-						matching: 'partial',
-					})
-				).toBe(false);
-			});
-		});
-
-		describe('edge cases', () => {
-			it('should handle files without extensions', () => {
-				const file = createProjectedNode('src/utils/helpers');
-
-				expect(
-					matchesPattern(file, 'helpers', {
-						target: 'filename',
-						matching: 'exact',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'help', {
-						target: 'filename',
-						matching: 'partial',
-					})
-				).toBe(true);
-			});
-
-			it('should handle files with multiple dots', () => {
-				const file = createProjectedNode('src/test/user.service.spec.ts');
-
-				expect(
-					matchesPattern(file, 'user.service.spec.ts', {
-						target: 'filename',
-						matching: 'exact',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'service.spec', {
-						target: 'filename',
-						matching: 'partial',
-					})
-				).toBe(true);
-			});
-
-			it('should handle files in root directory', () => {
-				const file = createProjectedNode('index.ts');
-
-				expect(
-					matchesPattern(file, 'index.ts', {
-						target: 'filename',
-						matching: 'exact',
-					})
-				).toBe(true);
-				expect(
-					matchesPattern(file, 'index.ts', {
-						target: 'path',
-						matching: 'exact',
-					})
-				).toBe(true);
-			});
-		});
-	});
-
 	describe('matchesAllPatterns', () => {
 		it('should return true when all patterns match', () => {
 			const file = createProjectedNode('src/services/UserService.ts');
@@ -333,30 +130,20 @@ describe('Pattern Matching', () => {
 			const userServiceFile = createProjectedNode('src/services/UserService.ts');
 
 			// Using filename-only exact matching, "Service.*" should not match "SService.ts"
-			expect(
-				matchesPattern(serviceFile, /^Service.*/, {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(false);
-			expect(
-				matchesPattern(userServiceFile, /^Service.*/, {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(false);
+			expect(matchesPattern(serviceFile, /^Service.*/)).toBe(false);
+			expect(matchesPattern(userServiceFile, /^Service.*/)).toBe(false);
 
-			// But using partial matching or path matching would match
+			// But using partial matching would match
 			expect(
-				matchesPattern(serviceFile, 'Service', {
-					target: 'filename',
-					matching: 'partial',
+				matchesPattern(serviceFile, {
+					pattern: 'Service',
+					options: { matching: 'partial' },
 				})
 			).toBe(true);
 			expect(
-				matchesPattern(serviceFile, 'Service', {
-					target: 'path',
-					matching: 'partial',
+				matchesPattern(userServiceFile, {
+					pattern: 'Service',
+					options: { matching: 'partial' },
 				})
 			).toBe(true);
 		});
@@ -376,18 +163,10 @@ describe('Pattern Matching', () => {
 				options: { target: 'filename' as const, matching: 'exact' as const },
 			};
 
-			expect(
-				matchesPattern(files[0], servicePattern.pattern, servicePattern.options)
-			).toBe(false); // Controller
-			expect(
-				matchesPattern(files[1], servicePattern.pattern, servicePattern.options)
-			).toBe(true); // Service
-			expect(
-				matchesPattern(files[2], servicePattern.pattern, servicePattern.options)
-			).toBe(false); // Repository      expect(matchesPattern(files[3], servicePattern.pattern, servicePattern.options)).toBe(false); // Model
-			expect(
-				matchesPattern(files[4], servicePattern.pattern, servicePattern.options)
-			).toBe(false); // Utils
+			expect(matchesPattern(files[0], servicePattern.pattern)).toBe(false); // Controller
+			expect(matchesPattern(files[1], servicePattern.pattern)).toBe(true); // Service
+			expect(matchesPattern(files[2], servicePattern.pattern)).toBe(false); // Repository      expect(matchesPattern(files[3], servicePattern.pattern, servicePattern.options)).toBe(false); // Model
+			expect(matchesPattern(files[4], servicePattern.pattern)).toBe(false); // Utils
 		});
 	});
 
@@ -396,59 +175,25 @@ describe('Pattern Matching', () => {
 			const file = createProjectedNode('src/services/UserService.ts');
 
 			// Test * wildcard
-			expect(
-				matchesPattern(file, 'User*', { target: 'filename', matching: 'exact' })
-			).toBe(true);
-			expect(
-				matchesPattern(file, 'Service*', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(false);
-			expect(
-				matchesPattern(file, '*Service.ts', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(true);
-			expect(
-				matchesPattern(file, '*User*', { target: 'filename', matching: 'exact' })
-			).toBe(true);
+			expect(matchesPattern(file, 'User*')).toBe(true);
+			expect(matchesPattern(file, 'Service*')).toBe(false);
+			expect(matchesPattern(file, '*Service.ts')).toBe(true);
+			expect(matchesPattern(file, '*User*')).toBe(true);
 		});
 
 		it('should handle question mark wildcards', () => {
 			const file = createProjectedNode('src/test/TestA.ts');
 
-			expect(
-				matchesPattern(file, 'Test?.ts', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(true);
-			expect(
-				matchesPattern(file, 'Test??.ts', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(false);
+			expect(matchesPattern(file, 'Test?.ts')).toBe(true);
+			expect(matchesPattern(file, 'Test??.ts')).toBe(false);
 		});
 
 		it('should distinguish glob patterns from exact patterns', () => {
 			const file = createProjectedNode('src/literal/Service*.ts');
 
 			// When there are no wildcards, should match exactly
-			expect(
-				matchesPattern(file, 'Service*.ts', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(true);
-			expect(
-				matchesPattern(file, 'Service.ts', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(false);
+			expect(matchesPattern(file, 'Service*.ts')).toBe(true);
+			expect(matchesPattern(file, 'Service.ts')).toBe(false);
 		});
 
 		it('should correctly handle the original Service pattern issue', () => {
@@ -460,30 +205,10 @@ describe('Pattern Matching', () => {
 			];
 
 			// Service* should match files starting with "Service"
-			expect(
-				matchesPattern(files[0], 'Service*', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(true); // Service.ts
-			expect(
-				matchesPattern(files[1], 'Service*', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(true); // ServiceA.ts
-			expect(
-				matchesPattern(files[2], 'Service*', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(true); // ServiceB.ts
-			expect(
-				matchesPattern(files[3], 'Service*', {
-					target: 'filename',
-					matching: 'exact',
-				})
-			).toBe(false); // SService.ts
+			expect(matchesPattern(files[0], 'Service*')).toBe(true); // Service.ts
+			expect(matchesPattern(files[1], 'Service*')).toBe(true); // ServiceA.ts
+			expect(matchesPattern(files[2], 'Service*')).toBe(true); // ServiceB.ts
+			expect(matchesPattern(files[3], 'Service*')).toBe(false); // SService.ts
 		});
 	});
 });

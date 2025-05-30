@@ -13,7 +13,7 @@ export class ViolatingCycle implements Violation {
 
 export const gatherCycleViolations = (
 	projectedEdges: ProjectedEdge[],
-	preconditionPatterns: string[]
+	preconditionPatterns: (string | RegExp)[]
 ): ViolatingCycle[] => {
 	const filteredEdges = projectedEdges.filter(
 		(edge) =>

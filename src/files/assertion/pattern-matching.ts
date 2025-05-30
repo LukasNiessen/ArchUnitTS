@@ -21,6 +21,11 @@ export interface PatternMatchingOptions {
 	matching?: 'exact' | 'partial';
 }
 
+const patternDefaultOptions: PatternMatchingOptions = {
+	target: 'filename',
+	matching: 'exact',
+};
+
 /**
  * Pattern types supported by the matching system
  */
@@ -50,8 +55,7 @@ export function extractFilename(filePath: string): string {
  */
 export function matchesPattern(
 	file: ProjectedNode | string,
-	pattern: Pattern | EnhancedPattern,
-	defaultOptions: PatternMatchingOptions = { target: 'filename', matching: 'exact' }
+	pattern: Pattern | EnhancedPattern
 ): boolean {
 	const filePath = typeof file === 'string' ? file : file.label;
 	let actualPattern: Pattern;
@@ -59,10 +63,10 @@ export function matchesPattern(
 
 	if (typeof pattern === 'object' && 'pattern' in pattern) {
 		actualPattern = pattern.pattern;
-		options = { ...defaultOptions, ...pattern.options };
+		options = { ...patternDefaultOptions, ...pattern.options };
 	} else {
 		actualPattern = pattern;
-		options = defaultOptions;
+		options = patternDefaultOptions;
 	}
 	// Determine target string to match against
 	const normalizedPath = filePath.replace(/\\/g, '/');
@@ -118,10 +122,9 @@ function escapeRegexSpecialChars(str: string): string {
  */
 export function matchesAllPatterns(
 	file: ProjectedNode | string,
-	patterns: (Pattern | EnhancedPattern)[],
-	defaultOptions?: PatternMatchingOptions
+	patterns: (Pattern | EnhancedPattern)[]
 ): boolean {
-	return patterns.every((pattern) => matchesPattern(file, pattern, defaultOptions));
+	return patterns.every((pattern) => matchesPattern(file, pattern));
 }
 
 /**
@@ -129,8 +132,7 @@ export function matchesAllPatterns(
  */
 export function matchesAnyPattern(
 	file: ProjectedNode | string,
-	patterns: (Pattern | EnhancedPattern)[],
-	defaultOptions?: PatternMatchingOptions
+	patterns: (Pattern | EnhancedPattern)[]
 ): boolean {
-	return patterns.some((pattern) => matchesPattern(file, pattern, defaultOptions));
+	return patterns.some((pattern) => matchesPattern(file, pattern));
 }

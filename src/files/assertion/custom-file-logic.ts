@@ -25,7 +25,7 @@ export class CustomFileViolation implements Violation {
 
 export const gatherCustomFileViolations = (
 	projectedNodes: ProjectedNode[],
-	patterns: string[],
+	patterns: (string | RegExp)[],
 	condition: CustomFileCondition,
 	message: string
 ): CustomFileViolation[] => {
@@ -33,14 +33,16 @@ export const gatherCustomFileViolations = (
 
 	// Convert glob patterns to regex patterns for consistency with other file operations
 	const regexPatterns = patterns.map((pattern) => {
-		// Handle glob patterns by converting them to regex
-		if (pattern.includes('*') || pattern.includes('?')) {
-			const regexPattern = pattern
-				.replace(/\*\*/g, '.*') // ** matches any number of directories
-				.replace(/\*/g, '[^/\\\\]*') // * matches any characters except path separators
-				.replace(/\?/g, '.') // ? matches any single character
-				.replace(/\./g, '\\.'); // Escape literal dots
-			return regexPattern;
+		if (typeof pattern === 'string') {
+			// Handle glob patterns by converting them to regex
+			if (pattern.includes('*') || pattern.includes('?')) {
+				const regexPattern = pattern
+					.replace(/\*\*/g, '.*') // ** matches any number of directories
+					.replace(/\*/g, '[^/\\\\]*') // * matches any characters except path separators
+					.replace(/\?/g, '.') // ? matches any single character
+					.replace(/\./g, '\\.'); // Escape literal dots
+				return regexPattern;
+			}
 		}
 		return pattern;
 	});

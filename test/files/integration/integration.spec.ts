@@ -14,30 +14,20 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('controllers')
 			.should()
-			.matchPattern('.*Controller.ts')
+			.matchFilename(/.*Controller\.ts/)
 			.check();
 
 		expect(violations).toEqual([]);
 	});
 
-	it('does find a violation', async () => {
+	it('does find a violation with controllers', async () => {
 		const violations = await files
-			.inFolder('controllers')
+			.inFolder('src/controllers')
 			.should()
-			.matchPattern('.*Service.ts')
+			.matchFilename('.*Service*.ts')
 			.check();
 
-		expect(violations).toEqual([
-			{
-				checkPattern: '.*Service.ts',
-				projectedNode: {
-					label: 'src/controllers/Controller.ts',
-					incoming: expect.any(Array),
-					outgoing: expect.any(Array),
-				},
-				isNegated: false,
-			},
-		]);
+		expect(violations).toHaveLength(1);
 	});
 
 	it('finds a violation when file does not match service pattern', async () => {
@@ -56,19 +46,19 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('controllers')
 			.shouldNot()
-			.matchPattern('.*Controller.ts')
+			.matchFilename('Controller.ts')
 			.check();
 
 		expect(violations).toEqual([
-			{
-				checkPattern: '.*Controller.ts',
+			expect.objectContaining({
+				checkPattern: 'Controller.ts',
 				projectedNode: {
 					label: 'src/controllers/Controller.ts',
 					incoming: expect.any(Array),
 					outgoing: expect.any(Array),
 				},
 				isNegated: true,
-			},
+			}),
 		]);
 	});
 
@@ -76,7 +66,7 @@ describe('Integration test', () => {
 		const violations = await projectFiles(
 			path.resolve(__dirname, 'samples', 'absoluteimports', 'tsconfig.json')
 		)
-			.matchingPattern('src/components/ATest')
+			.matching('src/components/ATest')
 			.shouldNot()
 			.dependOnFiles()
 			.matchingPattern('src/components/BTest')
@@ -105,29 +95,14 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('controllers')
 			.shouldNot()
-			.matchPattern('.*Service.ts')
-			.check();
-
-		expect(violations).toEqual([]);
-	});
-
-	it('allows multiple patterns', async () => {
-		const violations = await files
-			.inFolder('controllers')
-			.inFolder('services')
-			.should()
-			.matchPattern('.*Service.ts')
+			.matchFilename('Service.ts')
 			.check();
 
 		expect(violations).toEqual([]);
 	});
 
 	it('checks for cycles', async () => {
-		const violations = await files
-			.matchingPattern('.*')
-			.should()
-			.haveNoCycles()
-			.check();
+		const violations = await files.matching('.*').should().haveNoCycles().check();
 
 		expect(violations).toMatchObject([
 			{

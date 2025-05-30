@@ -8,7 +8,7 @@ describe('Custom File Logic', () => {
 		};
 
 		const violations = await projectFiles()
-			.matchingPattern('src/**/*.ts')
+			.matching('src/**/*.ts')
 			.should()
 			.adhereTo(customCondition, 'File should have 50 lines or less')
 			.check();
@@ -18,7 +18,7 @@ describe('Custom File Logic', () => {
 
 	it('should support custom file filtering and assertions', async () => {
 		const violations = await projectFiles()
-			.matchingPattern('**/*.spec.ts')
+			.matching('**/*.spec.ts')
 			.should()
 			.adhereTo((file: FileInfo) => {
 				// Custom logic: TypeScript files should contain export statements
@@ -31,7 +31,7 @@ describe('Custom File Logic', () => {
 
 	it('should create violations when custom conditions fail', async () => {
 		const rule = projectFiles()
-			.matchingPattern('**/*.ts')
+			.matching('**/*.ts')
 			.should()
 			.adhereTo((file: FileInfo) => {
 				// Custom logic that will fail: files should be empty
