@@ -662,7 +662,7 @@ ArchUnitTS works with Jest, Jasmine, Vitest, Mocha, and any other testing framew
 
 **Q: Can I use ArchUnitTS with JavaScript projects?**
 
-Yes! While ArchUnitTS is built for TypeScript, it works with JavaScript projects too. You'll get the most benefit with TypeScript due to better static analysis capabilities .
+Yes! While ArchUnitTS is built for TypeScript, it works with JavaScript projects too. You'll get the most benefit with TypeScript due to better static analysis capabilities.
 
 **Q: How do I handle false positives in architecture rules?**
 
