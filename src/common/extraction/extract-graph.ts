@@ -66,7 +66,13 @@ export const clearGraphCache = (): void => {
 	graphCache.clear();
 };
 
-export const extractGraph = async (configFileName?: string): Promise<Edge[]> => {
+export const extractGraph = async (
+	configFileName?: string,
+	clearCache: boolean = false
+): Promise<Edge[]> => {
+	if (clearCache) {
+		clearGraphCache();
+	}
 	const cachedResult = graphCache.get(configFileName);
 	if (cachedResult) {
 		return cachedResult;

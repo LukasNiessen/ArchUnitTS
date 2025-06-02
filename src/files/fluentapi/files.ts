@@ -795,10 +795,10 @@ export class DependOnFileCondition implements Checkable {
 		logger.startCheck(ruleName);
 		logger.logProgress('Extracting project graph for dependency analysis...');
 
-		const graph = await extractGraph(
+		const configFileName =
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
-				.filesShouldCondition.fileCondition.tsConfigFilePath
-		);
+				.filesShouldCondition.fileCondition.tsConfigFilePath;
+		const graph = await extractGraph(configFileName, options?.clearCache);
 
 		const projectedEdges = projectEdges(graph, perEdge());
 		logger.logProgress(
@@ -873,10 +873,10 @@ export class CycleFreeFileCondition implements Checkable {
 		logger.startCheck(ruleName);
 		logger.logProgress('Extracting project graph for cycle detection...');
 
-		const graph = await extractGraph(
+		const configFileName =
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
-				.tsConfigFilePath
-		);
+				.tsConfigFilePath;
+		const graph = await extractGraph(configFileName, options?.clearCache);
 
 		const projectedEdges = projectEdges(graph, perInternalEdge());
 
@@ -924,10 +924,10 @@ export class MatchPatternFileCondition implements Checkable {
 		logger.startCheck(ruleName);
 		logger.logProgress('Extracting project graph...');
 
-		const graph = await extractGraph(
+		const configFileName =
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
-				.tsConfigFilePath
-		);
+				.tsConfigFilePath;
+		const graph = await extractGraph(configFileName, options?.clearCache);
 
 		const projectedNodes = projectToNodes(graph);
 
@@ -1019,13 +1019,13 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 		logger.startCheck(ruleName);
 		logger.logProgress('Extracting project graph...');
 
-		const graph = await extractGraph(
+		const configFileName =
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
-				.tsConfigFilePath
-		);
+				.tsConfigFilePath;
+		const graph = await extractGraph(configFileName, options?.clearCache);
 
 		const projectedNodes = projectToNodes(graph, {
-			includeExternals: true,
+			includeExternals: true, // X-TODO : just temp!
 		});
 		logger.logProgress(
 			`Processing ${projectedNodes.length} files with enhanced pattern matching`
@@ -1114,7 +1114,7 @@ export class CustomFileCheckableCondition implements Checkable {
 		logger.startCheck(ruleName);
 		logger.logProgress('Extracting project graph for custom file analysis...');
 
-		const graph = await extractGraph(this.tsConfigFilePath);
+		const graph = await extractGraph(this.tsConfigFilePath, options?.clearCache);
 		const projectedNodes = projectToNodes(graph);
 
 		logger.logProgress(`Applying custom condition to ${projectedNodes.length} files`);

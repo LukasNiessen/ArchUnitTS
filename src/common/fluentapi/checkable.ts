@@ -52,6 +52,8 @@ export interface CheckOptions {
 	 * Logging configuration for check execution
 	 */
 	logging?: LoggingOptions;
+
+	clearCache?: boolean;
 }
 
 export interface Checkable {
