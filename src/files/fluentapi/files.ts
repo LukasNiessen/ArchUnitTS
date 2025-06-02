@@ -8,7 +8,7 @@ import { projectToNodes } from '../../common/projection/project-nodes';
 import { gatherRegexMatchingViolations } from '../assertion/matching-files';
 import { Pattern, PatternMatchingOptions } from '../assertion/pattern-matching';
 import { Violation } from '../../common/assertion/violation';
-import { gatherCycleViolations } from '../assertion/free-of-cycles';
+import { gatherCycleViolations } from '../assertion/cycle-free';
 import { gatherDependOnFileViolations } from '../assertion/depend-on-files';
 import {
 	gatherCustomFileViolations,

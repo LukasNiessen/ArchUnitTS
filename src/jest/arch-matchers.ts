@@ -2,7 +2,7 @@ import { Checkable } from '../common/fluentapi/checkable';
 import { Violation } from '../common/assertion/violation';
 import { ViolatingNode } from '../files/assertion/matching-files';
 import { ViolatingEdge } from '../slices/assertion/admissible-edges';
-import { ViolatingCycle } from '../files/assertion/free-of-cycles';
+import { ViolatingCycle } from '../files/assertion/cycle-free';
 import { ViolatingFileDependency } from '../files/assertion/depend-on-files';
 import { MetricViolation } from '../metrics/assertion/metric-thresholds';
 import { ResultFactory } from '../testing/common/result-factory';

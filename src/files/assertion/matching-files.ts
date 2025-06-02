@@ -2,9 +2,9 @@ import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedNode } from '../../common/projection/project-nodes';
 import { Pattern, EnhancedPattern, matchesPattern } from './pattern-matching';
-import { ProjectedEdge } from '../../common/projection/project-edges';
 import { CheckLogger } from '../../common/util/logger';
 import { CheckOptions } from '../../common/fluentapi/checkable';
+import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 
 export class ViolatingNode implements Violation {
 	public checkPattern: string;
@@ -18,28 +18,6 @@ export class ViolatingNode implements Violation {
 	) {
 		this.checkPattern = checkPattern;
 		this.projectedNode = projectedNode;
-		this.isNegated = isNegated;
-	}
-}
-
-/**
- * EmptyTestViolation represents a violation when no files are found that match the preconditions
- * This helps detect tests that don't actually test anything because they match no files
- */
-export class EmptyTestViolation implements Violation {
-	public patterns: (string | RegExp)[];
-	public message: string;
-	public isNegated: boolean;
-	public dependency?: ProjectedEdge;
-
-	constructor(
-		patterns: (string | RegExp)[],
-		customMessage?: string,
-		isNegated = false
-	) {
-		this.patterns = patterns;
-		this.message =
-			customMessage || `No files found matching pattern(s): ${patterns.join(', ')}`;
 		this.isNegated = isNegated;
 	}
 }

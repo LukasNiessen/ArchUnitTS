@@ -1,4 +1,4 @@
-import { gatherCycleViolations } from './free-of-cycles';
+import { gatherCycleViolations } from './cycle-free';
 import { ProjectedEdge } from '../../common/projection/project-edges';
 
 describe('freeOfCycles', () => {

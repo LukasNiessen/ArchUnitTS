@@ -13,6 +13,7 @@ import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
 import { Violation } from '../../common/assertion/violation';
 import { CheckLogger } from '../../common/util/logger';
 import { extractClassInfo } from '../extraction/extract-class-info';
+import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 
 /**
  * Type for user-defined custom metric calculation functions
@@ -273,6 +274,14 @@ export class CustomMetricThresholdBuilder implements Checkable {
 			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
 		);
 
+		// Check for empty test condition
+		if (filteredClasses.length === 0 && !options?.allowEmptyTests) {
+			const emptyViolation = new EmptyTestViolation(['extracted classes']);
+			logger.logViolation(emptyViolation.toString());
+			logger.endCheck(ruleName, 1);
+			return [emptyViolation];
+		}
+
 		logger.logProgress('Calculating custom metrics and checking thresholds');
 		for (const classInfo of filteredClasses) {
 			const metricValue = this.calculation(classInfo);
@@ -368,6 +377,14 @@ export class CustomMetricCondition implements Checkable {
 		logger.logProgress(
 			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
 		);
+
+		// Check for empty test condition
+		if (filteredClasses.length === 0 && !options?.allowEmptyTests) {
+			const emptyViolation = new EmptyTestViolation(['extracted classes']);
+			logger.logViolation(emptyViolation.toString());
+			logger.endCheck(ruleName, 1);
+			return [emptyViolation];
+		}
 
 		logger.logProgress('Calculating custom metrics and applying assertion logic');
 		for (const classInfo of filteredClasses) {

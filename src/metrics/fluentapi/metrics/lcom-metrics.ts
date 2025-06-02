@@ -295,7 +295,11 @@ export class MetricCondition implements Checkable {
 
 		// Return violations using the assertion layer
 		logger.logProgress('Gathering metric violations from results');
-		const violations = gatherMetricViolations(metricResults);
+		const violations = gatherMetricViolations(
+			metricResults,
+			options?.allowEmptyTests,
+			['extracted classes']
+		);
 
 		// Log violations if enabled
 		violations.forEach((violation) => {

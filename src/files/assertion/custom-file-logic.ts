@@ -1,7 +1,7 @@
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedNode } from '../../common/projection/project-nodes';
 import { matchingAllPatterns } from '../../common/util/regex-utils';
-import { EmptyTestViolation } from './matching-files';
+import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 
 // Type definitions for custom logic
 export type FileInfo = {
@@ -30,13 +30,13 @@ export const gatherCustomFileViolations = (
 	condition: CustomFileCondition,
 	message: string,
 	allowEmptyTests: boolean = false
-): CustomFileViolation[] => {
-	const violations: CustomFileViolation[] = [];
+): (CustomFileViolation | EmptyTestViolation)[] => {
+	const violations: (CustomFileViolation | EmptyTestViolation)[] = [];
 
 	// Check for empty test if no files match preconditions
-	//if (projectedNodes.length === 0 && !allowEmptyTests) {
-	//	return [new EmptyTestViolation(condition)];
-	//}
+	if (projectedNodes.length === 0 && !allowEmptyTests) {
+		return [new EmptyTestViolation(patterns)];
+	}
 
 	// Convert glob patterns to regex patterns for consistency with other file operations
 	const regexPatterns = patterns.map((pattern) => {

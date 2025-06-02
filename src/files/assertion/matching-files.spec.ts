@@ -1,5 +1,6 @@
-import { gatherRegexMatchingViolations, EmptyTestViolation } from './matching-files';
+import { gatherRegexMatchingViolations } from './matching-files';
 import { ProjectedNode } from '../../common/projection/project-nodes';
+import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 
 describe('matchingFiles', () => {
 	describe('when not negated', () => {

@@ -14,6 +14,7 @@ import { extractEnhancedClassInfo } from '../../extraction/extract-class-info';
 import { MetricComparison } from '../types';
 import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
 import * as path from 'path';
+import { EmptyTestViolation } from '../../../common/assertion/EmptyTestViolation';
 
 /**
  * Project summary for distance metrics
@@ -285,6 +286,14 @@ export class DistanceCondition implements Checkable {
 		const analysisResults = await extractEnhancedClassInfo(this.tsConfigFilePath);
 		logger.logProgress(`Analyzed ${analysisResults.length} files from project`);
 
+		// Check for empty test condition
+		if (analysisResults.length === 0 && !options?.allowEmptyTests) {
+			const emptyViolation = new EmptyTestViolation(['enhanced class info']);
+			logger.logViolation(emptyViolation.toString());
+			logger.endCheck(ruleName, 1);
+			return [emptyViolation];
+		}
+
 		// Filter results if needed
 		let filteredResults = analysisResults;
 		if (this.targetFile) {
@@ -374,6 +383,14 @@ export class ZoneCondition implements Checkable {
 		// Analyze the project
 		const analysisResults = await extractEnhancedClassInfo(this.tsConfigFilePath);
 		logger.logProgress(`Analyzed ${analysisResults.length} files from project`);
+
+		// Check for empty test condition
+		if (analysisResults.length === 0 && !options?.allowEmptyTests) {
+			const emptyViolation = new EmptyTestViolation(['enhanced class info']);
+			logger.logViolation(emptyViolation.toString());
+			logger.endCheck(ruleName, 1);
+			return [emptyViolation];
+		}
 
 		// Filter results if needed
 		let filteredResults = analysisResults;

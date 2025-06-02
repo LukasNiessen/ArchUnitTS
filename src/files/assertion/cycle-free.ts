@@ -4,6 +4,7 @@ import { projectCycles } from '../../common/projection/project-cycles';
 import { Violation } from '../../common/assertion/violation';
 import { CheckLogger } from '../../common/util/logger';
 import { CheckOptions } from '../../common/fluentapi/checkable';
+import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 
 export class ViolatingCycle implements Violation {
 	public cycle: ProjectedEdge[];
@@ -17,8 +18,13 @@ export const gatherCycleViolations = (
 	projectedEdges: ProjectedEdge[],
 	preconditionPatterns: (string | RegExp)[],
 	options?: CheckOptions
-): ViolatingCycle[] => {
+): (ViolatingCycle | EmptyTestViolation)[] => {
 	const logger = new CheckLogger(options?.logging);
+
+	// Check for empty test if no edges match preconditions
+	if (projectedEdges.length === 0 && !options?.allowEmptyTests) {
+		return [new EmptyTestViolation(preconditionPatterns)];
+	}
 
 	const filteredEdges = projectedEdges.filter(
 		(edge) =>
