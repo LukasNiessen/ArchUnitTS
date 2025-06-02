@@ -3,7 +3,7 @@ import { extractGraph } from '../../common/extraction/extract-graph';
 import { extractNxGraph } from '../../common/extraction/extract-nx-graph';
 import * as fs from 'fs';
 import { TechnicalError } from '../../common/error/errors';
-import { Checkable } from '../../common/fluentapi/checkable';
+import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
 import {
 	gatherPositiveViolations,
 	gatherViolations,
@@ -13,6 +13,7 @@ import { Violation } from '../../common/assertion/violation';
 import { identity, sliceByPattern } from '../projection/slicing-projections';
 import { MapFunction, projectEdges } from '../../common/projection/project-edges';
 import { Graph } from '../../common/extraction/graph';
+import { CheckLogger } from '../../common/util/logger';
 
 export const projectSlices = (filename?: string): SliceConditionBuilder => {
 	const graphProvider = () => extractGraph(filename);
@@ -89,7 +90,9 @@ export class PositiveSliceCondition implements Checkable {
 		readonly diagram: { filename?: string; diagram?: string }
 	) {}
 
-	public async check(): Promise<Violation[]> {
+	public async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+
 		const graph =
 			await this.positiveConditionBuilder.sliceConditionBuilder.graphProvider();
 		const filtered = this.positiveConditionBuilder.ignoreExternals
@@ -111,6 +114,12 @@ export class PositiveSliceCondition implements Checkable {
 		const mapped = projectEdges(
 			filtered,
 			this.positiveConditionBuilder.sliceConditionBuilder.mapFunction
+		);
+
+		mapped.forEach((edge) =>
+			logger.info(
+				`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`
+			)
 		);
 
 		return gatherPositiveViolations(

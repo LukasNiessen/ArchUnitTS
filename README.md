@@ -730,6 +730,8 @@ Here's how ArchUnitTS compares to other TypeScript architecture testing librarie
 | **File Pattern Matching**         | ✅ Glob + Regex                                   | ✅ Glob + Regex       | ⚠️ Simple patterns | ❌ Basic         |
 | **Custom Rules**                  | ✅ Full support                                   | ❌ No                 | ❌ No              | ❌ No            |
 | **Code Metrics**                  | ✅ Comprehensive                                  | ❌ No                 | ❌ No              | ❌ No            |
+| **Empty Test Detection**          | ✅ Fails by default (configurable)                | ❌ No                 | ❌ No              | ❌ No            |
+| **Debug Logging**                 | ✅ Optional (off by default)                      | ❌ No                 | ❌ No              | ❌ No            |
 | **LCOM Cohesion Analysis**        | ✅ Multiple algorithms                            | ❌ No                 | ❌ No              | ❌ No            |
 | **Distance Metrics**              | ✅ Coupling & abstraction                         | ❌ No                 | ❌ No              | ❌ No            |
 | **UML Diagram Validation**        | ✅ Supported                                      | ✅ Supported          | ❌ No              | ❌ No            |
@@ -742,6 +744,16 @@ Here's how ArchUnitTS compares to other TypeScript architecture testing librarie
 | **Documentation**                 | ✅ Comprehensive                                  | ⚠️ Basic              | ⚠️ Minimal         | ⚠️ Minimal       |
 | **Community Support**             | ✅ Active maintenance                             | ✅ Active maintenance | ❌ Inactive        | ❌ Inactive      |
 
+As you see in the table, there are some features that as of now only we support. Here is a brief highlight of those that we believe are the most critical ones of them:
+
+- **Empty Test Protection**: This one is extremely important. Let's say you define architectural boundaries that shall not be crossed - but you have a typo in the path to some folder. **Your test will just pass with other libraries!** They will 'check the rule' on 0 files and 'pass'. ArchUnitTS detects what we call _empty tests_ and your test fails if it's an empty test. This is the default behvaior, you can customize it to allow empty tests.
+- **Testing framework support**: ArchUnitTS works with any testing framework, plus we have special syntax extension for Jest, Vitest and Jasmine. Other libraries such as ts-arch only have special support for Jest or no special support at all.
+- **Logging**: We have great support for logs and different log levels. This can help to understand what files are being analyzed and why tests pass/fail. Other libraries have no logging support at all.
+- **Code Metrics**: Metrics such as cohesion, coupling metrics, distance from main sequence, and even custom metrics provide important insights into any projects code. But also here, ArchUnitTS is the only library supporting this.
+- **Intelligent Error Messages**: Our error messages contain clickable file paths and detailed violation descriptions. Again, other libraries do not have this.
+- **Custom rules**: ArchUnitTS is the only library that allows you to define custom rules and metrics.
+- **HTML Reports**: Auto generated dashboards with charts and detailed breakdowns. Here again, other libraries do not support this at all.
+
 ## 🔎 Informative Error Messages
 
 When tests fail, you get helpful, colorful output with clickable file paths.
@@ -749,6 +761,66 @@ When tests fail, you get helpful, colorful output with clickable file paths.
 https://github.com/user-attachments/assets/04b26afb-53e9-4507-ba24-c8308b3a7922
 
 _Click on file paths to jump directly to the issue in your IDE._
+
+## 📝 Debug Logging & Configuration
+
+ArchUnitTS provides optional debug logging to help you understand what files are being analyzed and troubleshoot test failures. Logging is **disabled by default** to keep test output clean.
+
+### Enabling Debug Logging
+
+```typescript
+it('should respect layered architecture', async () => {
+  const rule = projectFiles()
+    .inFolder('src/presentation')
+    .shouldNot()
+    .dependOnFiles()
+    .inFolder('src/database');
+
+  // Enable debug logging
+  const violations = await rule.check({
+    logging: {
+      enabled: true,
+      level: 'debug', // 'error' | 'warn' | 'info' | 'debug'
+    },
+  });
+
+  expect(violations).toEqual([]);
+});
+```
+
+### Sample Debug Output
+
+When debug logging is enabled, you'll see detailed information about the analysis:
+
+```
+[2025-06-02T12:08:26.355Z] [INFO] Starting architecture rule check: Dependency check: patterns [(^|.*/)src/database/.*]
+[2025-06-02T12:08:26.445Z] [DEBUG] Analyzing 12 files in 'src/presentation' folder
+[2025-06-02T12:08:26.456Z] [DEBUG] Found file: src/presentation/controllers/UserController.ts
+[2025-06-02T12:08:26.467Z] [DEBUG] Found file: src/presentation/views/UserView.tsx
+[2025-06-02T12:08:26.478Z] [DEBUG] Checking dependencies against 'src/database' pattern
+[2025-06-02T12:08:26.489Z] [DEBUG] Violation detected: src/presentation/controllers/UserController.ts depends on src/database/UserRepository.ts
+[2025-06-02T12:08:26.772Z] [WARN] Completed architecture rule check: Dependency check: patterns [(^|.*/)src/database/.*] (1 violations)
+```
+
+### Logging Configuration Options
+
+```typescript
+const violations = await rule.check({
+  logging: {
+    enabled: true, // Enable/disable logging (default: false)
+    level: 'info', // Log level: 'error' | 'warn' | 'info' | 'debug'
+    includeTimestamp: true, // Add timestamps to log messages (default: true)
+    colorOutput: true, // Colorized console output (default: true)
+  },
+});
+```
+
+### Benefits of Debug Logging
+
+- **🔍 Transparency**: See exactly which files are being analyzed
+- **🐛 Debugging**: Understand why tests pass or fail
+- **📊 Progress Tracking**: Monitor analysis progress on large codebases
+- **🎯 Rule Validation**: Verify that your architectural rules are working as expected
 
 ## 🏈 Architecture Fitness Functions
 

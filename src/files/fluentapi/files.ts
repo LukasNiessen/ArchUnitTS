@@ -808,6 +808,12 @@ export class DependOnFileCondition implements Checkable {
 			`Analyzing dependencies across ${projectedEdges.length} edges`
 		);
 
+		projectedEdges.forEach((edge) =>
+			logger.info(
+				`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`
+			)
+		);
+
 		const violations = gatherDependOnFileViolations(
 			projectedEdges,
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
@@ -882,6 +888,12 @@ export class CycleFreeFileCondition implements Checkable {
 			`Analyzing ${projectedEdges.length} internal dependencies for cycles`
 		);
 
+		projectedEdges.forEach((edge) =>
+			logger.info(
+				`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`
+			)
+		);
+
 		const violations = gatherCycleViolations(
 			projectedEdges,
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
@@ -928,7 +940,7 @@ export class MatchPatternFileCondition implements Checkable {
 		const projectedNodes = projectToNodes(graph);
 		logger.logProgress(`Processing ${projectedNodes.length} files`);
 
-		// console.log('projectedNodes:', projectedNodes);
+		projectedNodes.forEach((node) => logger.info(`File under check: ${node.label}`));
 
 		const violations = gatherRegexMatchingViolations(
 			projectedNodes,
@@ -1026,6 +1038,8 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 			`Processing ${projectedNodes.length} files with enhanced pattern matching`
 		);
 
+		projectedNodes.forEach((node) => logger.info(`File under check: ${node.label}`));
+
 		const violations = gatherFilenamePatternViolations(
 			projectedNodes,
 			{ pattern: this.pattern, options: this.options },
@@ -1109,7 +1123,9 @@ export class CustomFileCheckableCondition implements Checkable {
 
 		const graph = await extractGraph(this.tsConfigFilePath);
 		const projectedNodes = projectToNodes(graph);
+
 		logger.logProgress(`Applying custom condition to ${projectedNodes.length} files`);
+		projectedNodes.forEach((node) => logger.info(`File under check: ${node.label}`));
 
 		const violations = gatherCustomFileViolations(
 			projectedNodes,

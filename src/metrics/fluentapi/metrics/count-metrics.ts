@@ -392,8 +392,12 @@ export class CountThresholdBuilder implements Checkable {
 
 		const filteredClasses =
 			this.metricsBuilder.getFilter()?.apply(classes) ?? classes;
+
 		logger.logProgress(
 			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
+		);
+		filteredClasses.forEach((classToCheck) =>
+			logger.info(`Class under check: ${classToCheck.name}`)
 		);
 
 		logger.logProgress('Calculating count metrics and projecting to metric results');
