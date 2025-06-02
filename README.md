@@ -770,7 +770,7 @@ _Click on file paths to jump directly to the issue in your IDE._
 
 ## 📝 Debug Logging & Configuration
 
-ArchUnitTS provides optional debug logging to help you understand what files are being analyzed and troubleshoot test failures. Logging is **disabled by default** to keep test output clean.
+We support logging to help you understand what files are being analyzed and troubleshoot test failures. Logging is disabled by default to keep test output clean.
 
 ### Enabling Debug Logging
 
@@ -820,13 +820,6 @@ const violations = await rule.check({
   },
 });
 ```
-
-### Benefits of Debug Logging
-
-- **🔍 Transparency**: See exactly which files are being analyzed
-- **🐛 Debugging**: Understand why tests pass or fail
-- **📊 Progress Tracking**: Monitor analysis progress on large codebases
-- **🎯 Rule Validation**: Verify that your architectural rules are working as expected
 
 ## 🏈 Architecture Fitness Functions
 
