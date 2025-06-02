@@ -25,8 +25,16 @@ export const gatherDependOnFileViolations = (
 		throw new UserError('object and subject patterns must be set');
 	}
 
-	// Check for empty test if no edges are found
-	if (projectedEdges.length === 0 && !allowEmptyTests) {
+	// empty check
+	const edgesInSource = projectedEdges.filter((edge) =>
+		matchingAllPatterns(edge.sourceLabel, objectPatterns)
+	);
+	const edgesInTarget = projectedEdges.filter((edge) =>
+		matchingAllPatterns(edge.targetLabel, subjectPatterns)
+	);
+	const empty = edgesInSource.length === 0 || edgesInTarget.length === 0;
+
+	if (empty && !allowEmptyTests) {
 		return [new EmptyTestViolation(objectPatterns)];
 	}
 

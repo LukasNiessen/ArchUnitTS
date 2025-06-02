@@ -47,13 +47,14 @@ export const gatherRegexMatchingViolations = (
 	const filteredFiles = files.filter((node) =>
 		matchingAllPatterns(node.label, preconditionPatterns)
 	);
-	filteredFiles.forEach((node) => logger.info(`File under check: ${node.label}`));
 
 	// Check for empty test if no files match preconditions
 	const allowEmptyTests = options?.allowEmptyTests || false;
 	if (filteredFiles.length === 0 && !allowEmptyTests) {
 		return [new EmptyTestViolation(preconditionPatterns)];
 	}
+
+	filteredFiles.forEach((node) => logger.info(`File under check: ${node.label}`));
 
 	filteredFiles.forEach((file) => {
 		const matches = matchesPattern(file.label, checkPattern);

@@ -61,15 +61,6 @@ export const gatherCustomFileViolations = (
 	for (const node of projectedNodes) {
 		const path = node.label;
 
-		// Check if this file matches any of the patterns
-		if (
-			patterns &&
-			patterns.length > 0 &&
-			!matchingAllPatterns(path, regexPatterns)
-		) {
-			continue; // Skip files that don't match the patterns
-		}
-
 		const lastSlash = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
 		const directory = lastSlash >= 0 ? path.substring(0, lastSlash) : '';
 		const fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;

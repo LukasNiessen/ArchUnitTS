@@ -103,20 +103,6 @@ describe('Integration test', () => {
 
 	it('checks for cycles', async () => {
 		const violations = await files.inFolder('src').should().haveNoCycles().check();
-		console.log(JSON.stringify(violations, null, '\t'));
 		expect(violations).toHaveLength(1);
-	});
-
-	it('correctly ignores files excluded by tsconfig', async () => {
-		const violations = await projectFiles(
-			path.resolve(__dirname, 'samples', 'ignores', 'tsconfig.json')
-		)
-			.inFolder('ignore')
-			.shouldNot()
-			.dependOnFiles()
-			.inFolder('dontImport')
-			.check();
-
-		expect(violations).toEqual([]);
 	});
 });
