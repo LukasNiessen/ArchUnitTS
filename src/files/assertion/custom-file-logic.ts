@@ -2,6 +2,8 @@ import { Violation } from '../../common/assertion/violation';
 import { ProjectedNode } from '../../common/projection/project-nodes';
 import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
+import { CheckOptions } from '../../..';
+import { CheckLogger } from '../../common/util/logger';
 
 // Type definitions for custom logic
 export type FileInfo = {
@@ -29,8 +31,16 @@ export const gatherCustomFileViolations = (
 	patterns: (string | RegExp)[],
 	condition: CustomFileCondition,
 	message: string,
-	allowEmptyTests: boolean = false
+	options?: CheckOptions
 ): (CustomFileViolation | EmptyTestViolation)[] => {
+	const logger = new CheckLogger(options?.logging);
+	const allowEmptyTests = options?.allowEmptyTests || false;
+	logger?.debug(
+		`Starting custom file logic validation with ${patterns.length} patterns`
+	);
+	logger?.debug(`Patterns: ${JSON.stringify(patterns)}`);
+	logger?.debug(`Allow empty tests: ${allowEmptyTests}`);
+
 	const violations: (CustomFileViolation | EmptyTestViolation)[] = [];
 
 	// Convert glob patterns to regex patterns for consistency with other file operations
@@ -43,23 +53,39 @@ export const gatherCustomFileViolations = (
 					.replace(/\*/g, '[^/\\\\]*') // * matches any characters except path separators
 					.replace(/\?/g, '.') // ? matches any single character
 					.replace(/\./g, '\\.'); // Escape literal dots
+				logger?.debug(
+					`Converted glob pattern '${pattern}' to regex: '${regexPattern}'`
+				);
 				return regexPattern;
 			}
 		}
 		return pattern;
 	});
 
+	logger?.debug(`Filtering nodes to mach regexPatterns`);
+	regexPatterns.forEach((regexPattern) =>
+		logger?.debug(`regexPattern: ${regexPattern}`)
+	);
+
 	const projectedNodes = nodes.filter((node) =>
 		matchingAllPatterns(node.label, regexPatterns)
 	);
 
+	logger?.debug(
+		`Found ${projectedNodes.length} matching files from ${nodes.length} total nodes`
+	);
+
 	// Check for empty test if no files match preconditions
 	if (projectedNodes.length === 0 && !allowEmptyTests) {
+		logger?.warn(
+			'No files matched patterns and empty tests are not allowed - creating EmptyTestViolation'
+		);
 		return [new EmptyTestViolation(patterns)];
 	}
 
 	for (const node of projectedNodes) {
 		const path = node.label;
+		logger?.debug(`Processing file: ${path}`);
 
 		const lastSlash = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
 		const directory = lastSlash >= 0 ? path.substring(0, lastSlash) : '';
@@ -68,6 +94,10 @@ export const gatherCustomFileViolations = (
 		const name = lastDot >= 0 ? fileName.substring(0, lastDot) : fileName;
 		const extension = lastDot >= 0 ? fileName.substring(lastDot + 1) : '';
 
+		logger?.debug(
+			`File details: name='${name}', extension='${extension}', directory='${directory}'`
+		);
+
 		// Read file content and calculate lines of code
 		const fs = require('fs');
 		let content = '';
@@ -75,10 +105,14 @@ export const gatherCustomFileViolations = (
 		try {
 			content = fs.readFileSync(path, 'utf8');
 			linesOfCode = content.split('\n').length;
+			logger?.debug(`Successfully read file content: ${linesOfCode} lines of code`);
 		} catch (error) {
 			// If file can't be read, use empty content
 			content = '';
 			linesOfCode = 0;
+			logger?.warn(
+				`Failed to read file '${path}': ${error instanceof Error ? error.message : String(error)}`
+			);
 		}
 
 		const fileInfo: FileInfo = {
@@ -90,8 +124,14 @@ export const gatherCustomFileViolations = (
 			linesOfCode,
 		};
 
+		logger?.debug(`Evaluating custom condition for file: ${path}`);
 		const isValid = condition(fileInfo);
+		logger?.debug(`Custom condition result for '${path}': ${isValid}`);
+
 		if (!isValid) {
+			logger?.warn(
+				`Custom file condition failed for '${path}' - creating violation`
+			);
 			violations.push(
 				new CustomFileViolation(
 					message || 'Custom file condition failed',
@@ -99,8 +139,13 @@ export const gatherCustomFileViolations = (
 					'custom-condition'
 				)
 			);
+		} else {
+			logger?.debug(`File '${path}' passed custom condition`);
 		}
 	}
 
+	logger?.debug(
+		`Custom file logic validation completed. Found ${violations.length} violations`
+	);
 	return violations;
 };

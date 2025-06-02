@@ -1132,7 +1132,7 @@ export class CustomFileCheckableCondition implements Checkable {
 			this.patterns || [],
 			this.condition,
 			this.message || 'Custom file condition failed',
-			options?.allowEmptyTests || false
+			options
 		);
 
 		// Log violations if logging is enabled
