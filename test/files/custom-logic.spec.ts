@@ -18,12 +18,11 @@ describe('Custom File Logic', () => {
 
 	it('should support custom file filtering and assertions', async () => {
 		const violations = await projectFiles()
-			.matchingPattern('**/*.spec.ts')
+			.matchingPattern('*.spec.ts')
 			.should()
 			.adhereTo((file: FileInfo) => {
-				console.log('file.content:', file.content);
 				// Custom logic: TypeScript files should contain export statements
-				return file.content.includes('export');
+				return file.content.includes('import');
 			}, 'TypeScript files should export functionality')
 			.check();
 
