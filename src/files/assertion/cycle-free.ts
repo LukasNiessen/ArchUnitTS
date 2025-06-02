@@ -1,11 +1,11 @@
-import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { ProjectedEdge } from '../../common/projection/project-edges';
 import { projectCycles } from '../../common/projection/project-cycles';
 import { Violation } from '../../common/assertion/violation';
 import { CheckLogger } from '../../common/util/logger';
 import { CheckOptions } from '../../common/fluentapi/checkable';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
-import { Pattern } from './pattern-matching';
+import { Filter } from '../../common/type';
+import { matchesAllPatterns } from './pattern-matching';
 
 export class ViolatingCycle implements Violation {
 	public cycle: ProjectedEdge[];
@@ -17,12 +17,10 @@ export class ViolatingCycle implements Violation {
 
 export const gatherCycleViolations = (
 	projectedEdges: ProjectedEdge[],
-	preconditionPatterns: Pattern[],
+	preconditionFilters: Filter[],
 	options?: CheckOptions
 ): (ViolatingCycle | EmptyTestViolation)[] => {
 	const logger = new CheckLogger(options?.logging);
-
-	console.log('preconditionPatterns:', preconditionPatterns);
 
 	// Check for empty test if no edges match preconditions
 	/**
@@ -36,15 +34,15 @@ export const gatherCycleViolations = (
 	 * So we go the non ideal way of just checking the unfiltered ones for being empty or not.
 	 */
 	if (projectedEdges.length === 0 && !options?.allowEmptyTests) {
-		return [new EmptyTestViolation(preconditionPatterns)];
+		return [new EmptyTestViolation(preconditionFilters)];
 	}
 
 	const filteredEdges = projectedEdges.filter(
 		(edge) =>
 			// Exclude self-referencing edges (these are added for completeness but aren't considered cycles here)
 			edge.sourceLabel !== edge.targetLabel &&
-			matchingAllPatterns(edge.sourceLabel, preconditionPatterns) &&
-			matchingAllPatterns(edge.targetLabel, preconditionPatterns)
+			matchesAllPatterns(edge.sourceLabel, preconditionFilters) &&
+			matchesAllPatterns(edge.targetLabel, preconditionFilters)
 	);
 	filteredEdges.forEach((edge) =>
 		logger.info(`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`)

@@ -2,6 +2,7 @@ import { Violation } from '../../common/assertion/violation';
 import { MetricComparison } from './types';
 import { MetricResult } from '../projection/project-metrics';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
+import { Filter } from '../../common/type';
 
 /**
  * Represents a class that violates a metric threshold
@@ -30,11 +31,11 @@ export class MetricViolation implements Violation {
 export function gatherMetricViolations(
 	metricResults: MetricResult[],
 	allowEmptyTests?: boolean,
-	patterns?: string[]
+	filters?: Filter[]
 ): (MetricViolation | EmptyTestViolation)[] {
 	// Check for empty test condition
 	if (metricResults.length === 0 && !allowEmptyTests) {
-		return [new EmptyTestViolation(patterns || ['<no patterns specified>'])];
+		return [new EmptyTestViolation(filters || [])];
 	}
 
 	return metricResults

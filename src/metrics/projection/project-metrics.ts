@@ -1,4 +1,4 @@
-import { Pattern } from '../../files/assertion/pattern-matching';
+import { Pattern } from '../../common/type';
 import { ClassFilter, ClassInfo, Metric } from '../extraction/interface';
 import { MetricComparison } from './types';
 import * as path from 'path';

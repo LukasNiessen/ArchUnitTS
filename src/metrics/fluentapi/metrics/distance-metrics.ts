@@ -288,7 +288,7 @@ export class DistanceCondition implements Checkable {
 
 		// Check for empty test condition
 		if (analysisResults.length === 0 && !options?.allowEmptyTests) {
-			const emptyViolation = new EmptyTestViolation(['enhanced class info']);
+			const emptyViolation = new EmptyTestViolation([], 'enhanced class info'); // X-TODO: fix 1st arg (empty array)
 			logger.logViolation(emptyViolation.toString());
 			logger.endCheck(ruleName, 1);
 			return [emptyViolation];
@@ -386,7 +386,7 @@ export class ZoneCondition implements Checkable {
 
 		// Check for empty test condition
 		if (analysisResults.length === 0 && !options?.allowEmptyTests) {
-			const emptyViolation = new EmptyTestViolation(['enhanced class info']);
+			const emptyViolation = new EmptyTestViolation([], 'enhanced class info'); // X-TODO: fix 1st arg (empty array)
 			logger.logViolation(emptyViolation.toString());
 			logger.endCheck(ruleName, 1);
 			return [emptyViolation];

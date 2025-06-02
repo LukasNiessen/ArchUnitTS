@@ -1,9 +1,9 @@
-import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { UserError } from '../../common/error/errors';
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedEdge } from '../../common/projection/project-edges';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
-import { Pattern } from './pattern-matching';
+import { matchesAllPatterns } from './pattern-matching';
+import { Filter } from '../../common/type';
 
 export class ViolatingFileDependency implements Violation {
 	public dependency: ProjectedEdge;
@@ -17,8 +17,8 @@ export class ViolatingFileDependency implements Violation {
 
 export const gatherDependOnFileViolations = (
 	projectedEdges: ProjectedEdge[],
-	objectPatterns: Pattern[],
-	subjectPatterns: string[],
+	objectPatterns: Filter[],
+	subjectPatterns: Filter[],
 	isNegated: boolean,
 	allowEmptyTests: boolean = false
 ): (ViolatingFileDependency | EmptyTestViolation)[] => {
@@ -28,10 +28,10 @@ export const gatherDependOnFileViolations = (
 
 	// empty check
 	const edgesInSource = projectedEdges.filter((edge) =>
-		matchingAllPatterns(edge.sourceLabel, objectPatterns)
+		matchesAllPatterns(edge.sourceLabel, objectPatterns)
 	);
 	const edgesInTarget = projectedEdges.filter((edge) =>
-		matchingAllPatterns(edge.targetLabel, subjectPatterns)
+		matchesAllPatterns(edge.targetLabel, subjectPatterns)
 	);
 	const empty = edgesInSource.length === 0 || edgesInTarget.length === 0;
 
@@ -41,22 +41,22 @@ export const gatherDependOnFileViolations = (
 
 	const violatingEdgesFilter = isNegated
 		? (edge: ProjectedEdge) => {
-				const sourceMatches = matchingAllPatterns(
+				const sourceMatches = matchesAllPatterns(
 					edge.sourceLabel,
 					objectPatterns
 				);
-				const targetMatches = matchingAllPatterns(
+				const targetMatches = matchesAllPatterns(
 					edge.targetLabel,
 					subjectPatterns
 				);
 				return sourceMatches && targetMatches;
 			}
 		: (edge: ProjectedEdge) => {
-				const sourceMatches = matchingAllPatterns(
+				const sourceMatches = matchesAllPatterns(
 					edge.sourceLabel,
 					objectPatterns
 				);
-				const targetMatches = matchingAllPatterns(
+				const targetMatches = matchesAllPatterns(
 					edge.targetLabel,
 					subjectPatterns
 				);

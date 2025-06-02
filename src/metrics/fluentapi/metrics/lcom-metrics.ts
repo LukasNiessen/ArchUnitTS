@@ -298,7 +298,7 @@ export class MetricCondition implements Checkable {
 		const violations = gatherMetricViolations(
 			metricResults,
 			options?.allowEmptyTests,
-			['extracted classes']
+			[] //['extracted classes'] X-TODO
 		);
 
 		// Log violations if enabled

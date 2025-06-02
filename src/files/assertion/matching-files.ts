@@ -1,10 +1,10 @@
-import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedNode } from '../../common/projection/project-nodes';
-import { Pattern, EnhancedPattern, matchesPattern } from './pattern-matching';
 import { CheckLogger } from '../../common/util/logger';
 import { CheckOptions } from '../../common/fluentapi/checkable';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
+import { matchesAllPatterns, matchesPattern } from './pattern-matching';
+import { Filter } from '../../common/type';
 
 export class ViolatingNode implements Violation {
 	public checkPattern: string;
@@ -34,8 +34,8 @@ export class ViolatingNode implements Violation {
  */
 export const gatherRegexMatchingViolations = (
 	files: ProjectedNode[],
-	checkPattern: Pattern | EnhancedPattern,
-	preconditionPatterns: Pattern[],
+	filter: Filter,
+	preconditionFilters: Filter[],
 	isNegated: boolean,
 	options?: CheckOptions
 ): (ViolatingNode | EmptyTestViolation)[] => {
@@ -45,22 +45,22 @@ export const gatherRegexMatchingViolations = (
 
 	// Use matching for precondition patterns to maintain compatibility
 	const filteredFiles = files.filter((node) =>
-		matchingAllPatterns(node.label, preconditionPatterns)
+		matchesAllPatterns(node.label, preconditionFilters)
 	);
 
 	// Check for empty test if no files match preconditions
 	const allowEmptyTests = options?.allowEmptyTests || false;
 	if (filteredFiles.length === 0 && !allowEmptyTests) {
-		return [new EmptyTestViolation(preconditionPatterns)];
+		return [new EmptyTestViolation(preconditionFilters)];
 	}
 
 	filteredFiles.forEach((node) => logger.info(`File under check: ${node.label}`));
 
 	filteredFiles.forEach((file) => {
-		const matches = matchesPattern(file.label, checkPattern);
+		const matches = matchesPattern(file.label, filter);
 		const violation = isNegated
-			? checkNegativeViolation(matches, file, checkPattern)
-			: checkPositiveViolation(matches, file, checkPattern);
+			? checkNegativeViolation(matches, file, filter.regExp)
+			: checkPositiveViolation(matches, file, filter.regExp);
 
 		if (violation) {
 			violations.push(violation);
@@ -73,7 +73,7 @@ export const gatherRegexMatchingViolations = (
 const checkNegativeViolation = (
 	matches: boolean,
 	file: ProjectedNode,
-	pattern: Pattern | EnhancedPattern
+	pattern: RegExp
 ): ViolatingNode | null => {
 	const patternString = getPatternString(pattern);
 	return matches ? new ViolatingNode(patternString, file, true) : null;
@@ -82,51 +82,16 @@ const checkNegativeViolation = (
 const checkPositiveViolation = (
 	matches: boolean,
 	file: ProjectedNode,
-	pattern: Pattern | EnhancedPattern
+	pattern: RegExp
 ): ViolatingNode | null => {
 	const patternString = getPatternString(pattern);
 	return !matches ? new ViolatingNode(patternString, file, false) : null;
 };
 
-function getPatternString(pattern: Pattern | EnhancedPattern): string {
-	if (typeof pattern === 'string') {
-		return pattern;
-	} else if (pattern instanceof RegExp) {
-		// For display purposes, return the original regex source without double escaping
-		const source = pattern.source;
-		// Remove excessive escaping for common cases
-		const result = source.replace(/\\\\(.)/g, '\\$1');
-		return result;
-	} else {
-		// EnhancedPattern
-		return getPatternString(pattern.pattern);
-	}
+function getPatternString(pattern: RegExp): string {
+	// For display purposes, return the original regex source without double escaping
+	const source = pattern.source;
+	// Remove excessive escaping for common cases
+	const result = source.replace(/\\\\(.)/g, '\\$1');
+	return result;
 }
-
-/**
- * Enhanced pattern matching with full path exact matching
- *
- * @example
- * ```typescript
- * // Match files at exact path
- * gatherPathPatternViolations(files, "src/services/UserService.ts", [], false)
- *
- * // Match files in services folder with RegExp
- * gatherPathPatternViolations(files, /^src\/services\/.*\.ts$/, [], false)
- * ```
- */
-export const gatherPathPatternViolations = (
-	files: ProjectedNode[],
-	checkPattern: Pattern | EnhancedPattern,
-	preconditionPatterns: string[],
-	isNegated: boolean,
-	options?: CheckOptions
-): (ViolatingNode | EmptyTestViolation)[] => {
-	return gatherRegexMatchingViolations(
-		files,
-		checkPattern,
-		preconditionPatterns,
-		isNegated,
-		options
-	);
-};

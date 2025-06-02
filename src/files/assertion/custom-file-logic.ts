@@ -1,10 +1,10 @@
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedNode } from '../../common/projection/project-nodes';
-import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 import { CheckOptions } from '../../..';
 import { CheckLogger } from '../../common/util/logger';
-import { Pattern } from './pattern-matching';
+import { matchesAllPatterns } from './pattern-matching';
+import { Filter } from '../../common/type';
 
 // Type definitions for custom logic
 export type FileInfo = {
@@ -29,7 +29,7 @@ export class CustomFileViolation implements Violation {
 
 export const gatherCustomFileViolations = (
 	nodes: ProjectedNode[],
-	patterns: Pattern[],
+	filters: Filter[],
 	condition: CustomFileCondition,
 	message: string,
 	options?: CheckOptions
@@ -37,18 +37,18 @@ export const gatherCustomFileViolations = (
 	const logger = new CheckLogger(options?.logging);
 	const allowEmptyTests = options?.allowEmptyTests || false;
 	logger?.debug(
-		`Starting custom file logic validation with ${patterns.length} patterns`
+		`Starting custom file logic validation with ${filters.length} patterns`
 	);
-	logger?.debug(`Patterns: ${JSON.stringify(patterns)}`);
+	logger?.debug(`Patterns: ${JSON.stringify(filters)}`);
 	logger?.debug(`Allow empty tests: ${allowEmptyTests}`);
 
 	const violations: (CustomFileViolation | EmptyTestViolation)[] = [];
 
 	logger?.debug(`Filtering nodes to mach regexPatterns`);
-	patterns.forEach((pattern) => logger?.debug(`regexPattern: ${pattern}`));
+	filters.forEach((pattern) => logger?.debug(`regexPattern: ${pattern}`));
 
 	const projectedNodes = nodes.filter((node) =>
-		matchingAllPatterns(node.label, patterns)
+		matchesAllPatterns(node.label, filters)
 	);
 
 	logger?.debug(
@@ -60,7 +60,7 @@ export const gatherCustomFileViolations = (
 		logger?.warn(
 			'No files matched patterns and empty tests are not allowed - creating EmptyTestViolation'
 		);
-		return [new EmptyTestViolation(patterns)];
+		return [new EmptyTestViolation(filters)];
 	}
 
 	for (const node of projectedNodes) {

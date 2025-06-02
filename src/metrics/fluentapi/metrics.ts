@@ -14,7 +14,7 @@ import { Violation } from '../../common/assertion/violation';
 import { CheckLogger } from '../../common/util/logger';
 import { extractClassInfo } from '../extraction/extract-class-info';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
-import { Pattern } from '../../files/assertion/pattern-matching';
+import { Pattern } from '../../common/type';
 
 /**
  * Type for user-defined custom metric calculation functions
@@ -277,7 +277,7 @@ export class CustomMetricThresholdBuilder implements Checkable {
 
 		// Check for empty test condition
 		if (filteredClasses.length === 0 && !options?.allowEmptyTests) {
-			const emptyViolation = new EmptyTestViolation(['extracted classes']);
+			const emptyViolation = new EmptyTestViolation([], 'extracted classes'); // X-TODO: fix 1st arg (empty array)
 			logger.logViolation(emptyViolation.toString());
 			logger.endCheck(ruleName, 1);
 			return [emptyViolation];
@@ -381,7 +381,7 @@ export class CustomMetricCondition implements Checkable {
 
 		// Check for empty test condition
 		if (filteredClasses.length === 0 && !options?.allowEmptyTests) {
-			const emptyViolation = new EmptyTestViolation(['extracted classes']);
+			const emptyViolation = new EmptyTestViolation([], 'extracted classes'); // X-TODO: fix 1st arg (empty array)
 			logger.logViolation(emptyViolation.toString());
 			logger.endCheck(ruleName, 1);
 			return [emptyViolation];
