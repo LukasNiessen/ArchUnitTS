@@ -1,3 +1,4 @@
+import { Pattern } from '../../files/assertion/pattern-matching';
 import { ClassFilter, ClassInfo, Metric } from '../extraction/interface';
 import { MetricComparison } from './types';
 import * as path from 'path';
@@ -63,7 +64,7 @@ export class CompositeFilter implements ClassFilter {
  * @param pathPattern String or regex pattern matching folder paths
  * @returns ClassFilter instance
  */
-export const byFolderPath = (pathPattern: string | RegExp): ClassFilter => {
+export const byFolderPath = (pathPattern: Pattern): ClassFilter => {
 	const regex = typeof pathPattern === 'string' ? new RegExp(pathPattern) : pathPattern;
 	return new FolderPathFilter(regex);
 };
@@ -82,7 +83,7 @@ export const bySingleFile = (filePath: string): ClassFilter => {
  * @param namePattern String or regex pattern matching class names
  * @returns ClassFilter instance
  */
-export const byClassName = (namePattern: string | RegExp): ClassFilter => {
+export const byClassName = (namePattern: Pattern): ClassFilter => {
 	const regex = typeof namePattern === 'string' ? new RegExp(namePattern) : namePattern;
 	return new ClassNameFilter(regex);
 };

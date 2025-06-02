@@ -4,6 +4,7 @@ import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 import { CheckOptions } from '../../..';
 import { CheckLogger } from '../../common/util/logger';
+import { Pattern } from './pattern-matching';
 
 // Type definitions for custom logic
 export type FileInfo = {
@@ -28,7 +29,7 @@ export class CustomFileViolation implements Violation {
 
 export const gatherCustomFileViolations = (
 	nodes: ProjectedNode[],
-	patterns: (string | RegExp)[],
+	patterns: Pattern[],
 	condition: CustomFileCondition,
 	message: string,
 	options?: CheckOptions
@@ -43,32 +44,11 @@ export const gatherCustomFileViolations = (
 
 	const violations: (CustomFileViolation | EmptyTestViolation)[] = [];
 
-	// Convert glob patterns to regex patterns for consistency with other file operations
-	const regexPatterns = patterns.map((pattern) => {
-		if (typeof pattern === 'string') {
-			// Handle glob patterns by converting them to regex
-			if (pattern.includes('*') || pattern.includes('?')) {
-				const regexPattern = pattern
-					.replace(/\*\*/g, '.*') // ** matches any number of directories
-					.replace(/\*/g, '[^/\\\\]*') // * matches any characters except path separators
-					.replace(/\?/g, '.') // ? matches any single character
-					.replace(/\./g, '\\.'); // Escape literal dots
-				logger?.debug(
-					`Converted glob pattern '${pattern}' to regex: '${regexPattern}'`
-				);
-				return regexPattern;
-			}
-		}
-		return pattern;
-	});
-
 	logger?.debug(`Filtering nodes to mach regexPatterns`);
-	regexPatterns.forEach((regexPattern) =>
-		logger?.debug(`regexPattern: ${regexPattern}`)
-	);
+	patterns.forEach((pattern) => logger?.debug(`regexPattern: ${pattern}`));
 
 	const projectedNodes = nodes.filter((node) =>
-		matchingAllPatterns(node.label, regexPatterns)
+		matchingAllPatterns(node.label, patterns)
 	);
 
 	logger?.debug(

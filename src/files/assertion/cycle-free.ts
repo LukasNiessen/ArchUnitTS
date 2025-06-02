@@ -5,6 +5,7 @@ import { Violation } from '../../common/assertion/violation';
 import { CheckLogger } from '../../common/util/logger';
 import { CheckOptions } from '../../common/fluentapi/checkable';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
+import { Pattern } from './pattern-matching';
 
 export class ViolatingCycle implements Violation {
 	public cycle: ProjectedEdge[];
@@ -16,7 +17,7 @@ export class ViolatingCycle implements Violation {
 
 export const gatherCycleViolations = (
 	projectedEdges: ProjectedEdge[],
-	preconditionPatterns: (string | RegExp)[],
+	preconditionPatterns: Pattern[],
 	options?: CheckOptions
 ): (ViolatingCycle | EmptyTestViolation)[] => {
 	const logger = new CheckLogger(options?.logging);

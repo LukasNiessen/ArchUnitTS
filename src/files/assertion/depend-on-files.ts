@@ -3,6 +3,7 @@ import { UserError } from '../../common/error/errors';
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedEdge } from '../../common/projection/project-edges';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
+import { Pattern } from './pattern-matching';
 
 export class ViolatingFileDependency implements Violation {
 	public dependency: ProjectedEdge;
@@ -16,7 +17,7 @@ export class ViolatingFileDependency implements Violation {
 
 export const gatherDependOnFileViolations = (
 	projectedEdges: ProjectedEdge[],
-	objectPatterns: (string | RegExp)[],
+	objectPatterns: Pattern[],
 	subjectPatterns: string[],
 	isNegated: boolean,
 	allowEmptyTests: boolean = false

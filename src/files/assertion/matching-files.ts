@@ -35,7 +35,7 @@ export class ViolatingNode implements Violation {
 export const gatherRegexMatchingViolations = (
 	files: ProjectedNode[],
 	checkPattern: Pattern | EnhancedPattern,
-	preconditionPatterns: (string | RegExp)[],
+	preconditionPatterns: Pattern[],
 	isNegated: boolean,
 	options?: CheckOptions
 ): (ViolatingNode | EmptyTestViolation)[] => {

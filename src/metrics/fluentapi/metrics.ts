@@ -14,6 +14,7 @@ import { Violation } from '../../common/assertion/violation';
 import { CheckLogger } from '../../common/util/logger';
 import { extractClassInfo } from '../extraction/extract-class-info';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
+import { Pattern } from '../../files/assertion/pattern-matching';
 
 /**
  * Type for user-defined custom metric calculation functions
@@ -80,7 +81,7 @@ export class MetricsBuilder {
 	 * Filter classes by folder path using regex pattern
 	 * @param folderPattern String or regex pattern matching folder paths
 	 */
-	public inFolder(folderPattern: string | RegExp): MetricsBuilder {
+	public inFolder(folderPattern: Pattern): MetricsBuilder {
 		this.filters.push(byFolderPath(folderPattern));
 		return this;
 	}
@@ -98,7 +99,7 @@ export class MetricsBuilder {
 	 * Filter classes by name using regex pattern
 	 * @param namePattern String or regex pattern matching class names
 	 */
-	public forClassesMatching(namePattern: string | RegExp): MetricsBuilder {
+	public forClassesMatching(namePattern: Pattern): MetricsBuilder {
 		this.filters.push(byClassName(namePattern));
 		return this;
 	}

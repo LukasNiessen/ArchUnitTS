@@ -81,7 +81,7 @@ export class FileConditionBuilder {
 	 * @param folder string
 	 * @returns
 	 */
-	public inFolder(folder: string | RegExp): FilesShouldCondition {
+	public inFolder(folder: Pattern): FilesShouldCondition {
 		const patterns =
 			typeof folder === 'string'
 				? [RegexFactory.folderMatcher(folder)]
@@ -238,7 +238,7 @@ export class NegatedMatchPatternFileConditionBuilder {
 	 * files.inFolder('services').shouldNot().matchFilename(/^Service.*\.ts$/)
 	 * ```
 	 */
-	public matchFilename(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
+	public matchFilename(pattern: Pattern): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'filename',
 			matching: 'exact',
@@ -255,7 +255,7 @@ export class NegatedMatchPatternFileConditionBuilder {
 	 * files.shouldNot().matchPath(/^src\/services\/.*Service\.ts$/)
 	 * ```
 	 */
-	public matchPath(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
+	public matchPath(pattern: Pattern): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'path',
 			matching: 'exact',
@@ -271,9 +271,7 @@ export class NegatedMatchPatternFileConditionBuilder {
 	 * files.inFolder('services').shouldNot().containInFilename('Service')
 	 * ```
 	 */
-	public containInFilename(
-		pattern: string | RegExp
-	): EnhancedMatchPatternFileCondition {
+	public containInFilename(pattern: Pattern): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'filename',
 			matching: 'partial',
@@ -499,7 +497,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * files.inFolder('services').should().matchFilename(/^Service.*\.ts$/)
 	 * ```
 	 */
-	public matchFilename(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
+	public matchFilename(pattern: Pattern): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'filename',
 			matching: 'exact',
@@ -516,7 +514,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * files.should().matchPath(/^src\/services\/.*Service\.ts$/)
 	 * ```
 	 */
-	public matchPath(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
+	public matchPath(pattern: Pattern): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'path',
 			matching: 'exact',
@@ -532,9 +530,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * files.inFolder('services').should().containInFilename('Service')
 	 * ```
 	 */
-	public containInFilename(
-		pattern: string | RegExp
-	): EnhancedMatchPatternFileCondition {
+	public containInFilename(pattern: Pattern): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'filename',
 			matching: 'partial',
@@ -551,7 +547,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * files.should().containInPath(/test|spec/)
 	 * ```
 	 */
-	public containInPath(pattern: string | RegExp): EnhancedMatchPatternFileCondition {
+	public containInPath(pattern: Pattern): EnhancedMatchPatternFileCondition {
 		return new EnhancedMatchPatternFileCondition(this, pattern, {
 			target: 'path',
 			matching: 'partial',

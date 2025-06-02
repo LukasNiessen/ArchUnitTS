@@ -99,6 +99,7 @@ export function matchesPattern(
 /**
  * Convert glob pattern (with * and ?) to regex pattern
  */
+// X-TODO: use everywhere properly!!!
 function convertGlobToRegex(pattern: string): string {
 	// Escape all special regex characters except * and ?
 	let regexPattern = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
