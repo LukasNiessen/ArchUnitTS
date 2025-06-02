@@ -65,7 +65,7 @@ export const gatherRegexMatchingViolations = (
 
 	const violations: ViolatingNode[] = [];
 
-	// Use legacy matching for precondition patterns to maintain compatibility
+	// Use matching for precondition patterns to maintain compatibility
 	const filteredFiles = files.filter((node) =>
 		matchingAllPatterns(node.label, preconditionPatterns)
 	);
@@ -123,53 +123,6 @@ function getPatternString(pattern: Pattern | EnhancedPattern): string {
 		return getPatternString(pattern.pattern);
 	}
 }
-
-/**
- * Discontinued
-export const gatherRegexMatchingViolationsLegacy = (
-	files: ProjectedNode[],
-	checkPattern: string,
-	preconditionPatterns: string[],
-	isNegated: boolean,
-	allowEmptyTests: boolean = false
-): (ViolatingNode | EmptyTestViolation)[] => {
-	return gatherRegexMatchingViolations(
-		files,
-		checkPattern,
-		preconditionPatterns,
-		isNegated,
-		allowEmptyTests
-	);
-};
-*/
-
-/**
- * Enhanced pattern matching with filename-only exact matching (recommended for most use cases)
- *
- * @example
- * ```typescript
- * // Match files that start with "Service" (filename only)
- * gatherFilenamePatternViolations(files, /^Service.*\.ts$/, [], false)
- *
- * // Match files with exact name "Controller.ts"
- * gatherFilenamePatternViolations(files, "Controller.ts", [], false)
- * ```
- */
-export const gatherFilenamePatternViolations = (
-	files: ProjectedNode[],
-	checkPattern: Pattern | EnhancedPattern,
-	preconditionPatterns: (string | RegExp)[],
-	isNegated: boolean,
-	options?: CheckOptions
-): (ViolatingNode | EmptyTestViolation)[] => {
-	return gatherRegexMatchingViolations(
-		files,
-		checkPattern,
-		preconditionPatterns,
-		isNegated,
-		options
-	);
-};
 
 /**
  * Enhanced pattern matching with full path exact matching

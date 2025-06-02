@@ -573,10 +573,6 @@ it('should find files with path containing specific terms', async () => {
 ### Pattern Matching
 
 ```typescript
-// Legacy approach (deprecated)
-.matchPattern('.*Controller.ts')
-
-// Modern approach (recommended)
 .matchFilename('*Controller.ts')  // or
 .matchFilename(/.*Controller\.ts$/)
 ```

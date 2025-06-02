@@ -5,10 +5,7 @@ import { CheckLogger } from '../../common/util/logger';
 import { projectEdges } from '../../common/projection/project-edges';
 import { perEdge, perInternalEdge } from '../../common/projection/edge-projections';
 import { projectToNodes } from '../../common/projection/project-nodes';
-import {
-	gatherRegexMatchingViolations,
-	gatherFilenamePatternViolations,
-} from '../assertion/matching-files';
+import { gatherRegexMatchingViolations } from '../assertion/matching-files';
 import { Pattern, PatternMatchingOptions } from '../assertion/pattern-matching';
 import { Violation } from '../../common/assertion/violation';
 import { gatherCycleViolations } from '../assertion/free-of-cycles';
@@ -1027,14 +1024,16 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 				.tsConfigFilePath
 		);
 
-		const projectedNodes = projectToNodes(graph);
+		const projectedNodes = projectToNodes(graph, {
+			includeExternals: true,
+		});
 		logger.logProgress(
 			`Processing ${projectedNodes.length} files with enhanced pattern matching`
 		);
 
 		projectedNodes.forEach((node) => logger.info(`Found file: ${node.label}`));
 
-		const violations = gatherFilenamePatternViolations(
+		const violations = gatherRegexMatchingViolations(
 			projectedNodes,
 			{ pattern: this.pattern, options: this.options },
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
