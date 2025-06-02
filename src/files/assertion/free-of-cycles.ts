@@ -22,6 +22,8 @@ export const gatherCycleViolations = (
 
 	const filteredEdges = projectedEdges.filter(
 		(edge) =>
+			// Exclude self-referencing edges (these are added for completeness but aren't real cycles)
+			edge.sourceLabel !== edge.targetLabel &&
 			matchingAllPatterns(edge.sourceLabel, preconditionPatterns) &&
 			matchingAllPatterns(edge.targetLabel, preconditionPatterns)
 	);
