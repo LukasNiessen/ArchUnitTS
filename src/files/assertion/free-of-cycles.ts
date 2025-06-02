@@ -2,6 +2,8 @@ import { matchingAllPatterns } from '../../common/util/regex-utils';
 import { ProjectedEdge } from '../../common/projection/project-edges';
 import { projectCycles } from '../../common/projection/project-cycles';
 import { Violation } from '../../common/assertion/violation';
+import { CheckLogger } from '../../common/util/logger';
+import { CheckOptions } from '../../common/fluentapi/checkable';
 
 export class ViolatingCycle implements Violation {
 	public cycle: ProjectedEdge[];
@@ -14,12 +16,17 @@ export class ViolatingCycle implements Violation {
 export const gatherCycleViolations = (
 	projectedEdges: ProjectedEdge[],
 	preconditionPatterns: (string | RegExp)[],
-	allowEmptyTests: boolean = false
+	options?: CheckOptions
 ): ViolatingCycle[] => {
+	const logger = new CheckLogger(options?.logging);
+
 	const filteredEdges = projectedEdges.filter(
 		(edge) =>
 			matchingAllPatterns(edge.sourceLabel, preconditionPatterns) &&
 			matchingAllPatterns(edge.targetLabel, preconditionPatterns)
+	);
+	filteredEdges.forEach((edge) =>
+		logger.info(`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`)
 	);
 
 	const projectedCycles = projectCycles(filteredEdges);

@@ -3,6 +3,8 @@ import { Violation } from '../../common/assertion/violation';
 import { ProjectedNode } from '../../common/projection/project-nodes';
 import { Pattern, EnhancedPattern, matchesPattern } from './pattern-matching';
 import { ProjectedEdge } from '../../common/projection/project-edges';
+import { CheckLogger } from '../../common/util/logger';
+import { CheckOptions } from '../../common/fluentapi/checkable';
 
 export class ViolatingNode implements Violation {
 	public checkPattern: string;
@@ -57,16 +59,20 @@ export const gatherRegexMatchingViolations = (
 	checkPattern: Pattern | EnhancedPattern,
 	preconditionPatterns: (string | RegExp)[],
 	isNegated: boolean,
-	allowEmptyTests: boolean = false
+	options?: CheckOptions
 ): (ViolatingNode | EmptyTestViolation)[] => {
+	const logger = new CheckLogger(options?.logging);
+
 	const violations: ViolatingNode[] = [];
 
 	// Use legacy matching for precondition patterns to maintain compatibility
 	const filteredFiles = files.filter((node) =>
 		matchingAllPatterns(node.label, preconditionPatterns)
 	);
+	filteredFiles.forEach((node) => logger.info(`File under check: ${node.label}`));
 
 	// Check for empty test if no files match preconditions
+	const allowEmptyTests = options?.allowEmptyTests || false;
 	if (filteredFiles.length === 0 && !allowEmptyTests) {
 		return [new EmptyTestViolation(preconditionPatterns)];
 	}
@@ -154,14 +160,14 @@ export const gatherFilenamePatternViolations = (
 	checkPattern: Pattern | EnhancedPattern,
 	preconditionPatterns: (string | RegExp)[],
 	isNegated: boolean,
-	allowEmptyTests: boolean = false
+	options?: CheckOptions
 ): (ViolatingNode | EmptyTestViolation)[] => {
 	return gatherRegexMatchingViolations(
 		files,
 		checkPattern,
 		preconditionPatterns,
 		isNegated,
-		allowEmptyTests
+		options
 	);
 };
 
@@ -182,13 +188,13 @@ export const gatherPathPatternViolations = (
 	checkPattern: Pattern | EnhancedPattern,
 	preconditionPatterns: string[],
 	isNegated: boolean,
-	allowEmptyTests: boolean = false
+	options?: CheckOptions
 ): (ViolatingNode | EmptyTestViolation)[] => {
 	return gatherRegexMatchingViolations(
 		files,
 		checkPattern,
 		preconditionPatterns,
 		isNegated,
-		allowEmptyTests
+		options
 	);
 };

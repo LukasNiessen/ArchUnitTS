@@ -810,12 +810,14 @@ When debug logging is enabled, you'll see detailed information about the analysi
 
 ### Logging Configuration Options
 
+TODO: these options are false!!
+
 ```typescript
 const violations = await rule.check({
   logging: {
     enabled: true, // Enable/disable logging (default: false)
     level: 'info', // Log level: 'error' | 'warn' | 'info' | 'debug'
-    includeTimestamp: true, // Add timestamps to log messages (default: true)
+    logTiming: true, // Add timestamps to log messages (default: true)
     colorOutput: true, // Colorized console output (default: true)
   },
 });

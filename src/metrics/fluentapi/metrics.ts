@@ -273,10 +273,6 @@ export class CustomMetricThresholdBuilder implements Checkable {
 			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
 		);
 
-		filteredClasses.forEach((classToCheck) =>
-			logger.info(`Class under check: ${classToCheck.name}`)
-		);
-
 		logger.logProgress('Calculating custom metrics and checking thresholds');
 		for (const classInfo of filteredClasses) {
 			const metricValue = this.calculation(classInfo);
@@ -371,9 +367,6 @@ export class CustomMetricCondition implements Checkable {
 
 		logger.logProgress(
 			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
-		);
-		filteredClasses.forEach((classToCheck) =>
-			logger.info(`Class under check: ${classToCheck.name}`)
 		);
 
 		logger.logProgress('Calculating custom metrics and applying assertion logic');

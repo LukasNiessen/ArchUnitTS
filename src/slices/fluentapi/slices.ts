@@ -117,9 +117,7 @@ export class PositiveSliceCondition implements Checkable {
 		);
 
 		mapped.forEach((edge) =>
-			logger.info(
-				`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`
-			)
+			logger.info(`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`)
 		);
 
 		return gatherPositiveViolations(

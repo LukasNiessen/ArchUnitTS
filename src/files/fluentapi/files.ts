@@ -809,9 +809,7 @@ export class DependOnFileCondition implements Checkable {
 		);
 
 		projectedEdges.forEach((edge) =>
-			logger.info(
-				`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`
-			)
+			logger.info(`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`)
 		);
 
 		const violations = gatherDependOnFileViolations(
@@ -884,28 +882,25 @@ export class CycleFreeFileCondition implements Checkable {
 		);
 
 		const projectedEdges = projectEdges(graph, perInternalEdge());
+
 		logger.logProgress(
 			`Analyzing ${projectedEdges.length} internal dependencies for cycles`
 		);
-
 		projectedEdges.forEach((edge) =>
-			logger.info(
-				`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`
-			)
+			logger.info(`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`)
 		);
 
 		const violations = gatherCycleViolations(
 			projectedEdges,
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
-			options?.allowEmptyTests || false
+			options
 		);
 
-		// Log violations if logging is enabled
 		violations.forEach((violation) => {
 			logger.logViolation(`Cycle detected: ${JSON.stringify(violation)}`);
 		});
-
 		logger.endCheck(ruleName, violations.length);
+
 		return violations;
 	}
 }
@@ -938,26 +933,25 @@ export class MatchPatternFileCondition implements Checkable {
 		);
 
 		const projectedNodes = projectToNodes(graph);
-		logger.logProgress(`Processing ${projectedNodes.length} files`);
 
-		projectedNodes.forEach((node) => logger.info(`File under check: ${node.label}`));
+		logger.logProgress(`Processing ${projectedNodes.length} files`);
+		projectedNodes.forEach((node) => logger.info(`Found file: ${node.label}`));
 
 		const violations = gatherRegexMatchingViolations(
 			projectedNodes,
 			this.pattern,
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
 			this.matchPatternFileConditionBuilder.isNegated,
-			options?.allowEmptyTests || false
+			options
 		);
 
-		// Log violations if logging is enabled
 		violations.forEach((violation) => {
 			logger.logViolation(
 				`Pattern '${this.pattern}' violation: ${JSON.stringify(violation)}`
 			);
 		});
-
 		logger.endCheck(ruleName, violations.length);
+
 		return violations;
 	}
 }
@@ -1038,14 +1032,14 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 			`Processing ${projectedNodes.length} files with enhanced pattern matching`
 		);
 
-		projectedNodes.forEach((node) => logger.info(`File under check: ${node.label}`));
+		projectedNodes.forEach((node) => logger.info(`Found file: ${node.label}`));
 
 		const violations = gatherFilenamePatternViolations(
 			projectedNodes,
 			{ pattern: this.pattern, options: this.options },
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
 			this.matchPatternFileConditionBuilder.isNegated,
-			options?.allowEmptyTests || false
+			options
 		);
 
 		// Log violations if logging is enabled
@@ -1125,7 +1119,7 @@ export class CustomFileCheckableCondition implements Checkable {
 		const projectedNodes = projectToNodes(graph);
 
 		logger.logProgress(`Applying custom condition to ${projectedNodes.length} files`);
-		projectedNodes.forEach((node) => logger.info(`File under check: ${node.label}`));
+		projectedNodes.forEach((node) => logger.info(`Found file: ${node.label}`));
 
 		const violations = gatherCustomFileViolations(
 			projectedNodes,
