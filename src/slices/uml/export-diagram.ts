@@ -13,9 +13,11 @@ export const exportDiagram = (graph: ProjectedGraph): string => {
 		output += `component [${vertex}]\n`;
 	}
 
-	// Add relationships between components
+	// Add relationships between components, excluding self-referencing edges
 	for (const edge of graph) {
-		output += `[${edge.sourceLabel}] --> [${edge.targetLabel}]\n`;
+		if (edge.sourceLabel !== edge.targetLabel) {
+			output += `[${edge.sourceLabel}] --> [${edge.targetLabel}]\n`;
+		}
 	}
 
 	output += '@enduml';
