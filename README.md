@@ -907,3 +907,38 @@ This project is under the **MIT** license.
 </p>
 
 ---
+
+TODO: add elsewhere or just in docs
+TODO: add doc comments to extract-graph.ts
+
+### All Files Inclusion
+
+ArchUnitTS ensures that **all project files** appear in the dependency graph, even if they don't import other project files. This is achieved by adding self-referencing edges for every file in the project.
+
+**Why this matters:**
+
+- Standalone utility files are included in architectural analysis
+- Entry point files without imports are visible in the graph
+- Complete project coverage for architectural rules
+- No files are accidentally excluded from analysis
+
+**Example:**
+
+```typescript
+// Even if utils.ts doesn't import anything from your project,
+// it will still appear in the graph with a self-edge: utils.ts -> utils.ts
+
+// This ensures files like these are always analyzed:
+// - Configuration files
+// - Standalone utilities
+// - Entry points
+// - Constants files
+// - Type definition files
+```
+
+The graph will contain:
+
+- **Import edges**: Real dependencies between files (A imports B)
+- **Self edges**: Every project file references itself (ensures inclusion)
+
+This guarantees comprehensive architectural analysis across your entire codebase.

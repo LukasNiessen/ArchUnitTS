@@ -344,17 +344,37 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 		});
 	}
 
+	// Add self-referencing edges for all project files to ensure they appear in the graph
+	// This is crucial for files that don't import other project files
+	logger.debug('Adding self-referencing edges for all project files');
+
+	for (const sourceFile of projectFiles) {
+		const normalizedFileName = normalizeWindowsPaths(
+			path.relative(rootDir, sourceFile.fileName)
+		);
+
+		// Add self-referencing edge for every project file
+		const selfEdge: Edge = {
+			source: normalizedFileName,
+			target: normalizedFileName,
+			external: false,
+			importKinds: [], // Self-reference has no import kinds
+		};
+
+		imports.push(selfEdge);
+	}
+
+	if (projectFiles.length === 0) {
+		logger.warn(
+			'No project files found - this might indicate a configuration or file discovery issue'
+		);
+	}
+
 	logger.info(`Import analysis completed:`);
 	logger.info(`  - Total edges found: ${imports.length}`);
 	logger.info(`  - Files processed: ${processedFiles}`);
 	logger.info(`  - Imports skipped: ${skippedImports}`);
 	logger.info(`  - Import errors: ${erroredImports}`);
-
-	if (imports.length === 0) {
-		logger.warn(
-			'No imports found - this might indicate a configuration or file discovery issue'
-		);
-	}
 
 	return imports;
 };
