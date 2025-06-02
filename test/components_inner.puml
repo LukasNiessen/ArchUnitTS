@@ -5,6 +5,7 @@
     component [projection]
     component [uml]
     component [calculation]
+    component [util]
     [fluentapi] -> [assertion]
     [fluentapi] -> [uml]
     [fluentapi] -> [extraction]
@@ -18,4 +19,5 @@
     [extraction] -> [error]
     [uml] -> [assertion]
     [calculation] -> [extraction]
+    [util] -> [fluentapi]
 @enduml

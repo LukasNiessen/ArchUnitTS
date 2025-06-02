@@ -1,6 +1,7 @@
 import { extractGraph } from '../../common/extraction/extract-graph';
 import { RegexFactory } from './regex-factory';
 import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
+import { CheckLogger } from '../../common/util/logger';
 import { projectEdges } from '../../common/projection/project-edges';
 import { perEdge, perInternalEdge } from '../../common/projection/edge-projections';
 import { projectToNodes } from '../../common/projection/project-nodes';
@@ -787,17 +788,27 @@ export class DependOnFileCondition implements Checkable {
 	 * For negative assertions (shouldNot): Validates that selected files do NOT import
 	 * from files matching the specified dependency patterns.
 	 *
+	 * @param options Optional check options including allowEmptyTests and logging
 	 * @returns Promise<Violation[]> Array of violations found during the check
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `Dependency check: patterns [${this.subjectPatterns.join(', ')}]`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Extracting project graph for dependency analysis...');
+
 		const graph = await extractGraph(
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
 				.filesShouldCondition.fileCondition.tsConfigFilePath
 		);
 
 		const projectedEdges = projectEdges(graph, perEdge());
+		logger.logProgress(
+			`Analyzing dependencies across ${projectedEdges.length} edges`
+		);
 
-		return gatherDependOnFileViolations(
+		const violations = gatherDependOnFileViolations(
 			projectedEdges,
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
 				.filesShouldCondition.patterns,
@@ -805,6 +816,14 @@ export class DependOnFileCondition implements Checkable {
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder.isNegated,
 			options?.allowEmptyTests || false
 		);
+
+		// Log violations if logging is enabled
+		violations.forEach((violation) => {
+			logger.logViolation(`Dependency violation: ${JSON.stringify(violation)}`);
+		});
+
+		logger.endCheck(ruleName, violations.length);
+		return violations;
 	}
 }
 
@@ -843,21 +862,39 @@ export class CycleFreeFileCondition implements Checkable {
 	 * Executes the cycle detection check by analyzing import/export relationships.
 	 * Only checks internal dependencies (within the project) and ignores external libraries.
 	 *
+	 * @param options Optional check options including allowEmptyTests and logging
 	 * @returns Promise<Violation[]> Array of violations representing detected cycles
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = 'Cycle detection check';
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Extracting project graph for cycle detection...');
+
 		const graph = await extractGraph(
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
 				.tsConfigFilePath
 		);
 
 		const projectedEdges = projectEdges(graph, perInternalEdge());
+		logger.logProgress(
+			`Analyzing ${projectedEdges.length} internal dependencies for cycles`
+		);
 
-		return gatherCycleViolations(
+		const violations = gatherCycleViolations(
 			projectedEdges,
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
 			options?.allowEmptyTests || false
 		);
+
+		// Log violations if logging is enabled
+		violations.forEach((violation) => {
+			logger.logViolation(`Cycle detected: ${JSON.stringify(violation)}`);
+		});
+
+		logger.endCheck(ruleName, violations.length);
+		return violations;
 	}
 }
 
@@ -873,26 +910,43 @@ export class MatchPatternFileCondition implements Checkable {
 	 * For positive assertions (should): Validates that files match the pattern.
 	 * For negative assertions (shouldNot): Validates that files do NOT match the pattern.
 	 *
-	 * @param options Optional check options including allowEmptyTests
+	 * @param options Optional check options including allowEmptyTests and logging
 	 * @returns Promise<Violation[]> Array of violations found during the check
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `Pattern matching: ${this.pattern}`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Extracting project graph...');
+
 		const graph = await extractGraph(
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
 				.tsConfigFilePath
 		);
 
 		const projectedNodes = projectToNodes(graph);
+		logger.logProgress(`Processing ${projectedNodes.length} files`);
 
 		// console.log('projectedNodes:', projectedNodes);
 
-		return gatherRegexMatchingViolations(
+		const violations = gatherRegexMatchingViolations(
 			projectedNodes,
 			this.pattern,
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
 			this.matchPatternFileConditionBuilder.isNegated,
 			options?.allowEmptyTests || false
 		);
+
+		// Log violations if logging is enabled
+		violations.forEach((violation) => {
+			logger.logViolation(
+				`Pattern '${this.pattern}' violation: ${JSON.stringify(violation)}`
+			);
+		});
+
+		logger.endCheck(ruleName, violations.length);
+		return violations;
 	}
 }
 
@@ -948,23 +1002,47 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 	 * For positive assertions (should): Validates that files match the pattern with given options.
 	 * For negative assertions (shouldNot): Validates that files do NOT match the pattern.
 	 *
+	 * @param options Optional check options including allowEmptyTests and logging
 	 * @returns Promise<Violation[]> Array of violations found during the check
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+		const patternStr =
+			this.pattern instanceof RegExp
+				? this.pattern.source
+				: this.pattern.toString();
+		const ruleName = `Enhanced pattern matching: ${patternStr} (target: ${this.options.target}, matching: ${this.options.matching})`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Extracting project graph...');
+
 		const graph = await extractGraph(
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
 				.tsConfigFilePath
 		);
 
 		const projectedNodes = projectToNodes(graph);
+		logger.logProgress(
+			`Processing ${projectedNodes.length} files with enhanced pattern matching`
+		);
 
-		return gatherFilenamePatternViolations(
+		const violations = gatherFilenamePatternViolations(
 			projectedNodes,
 			{ pattern: this.pattern, options: this.options },
 			this.matchPatternFileConditionBuilder.filesShouldCondition.patterns,
 			this.matchPatternFileConditionBuilder.isNegated,
 			options?.allowEmptyTests || false
 		);
+
+		// Log violations if logging is enabled
+		violations.forEach((violation) => {
+			logger.logViolation(
+				`Enhanced pattern '${patternStr}' violation: ${JSON.stringify(violation)}`
+			);
+		});
+
+		logger.endCheck(ruleName, violations.length);
+		return violations;
 	}
 }
 
@@ -1015,6 +1093,7 @@ export class CustomFileCheckableCondition implements Checkable {
 	 * is called with a FileInfo object. If the function returns false for any file,
 	 * a violation is generated with the specified message.
 	 *
+	 * @param options Optional check options including allowEmptyTests and logging
 	 * @returns Promise<Violation[]> Array of violations where custom condition failed
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
@@ -1022,15 +1101,32 @@ export class CustomFileCheckableCondition implements Checkable {
 			return [];
 		}
 
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `Custom file condition: ${this.message || 'Custom rule'}`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Extracting project graph for custom file analysis...');
+
 		const graph = await extractGraph(this.tsConfigFilePath);
 		const projectedNodes = projectToNodes(graph);
+		logger.logProgress(`Applying custom condition to ${projectedNodes.length} files`);
 
-		return gatherCustomFileViolations(
+		const violations = gatherCustomFileViolations(
 			projectedNodes,
 			this.patterns || [],
 			this.condition,
 			this.message || 'Custom file condition failed',
 			options?.allowEmptyTests || false
 		);
+
+		// Log violations if logging is enabled
+		violations.forEach((violation) => {
+			logger.logViolation(
+				`Custom condition violation: ${JSON.stringify(violation)}`
+			);
+		});
+
+		logger.endCheck(ruleName, violations.length);
+		return violations;
 	}
 }

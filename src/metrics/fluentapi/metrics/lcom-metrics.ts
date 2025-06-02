@@ -1,5 +1,6 @@
 import { Violation } from '../../../common/assertion/violation';
-import { Checkable } from '../../../common/fluentapi/checkable';
+import { Checkable, CheckOptions } from '../../../common/fluentapi/checkable';
+import { CheckLogger } from '../../../common/util/logger';
 import { gatherMetricViolations } from '../../assertion/metric-thresholds';
 import {
 	LCOM96a,
@@ -265,15 +266,26 @@ export class MetricCondition implements Checkable {
 	/**
 	 * Check if classes violate the metric condition
 	 */
-	public async check(): Promise<Violation[]> {
+	public async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `${this.metric.name} metric check (${this.comparison} ${this.threshold})`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Extracting class information from codebase');
+
 		// Extract class information from the codebase
 		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
 		const classes = filter ? filter.apply(allClasses) : allClasses;
+		logger.logProgress(
+			`Applied filters, ${classes.length} classes remaining for analysis`
+		);
 
 		// Project classes to metric results through the projection layer
+		logger.logProgress('Calculating metrics and projecting to metric results');
 		const metricResults = projectToMetricResults(
 			classes,
 			this.metric,
@@ -282,6 +294,15 @@ export class MetricCondition implements Checkable {
 		);
 
 		// Return violations using the assertion layer
-		return gatherMetricViolations(metricResults);
+		logger.logProgress('Gathering metric violations from results');
+		const violations = gatherMetricViolations(metricResults);
+
+		// Log violations if enabled
+		violations.forEach((violation) => {
+			logger.logViolation(violation.toString());
+		});
+
+		logger.endCheck(ruleName, violations.length);
+		return violations;
 	}
 }

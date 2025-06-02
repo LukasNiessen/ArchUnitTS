@@ -9,8 +9,9 @@ import { DistanceMetricsBuilder } from './metrics/distance-metrics';
 import { LCOMMetricsBuilder } from './metrics/lcom-metrics';
 import { CountMetricsBuilder } from './metrics/count-metrics';
 import { MetricComparison } from './types';
-import { Checkable } from '../../common/fluentapi/checkable';
+import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
 import { Violation } from '../../common/assertion/violation';
+import { CheckLogger } from '../../common/util/logger';
 import { extractClassInfo } from '../extraction/extract-class-info';
 
 /**
@@ -253,16 +254,33 @@ export class CustomMetricThresholdBuilder implements Checkable {
 		readonly comparison: MetricComparison
 	) {}
 
-	async check(): Promise<Violation[]> {
+	async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `${this.metricName} custom metric threshold check (${this.comparison} ${this.threshold})`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Extracting class information from codebase');
+
 		const violations: Violation[] = [];
 		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
 		const filteredClasses = filter ? filter.apply(allClasses) : allClasses;
+		logger.logProgress(
+			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
+		);
 
+		logger.logProgress('Calculating custom metrics and checking thresholds');
 		for (const classInfo of filteredClasses) {
 			const metricValue = this.calculation(classInfo);
+			logger.logMetric(
+				`${this.metricName} (${classInfo.name})`,
+				metricValue,
+				this.threshold
+			);
+
 			let passes = false;
 
 			switch (this.comparison) {
@@ -285,18 +303,19 @@ export class CustomMetricThresholdBuilder implements Checkable {
 
 			if (!passes) {
 				const comparisonText = this.getComparisonDescription();
-				violations.push(
-					new CustomMetricViolation(
-						classInfo.name,
-						classInfo.filePath,
-						this.metricName,
-						metricValue,
-						`${comparisonText} ${this.threshold}`
-					)
+				const violation = new CustomMetricViolation(
+					classInfo.name,
+					classInfo.filePath,
+					this.metricName,
+					metricValue,
+					`${comparisonText} ${this.threshold}`
 				);
+				violations.push(violation);
+				logger.logViolation(violation.toString());
 			}
 		}
 
+		logger.endCheck(ruleName, violations.length);
 		return violations;
 	}
 
@@ -330,31 +349,45 @@ export class CustomMetricCondition implements Checkable {
 		readonly assertion: CustomMetricAssertion
 	) {}
 
-	async check(): Promise<Violation[]> {
+	async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `${this.metricName} custom metric assertion check`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Extracting class information from codebase');
+
 		const violations: Violation[] = [];
 		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
 		const filteredClasses = filter ? filter.apply(allClasses) : allClasses;
+		logger.logProgress(
+			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
+		);
 
+		logger.logProgress('Calculating custom metrics and applying assertion logic');
 		for (const classInfo of filteredClasses) {
 			const metricValue = this.calculation(classInfo);
+			logger.logMetric(`${this.metricName} (${classInfo.name})`, metricValue);
+
 			const passes = this.assertion(metricValue, classInfo);
 
 			if (!passes) {
-				violations.push(
-					new CustomMetricViolation(
-						classInfo.name,
-						classInfo.filePath,
-						this.metricName,
-						metricValue,
-						'failed custom assertion'
-					)
+				const violation = new CustomMetricViolation(
+					classInfo.name,
+					classInfo.filePath,
+					this.metricName,
+					metricValue,
+					'failed custom assertion'
 				);
+				violations.push(violation);
+				logger.logViolation(violation.toString());
 			}
 		}
 
+		logger.endCheck(ruleName, violations.length);
 		return violations;
 	}
 }

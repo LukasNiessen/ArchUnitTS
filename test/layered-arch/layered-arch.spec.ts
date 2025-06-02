@@ -13,7 +13,12 @@ describe('Layered architecture', () => {
 		// commented as this fails, as its supposed to!
 		// await expect(rule).toPassAsync();
 
-		const violations = await rule.check();
+		const violations = await rule.check({
+			logging: {
+				enabled: true,
+				level: 'debug',
+			},
+		});
 		expect(violations).toHaveLength(1);
 	});
 });

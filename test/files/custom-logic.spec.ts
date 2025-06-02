@@ -21,6 +21,7 @@ describe('Custom File Logic', () => {
 			.matchingPattern('**/*.spec.ts')
 			.should()
 			.adhereTo((file: FileInfo) => {
+				console.log('file.content:', file.content);
 				// Custom logic: TypeScript files should contain export statements
 				return file.content.includes('export');
 			}, 'TypeScript files should export functionality')

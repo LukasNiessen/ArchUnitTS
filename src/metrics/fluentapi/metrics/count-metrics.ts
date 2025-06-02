@@ -1,7 +1,8 @@
 import * as ts from 'typescript';
 import * as path from 'path';
 import { Violation } from '../../../common/assertion/violation';
-import { Checkable } from '../../../common/fluentapi/checkable';
+import { Checkable, CheckOptions } from '../../../common/fluentapi/checkable';
+import { CheckLogger } from '../../../common/util/logger';
 import { gatherMetricViolations } from '../../assertion/metric-thresholds';
 import {
 	MethodCountMetric,
@@ -375,14 +376,27 @@ export class CountThresholdBuilder implements Checkable {
 		this.comparison = 'equal';
 		return this;
 	}
-	async check(): Promise<Violation[]> {
+	async check(options?: CheckOptions): Promise<Violation[]> {
 		if (this.threshold === undefined || !this.comparison) {
 			throw new Error('Threshold and comparison must be set before checking');
 		}
 
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `${this.metric.name} count metric check (${this.comparison} ${this.threshold})`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Extracting class information from codebase');
+
 		const classes = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		logger.logProgress(`Extracted ${classes.length} classes from codebase`);
+
 		const filteredClasses =
 			this.metricsBuilder.getFilter()?.apply(classes) ?? classes;
+		logger.logProgress(
+			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
+		);
+
+		logger.logProgress('Calculating count metrics and projecting to metric results');
 		const results = projectToMetricResults(
 			filteredClasses,
 			this.metric,
@@ -390,7 +404,16 @@ export class CountThresholdBuilder implements Checkable {
 			this.comparison
 		);
 
-		return gatherMetricViolations(results);
+		logger.logProgress('Gathering metric violations from results');
+		const violations = gatherMetricViolations(results);
+
+		// Log violations if enabled
+		violations.forEach((violation) => {
+			logger.logViolation(violation.toString());
+		});
+
+		logger.endCheck(ruleName, violations.length);
+		return violations;
 	}
 }
 
@@ -436,43 +459,55 @@ export class FileCountThresholdBuilder implements Checkable {
 		return this;
 	}
 
-	async check(): Promise<Violation[]> {
+	async check(options?: CheckOptions): Promise<Violation[]> {
 		if (!this.threshold || !this.comparison) {
 			throw new Error('Threshold and comparison must be set before checking');
 		}
 
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `${this.metric.name} file count metric check (${this.comparison} ${this.threshold})`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Creating TypeScript program for file analysis');
+
 		const violations: Violation[] = [];
 		const program = this.createTypeScriptProgram();
+		const sourceFiles = program
+			.getSourceFiles()
+			.filter(
+				(sf) => !sf.isDeclarationFile && !sf.fileName.includes('node_modules')
+			);
 
-		for (const sourceFile of program.getSourceFiles()) {
-			if (
-				!sourceFile.isDeclarationFile &&
-				!sourceFile.fileName.includes('node_modules')
-			) {
-				// Apply file filtering if specified
-				if (this.metricsBuilder.getFilter()) {
-					// For file-level metrics, we need to check if this file should be included
-					// This is a simplified check - in a more complete implementation,
-					// we'd need to enhance the filter system to work with files
-					// For now, we'll include all files and let class-level filters be ignored
-				}
+		logger.logProgress(`Analyzing ${sourceFiles.length} source files`);
 
-				const value = this.metric.calculateFromFile(sourceFile);
-				const passes = this.evaluateThreshold(value);
-				if (!passes) {
-					violations.push(
-						new FileCountViolation(
-							sourceFile.fileName,
-							this.metric.name,
-							value,
-							this.threshold,
-							this.comparison
-						)
-					);
-				}
+		for (const sourceFile of sourceFiles) {
+			// Apply file filtering if specified
+			if (this.metricsBuilder.getFilter()) {
+				// For file-level metrics, we need to check if this file should be included
+				// This is a simplified check - in a more complete implementation,
+				// we'd need to enhance the filter system to work with files
+				// For now, we'll include all files and let class-level filters be ignored
+			}
+
+			logger.logProgress(`Processing file: ${sourceFile.fileName}`);
+			const value = this.metric.calculateFromFile(sourceFile);
+			logger.logMetric(this.metric.name, value, this.threshold);
+
+			const passes = this.evaluateThreshold(value);
+			if (!passes) {
+				const violation = new FileCountViolation(
+					sourceFile.fileName,
+					this.metric.name,
+					value,
+					this.threshold,
+					this.comparison
+				);
+				violations.push(violation);
+				logger.logViolation(violation.toString());
 			}
 		}
 
+		logger.endCheck(ruleName, violations.length);
 		return violations;
 	}
 	private evaluateThreshold(value: number): boolean {

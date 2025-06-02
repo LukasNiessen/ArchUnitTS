@@ -1,5 +1,6 @@
-import { Checkable } from '../../../common/fluentapi/checkable';
+import { Checkable, CheckOptions } from '../../../common/fluentapi/checkable';
 import { Violation } from '../../../common/assertion/violation';
+import { CheckLogger } from '../../../common/util/logger';
 import {
 	Abstractness,
 	Instability,
@@ -273,9 +274,16 @@ export class DistanceCondition implements Checkable {
 	/**
 	 * Check if files violate the distance metric condition
 	 */
-	public async check(): Promise<Violation[]> {
+	public async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `${this.metric.name} distance metric check (${this.comparison} ${this.threshold})`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Analyzing project for enhanced class information');
+
 		// Analyze the project
 		const analysisResults = await extractEnhancedClassInfo(this.tsConfigFilePath);
+		logger.logProgress(`Analyzed ${analysisResults.length} files from project`);
 
 		// Filter results if needed
 		let filteredResults = analysisResults;
@@ -283,17 +291,26 @@ export class DistanceCondition implements Checkable {
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFile!)
 			);
+			logger.logProgress(
+				`Filtered to target file: ${this.targetFile}, ${filteredResults.length} results remaining`
+			);
 		} else if (this.targetFolder) {
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFolder!)
 			);
+			logger.logProgress(
+				`Filtered to target folder: ${this.targetFolder}, ${filteredResults.length} results remaining`
+			);
 		}
 
 		// Calculate metrics for each file and check threshold
+		logger.logProgress('Calculating distance metrics and checking thresholds');
 		const violations: Violation[] = [];
 
 		for (const result of filteredResults) {
 			const metricValue = this.metric.calculateForFile(result);
+			logger.logMetric(this.metric.name, metricValue, this.threshold);
+
 			let isViolation = false;
 
 			switch (this.comparison) {
@@ -315,17 +332,20 @@ export class DistanceCondition implements Checkable {
 			}
 
 			if (isViolation) {
-				violations.push({
+				const violation = {
 					message: `File ${result.filePath} has a ${this.metric.name} value of ${metricValue.toFixed(2)}, which violates the specified threshold of ${this.threshold} (expected is ${this.comparison})`,
 					filePath: result.filePath,
 					metric: this.metric.name,
-					value: metricValue,
+					metricValue,
 					threshold: this.threshold,
 					comparison: this.comparison,
-				});
+				};
+				violations.push(violation);
+				logger.logViolation(violation.message);
 			}
 		}
 
+		logger.endCheck(ruleName, violations.length);
 		return violations;
 	}
 }
@@ -344,9 +364,16 @@ export class ZoneCondition implements Checkable {
 	/**
 	 * Check if files are in the specified architectural zone
 	 */
-	public async check(): Promise<Violation[]> {
+	public async check(options?: CheckOptions): Promise<Violation[]> {
+		const logger = new CheckLogger(options?.logging);
+		const ruleName = `${this.zoneType.replace(/-/g, ' ')} zone check`;
+
+		logger.startCheck(ruleName);
+		logger.logProgress('Analyzing project for enhanced class information');
+
 		// Analyze the project
 		const analysisResults = await extractEnhancedClassInfo(this.tsConfigFilePath);
+		logger.logProgress(`Analyzed ${analysisResults.length} files from project`);
 
 		// Filter results if needed
 		let filteredResults = analysisResults;
@@ -354,12 +381,21 @@ export class ZoneCondition implements Checkable {
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFile!)
 			);
+			logger.logProgress(
+				`Filtered to target file: ${this.targetFile}, ${filteredResults.length} results remaining`
+			);
 		} else if (this.targetFolder) {
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFolder!)
 			);
+			logger.logProgress(
+				`Filtered to target folder: ${this.targetFolder}, ${filteredResults.length} results remaining`
+			);
 		}
 
+		logger.logProgress(
+			'Calculating abstractness and instability metrics for zone analysis'
+		);
 		const abstractness = new Abstractness();
 		const instability = new Instability();
 		const violations: Violation[] = [];
@@ -367,6 +403,9 @@ export class ZoneCondition implements Checkable {
 		for (const result of filteredResults) {
 			const abstractnessValue = abstractness.calculateForFile(result);
 			const instabilityValue = instability.calculateForFile(result);
+			logger.logMetric(`abstractness (${result.filePath})`, abstractnessValue);
+			logger.logMetric(`instability (${result.filePath})`, instabilityValue);
+
 			let isViolation = false;
 
 			if (this.zoneType === 'zone-of-pain') {
@@ -378,16 +417,19 @@ export class ZoneCondition implements Checkable {
 			}
 
 			if (isViolation) {
-				violations.push({
+				const violation = {
 					message: `File ${result.filePath} is in the ${this.zoneType.replace(/-/g, ' ')} (A=${abstractnessValue.toFixed(2)}, I=${instabilityValue.toFixed(2)})`,
 					filePath: result.filePath,
 					metric: this.zoneType,
 					abstractness: abstractnessValue,
 					instability: instabilityValue,
-				});
+				};
+				violations.push(violation);
+				logger.logViolation(violation.message);
 			}
 		}
 
+		logger.endCheck(ruleName, violations.length);
 		return violations;
 	}
 }
