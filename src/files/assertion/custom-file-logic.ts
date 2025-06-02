@@ -25,18 +25,13 @@ export class CustomFileViolation implements Violation {
 }
 
 export const gatherCustomFileViolations = (
-	projectedNodes: ProjectedNode[],
+	nodes: ProjectedNode[],
 	patterns: (string | RegExp)[],
 	condition: CustomFileCondition,
 	message: string,
 	allowEmptyTests: boolean = false
 ): (CustomFileViolation | EmptyTestViolation)[] => {
 	const violations: (CustomFileViolation | EmptyTestViolation)[] = [];
-
-	// Check for empty test if no files match preconditions
-	if (projectedNodes.length === 0 && !allowEmptyTests) {
-		return [new EmptyTestViolation(patterns)];
-	}
 
 	// Convert glob patterns to regex patterns for consistency with other file operations
 	const regexPatterns = patterns.map((pattern) => {
@@ -53,6 +48,15 @@ export const gatherCustomFileViolations = (
 		}
 		return pattern;
 	});
+
+	const projectedNodes = nodes.filter((node) =>
+		matchingAllPatterns(node.label, regexPatterns)
+	);
+
+	// Check for empty test if no files match preconditions
+	if (projectedNodes.length === 0 && !allowEmptyTests) {
+		return [new EmptyTestViolation(patterns)];
+	}
 
 	for (const node of projectedNodes) {
 		const path = node.label;

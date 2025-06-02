@@ -6,11 +6,12 @@ import { TechnicalError } from '../error/errors';
 import { normalizeWindowsPaths } from '../util/path-utils';
 import { ImportPathsResolver } from '@zerollup/ts-helpers';
 import { determineImportKinds } from '../util/import-kinds-helper';
-import { DefaultLogger } from '../util/logger';
 import { Logger } from '../util';
 
 // Constant to control whether node_modules files should be excluded from the graph
+// TODO: introduce a .archignore file instead a la .gitignore
 const EXCLUDE_NODE_MODULES = true;
+const EXCLUDE_DIST = true;
 
 // Logger instance for debugging graph extraction
 let logger: Logger | undefined;
@@ -313,14 +314,21 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 				);
 
 				// Skip node_modules files if configured so
+				//console.log('resolvedFileName:', resolvedFileName);
+				//console.log('normalizedTargetFileName:', normalizedTargetFileName);
 				if (
 					EXCLUDE_NODE_MODULES &&
-					(resolvedFileName.includes('node_modules') ||
-						normalizedTargetFileName.includes('node_modules'))
+					normalizedTargetFileName.startsWith('node_modules')
 				) {
 					logger?.debug(
 						`Excluding node_modules file: ${normalizedTargetFileName}`
 					);
+					skippedImports++;
+					return;
+				}
+				// Skip dist files if configured so
+				if (EXCLUDE_DIST && normalizedTargetFileName.startsWith('dist')) {
+					logger?.debug(`Excluding dist file: ${normalizedTargetFileName}`);
 					skippedImports++;
 					return;
 				}
@@ -357,6 +365,21 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 		const normalizedFileName = normalizeWindowsPaths(
 			path.relative(rootDir, sourceFile.fileName)
 		);
+
+		// Skip node_modules files if configured so
+		//console.log('resolvedFileName:', resolvedFileName);
+		//console.log('normalizedTargetFileName:', normalizedTargetFileName);
+		if (EXCLUDE_NODE_MODULES && normalizedFileName.startsWith('node_modules')) {
+			logger?.debug(`Excluding node_modules file: ${normalizedFileName}`);
+			skippedImports++;
+			continue;
+		}
+		// Skip dist files if configured so
+		if (EXCLUDE_DIST && normalizedFileName.startsWith('dist')) {
+			logger?.debug(`Excluding dist file: ${normalizedFileName}`);
+			skippedImports++;
+			continue;
+		}
 
 		// Add self-referencing edge for every project file
 		const selfEdge: Edge = {

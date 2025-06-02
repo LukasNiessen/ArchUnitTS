@@ -57,8 +57,12 @@ export class FileConditionBuilder {
 	 * This will return all files that are in a folder as you specified.
 	 * You can specify a path as well though, like so: src/components
 	 *
-	 * What happens is, the input is is converted to: .\*\/?${escapedFolder}/.*
+	 * If he input is a string, the input is is converted to: .\*\/?${escapedFolder}/.*
 	 * and we check if a file path matches this or not.
+	 *
+	 * If the input is a regex, the path is checked whether it matches the regex or not.
+	 *
+	 * Important note: files in node_modules or dist are never matched.
 	 *
 	 * For example, if the input is 'components':
 	 * - Matches: 'src/components/component-a.ts
@@ -77,8 +81,12 @@ export class FileConditionBuilder {
 	 * @param folder string
 	 * @returns
 	 */
-	public inFolder(folder: string): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.folderMatcher(folder)]);
+	public inFolder(folder: string | RegExp): FilesShouldCondition {
+		const patterns =
+			typeof folder === 'string'
+				? [RegexFactory.folderMatcher(folder)]
+				: [folder.source];
+		return new FilesShouldCondition(this, patterns);
 	}
 }
 

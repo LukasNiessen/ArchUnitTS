@@ -21,21 +21,23 @@ export const gatherCycleViolations = (
 ): (ViolatingCycle | EmptyTestViolation)[] => {
 	const logger = new CheckLogger(options?.logging);
 
-	// Check for empty test if no edges match preconditions
-	if (projectedEdges.length === 0 && !options?.allowEmptyTests) {
-		return [new EmptyTestViolation(preconditionPatterns)];
-	}
+	console.log('preconditionPatterns:', preconditionPatterns);
 
 	const filteredEdges = projectedEdges.filter(
 		(edge) =>
-			// Exclude self-referencing edges (these are added for completeness but aren't real cycles)
+			// Exclude self-referencing edges (these are added for completeness but aren't considered cycles here)
 			edge.sourceLabel !== edge.targetLabel &&
-			matchingAllPatterns(edge.sourceLabel, preconditionPatterns) &&
-			matchingAllPatterns(edge.targetLabel, preconditionPatterns)
+			(matchingAllPatterns(edge.sourceLabel, preconditionPatterns) ||
+				matchingAllPatterns(edge.targetLabel, preconditionPatterns))
 	);
 	filteredEdges.forEach((edge) =>
 		logger.info(`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`)
 	);
+
+	// Check for empty test if no edges match preconditions
+	if (filteredEdges.length === 0 && !options?.allowEmptyTests) {
+		return [new EmptyTestViolation(preconditionPatterns)];
+	}
 
 	const projectedCycles = projectCycles(filteredEdges);
 

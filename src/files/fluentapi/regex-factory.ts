@@ -1,6 +1,6 @@
 export class RegexFactory {
 	private static escapeRegex(str: string): string {
-		return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace('/', '\\/');
 	}
 
 	public static fileNameMatcher(name: string): string {
