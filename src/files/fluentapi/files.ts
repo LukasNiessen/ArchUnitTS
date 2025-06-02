@@ -798,7 +798,8 @@ export class DependOnFileCondition implements Checkable {
 		const configFileName =
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
 				.filesShouldCondition.fileCondition.tsConfigFilePath;
-		const graph = await extractGraph(configFileName, options?.clearCache);
+
+		const graph = await extractGraph(configFileName, options?.clearCache, logger);
 
 		const projectedEdges = projectEdges(graph, perEdge());
 		logger.logProgress(

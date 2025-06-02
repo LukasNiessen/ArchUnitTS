@@ -13,7 +13,7 @@ import { Logger } from '../util';
 const EXCLUDE_NODE_MODULES = true;
 
 // Logger instance for debugging graph extraction
-let logger: Logger = new DefaultLogger();
+let logger: Logger | undefined;
 
 /**
  * Configure logging for graph extraction debugging.
@@ -28,7 +28,7 @@ let logger: Logger = new DefaultLogger();
  *
  * // Enable debug logging
  * const debugLogger = new DefaultLogger();
- * debugLogger.setLevel('debug');
+ * debuglogger?.setLevel('debug');
  * setGraphExtractionLogger(debugLogger);
  *
  * // Disable logging
@@ -50,21 +50,21 @@ export const setGraphExtractionLogger = (customLogger?: Logger): void => {
 };
 
 export const guessLocationOfTsconfig = (): string | undefined => {
-	logger.debug('Starting tsconfig.json discovery from current directory');
+	logger?.debug('Starting tsconfig.json discovery from current directory');
 	const result = guessLocationOfTsconfigRecursively('.');
 	if (result) {
-		logger.debug(`Found tsconfig.json at: ${result}`);
+		logger?.debug(`Found tsconfig.json at: ${result}`);
 	} else {
-		logger.warn('No tsconfig.json found in current directory tree');
+		logger?.warn('No tsconfig.json found in current directory tree');
 	}
 	return result;
 };
 
 const guessLocationOfTsconfigRecursively = (pathName: string): string | undefined => {
-	logger.debug(`Searching for tsconfig.json in directory: ${path.resolve(pathName)}`);
+	logger?.debug(`Searching for tsconfig.json in directory: ${path.resolve(pathName)}`);
 
 	const dir = fs.readdirSync(pathName);
-	logger.debug(`Directory contents: ${dir.join(', ')}`);
+	logger?.debug(`Directory contents: ${dir.join(', ')}`);
 
 	// First check if tsconfig exists in the current directory
 	const tsconfigFileName = dir.find(
@@ -72,17 +72,17 @@ const guessLocationOfTsconfigRecursively = (pathName: string): string | undefine
 	);
 	if (tsconfigFileName) {
 		const resolvedPath = path.resolve(pathName, 'tsconfig.json');
-		logger.debug(`Found tsconfig.json at: ${resolvedPath}`);
+		logger?.debug(`Found tsconfig.json at: ${resolvedPath}`);
 		return resolvedPath;
 	}
 
 	// If not, go up one level
 	const levelUp = path.resolve(pathName, '..');
-	logger.debug(`tsconfig.json not found, moving up to: ${levelUp}`);
+	logger?.debug(`tsconfig.json not found, moving up to: ${levelUp}`);
 
 	// Stop if we've reached the filesystem root
 	if (path.relative(levelUp, pathName) === '') {
-		logger.debug('Reached filesystem root, stopping search');
+		logger?.debug('Reached filesystem root, stopping search');
 		return undefined;
 	}
 
@@ -95,13 +95,13 @@ const getProjectFiles = (
 	compilerHost: CompilerHost,
 	config: CompilerOptions & TypeAcquisition
 ): string[] => {
-	logger.debug(`Getting project files from root directory: ${rootDir}`);
-	logger.debug(`Include patterns: ${JSON.stringify(config.include)}`);
-	logger.debug(`Exclude patterns: ${JSON.stringify(config.exclude)}`);
+	logger?.debug(`Getting project files from root directory: ${rootDir}`);
+	logger?.debug(`Include patterns: ${JSON.stringify(config.include)}`);
+	logger?.debug(`Exclude patterns: ${JSON.stringify(config.exclude)}`);
 
 	if (!compilerHost.readDirectory) {
 		const error = 'compiler host is missing readDirectory method';
-		logger.error(error);
+		logger?.error(error);
 		throw new TechnicalError(error);
 	}
 
@@ -114,12 +114,12 @@ const getProjectFiles = (
 
 	if (!files) {
 		const error = 'compiler could not resolve project files';
-		logger.error(error);
+		logger?.error(error);
 		throw new TechnicalError(error);
 	}
 
-	logger.info(`Found ${files.length} TypeScript files in project`);
-	logger.debug(
+	logger?.info(`Found ${files.length} TypeScript files in project`);
+	logger?.debug(
 		`Project files: ${files.slice(0, 10).join(', ')}${files.length > 10 ? `... and ${files.length - 10} more` : ''}`
 	);
 
@@ -131,74 +131,79 @@ const graphCache: Map<string | undefined, Promise<Edge[]>> = new Map();
 export const clearGraphCache = (): void => {
 	const cacheSize = graphCache.size;
 	graphCache.clear();
-	logger.debug(`Cleared graph cache (previously contained ${cacheSize} entries)`);
+	logger?.debug(`Cleared graph cache (previously contained ${cacheSize} entries)`);
 };
 
 export const extractGraph = async (
 	configFileName?: string,
-	clearCache: boolean = false
+	clearCache: boolean = false,
+	loggerInput?: Logger
 ): Promise<Edge[]> => {
-	logger.debug(
+	if (loggerInput) {
+		setGraphExtractionLogger(loggerInput);
+	}
+
+	logger?.debug(
 		`Starting graph extraction with config: ${configFileName || 'auto-detected'}`
 	);
 
 	if (clearCache) {
-		logger.debug('Clearing graph cache');
+		logger?.debug('Clearing graph cache');
 		clearGraphCache();
 	}
 
 	const cachedResult = graphCache.get(configFileName);
 	if (cachedResult) {
-		logger.debug('Using cached graph extraction result');
+		logger?.debug('Using cached graph extraction result');
 		return cachedResult;
 	}
 
-	logger.debug('No cached result found, computing new graph');
+	logger?.debug('No cached result found, computing new graph');
 	const computedResult = extractGraphUncached(configFileName);
 	graphCache.set(configFileName, computedResult);
 	const result = await computedResult;
-	logger.info(`Graph extraction completed with ${result.length} edges`);
+	logger?.info(`Graph extraction completed with ${result.length} edges`);
 	return result;
 };
 
 export const extractGraphUncached = async (configFileName?: string): Promise<Edge[]> => {
-	logger.debug('Starting uncached graph extraction');
+	logger?.debug('Starting uncached graph extraction');
 
 	const configFile = configFileName ?? guessLocationOfTsconfig();
 	if (!configFile) {
 		const error = 'Could not find configuration path';
-		logger.error(error);
+		logger?.error(error);
 		throw new TechnicalError(error);
 	}
 
-	logger.info(`Using TypeScript config file: ${configFile}`);
+	logger?.info(`Using TypeScript config file: ${configFile}`);
 
 	const config = ts.readConfigFile(configFile, (path: string) => {
-		logger.debug(`Reading config file: ${path}`);
+		logger?.debug(`Reading config file: ${path}`);
 		return fs.readFileSync(path).toString();
 	});
 
 	if (config.error) {
-		logger.error(`Invalid config file: ${config.error.messageText}`);
+		logger?.error(`Invalid config file: ${config.error.messageText}`);
 		throw new TechnicalError('invalid config path');
 	}
 
-	logger.debug('Successfully parsed TypeScript configuration');
+	logger?.debug('Successfully parsed TypeScript configuration');
 
 	const parsedConfig: CompilerOptions = config.config;
-	logger.debug(
+	logger?.debug(
 		`Compiler options: ${JSON.stringify(parsedConfig, null, 2).slice(0, 500)}...`
 	);
 
 	const rootDir = path.dirname(path.resolve(configFile));
-	logger.info(`Project root directory: ${rootDir}`);
+	logger?.info(`Project root directory: ${rootDir}`);
 
 	const compilerHost = ts.createCompilerHost(parsedConfig);
-	logger.debug('Created TypeScript compiler host');
+	logger?.debug('Created TypeScript compiler host');
 
 	const files = getProjectFiles(rootDir, compilerHost, config?.config);
 
-	logger.debug('Creating TypeScript program');
+	logger?.debug('Creating TypeScript program');
 	const program = ts.createProgram({
 		rootNames: files ?? [],
 		options: parsedConfig,
@@ -206,7 +211,7 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 	});
 
 	const sourceFiles = program.getSourceFiles();
-	logger.info(`TypeScript program created with ${sourceFiles.length} source files`);
+	logger?.info(`TypeScript program created with ${sourceFiles.length} source files`);
 
 	// Filter out files from node_modules for logging purposes
 	const projectFiles = sourceFiles.filter(
@@ -216,11 +221,11 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 		sf.fileName.includes('node_modules')
 	);
 
-	logger.debug(`Project source files: ${projectFiles.length}`);
-	logger.debug(`Node modules files: ${nodeModulesFiles.length}`);
+	logger?.debug(`Project source files: ${projectFiles.length}`);
+	logger?.debug(`Node modules files: ${nodeModulesFiles.length}`);
 
 	if (projectFiles.length === 0) {
-		logger.warn(
+		logger?.warn(
 			'No project source files found - this might indicate a configuration issue'
 		);
 	}
@@ -230,14 +235,14 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 	let skippedImports = 0;
 	let erroredImports = 0;
 
-	logger.debug('Starting import analysis');
+	logger?.debug('Starting import analysis');
 
 	for (const sourceFile of program.getSourceFiles()) {
 		const isProjectFile = !sourceFile.fileName.includes('node_modules');
 
 		if (isProjectFile) {
 			processedFiles++;
-			logger.debug(
+			logger?.debug(
 				`Processing file ${processedFiles}/${projectFiles.length}: ${path.relative(rootDir, sourceFile.fileName)}`
 			);
 		}
@@ -256,14 +261,14 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 				const specifier = x.moduleSpecifier;
 				const module = (specifier as { text?: string })['text'];
 				if (module === undefined) {
-					logger.debug(
+					logger?.debug(
 						`Skipping import with undefined module specifier in ${normalizedSourceFileName}`
 					);
 					skippedImports++;
 					return;
 				}
 
-				logger.debug(
+				logger?.debug(
 					`Processing import: "${module}" in ${normalizedSourceFileName}`
 				);
 
@@ -279,7 +284,7 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 
 				const bestGuess = suggestion !== undefined ? suggestion[0] : undefined;
 				if (bestGuess && bestGuess !== module) {
-					logger.debug(
+					logger?.debug(
 						`Import path resolved from "${module}" to "${bestGuess}"`
 					);
 				}
@@ -293,7 +298,7 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 				).resolvedModule;
 
 				if (resolvedModule === undefined) {
-					logger.debug(
+					logger?.debug(
 						`Could not resolve module "${module}" from ${normalizedSourceFileName}`
 					);
 					skippedImports++;
@@ -303,7 +308,7 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 				const { resolvedFileName, isExternalLibraryImport } = resolvedModule;
 				const normalizedTargetFileName = path.relative(rootDir, resolvedFileName);
 
-				logger.debug(
+				logger?.debug(
 					`Resolved "${module}" to: ${normalizedTargetFileName} (external: ${isExternalLibraryImport})`
 				);
 
@@ -313,7 +318,7 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 					(resolvedFileName.includes('node_modules') ||
 						normalizedTargetFileName.includes('node_modules'))
 				) {
-					logger.debug(
+					logger?.debug(
 						`Excluding node_modules file: ${normalizedTargetFileName}`
 					);
 					skippedImports++;
@@ -332,12 +337,12 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 				imports.push(edge);
 
 				if (imports.length % 100 === 0) {
-					logger.debug(`Processed ${imports.length} imports so far...`);
+					logger?.debug(`Processed ${imports.length} imports so far...`);
 				}
 			} catch (importError) {
 				// Skip this import if there's an error processing it
 				erroredImports++;
-				logger.warn(
+				logger?.warn(
 					`Error processing import in ${path.relative(rootDir, sourceFile.fileName)}: ${importError}`
 				);
 			}
@@ -346,7 +351,7 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 
 	// Add self-referencing edges for all project files to ensure they appear in the graph
 	// This is crucial for files that don't import other project files
-	logger.debug('Adding self-referencing edges for all project files');
+	logger?.debug('Adding self-referencing edges for all project files');
 
 	for (const sourceFile of projectFiles) {
 		const normalizedFileName = normalizeWindowsPaths(
@@ -365,16 +370,16 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 	}
 
 	if (projectFiles.length === 0) {
-		logger.warn(
+		logger?.warn(
 			'No project files found - this might indicate a configuration or file discovery issue'
 		);
 	}
 
-	logger.info(`Import analysis completed:`);
-	logger.info(`  - Total edges found: ${imports.length}`);
-	logger.info(`  - Files processed: ${processedFiles}`);
-	logger.info(`  - Imports skipped: ${skippedImports}`);
-	logger.info(`  - Import errors: ${erroredImports}`);
+	logger?.info(`Import analysis completed:`);
+	logger?.info(`  - Total edges found: ${imports.length}`);
+	logger?.info(`  - Files processed: ${processedFiles}`);
+	logger?.info(`  - Imports skipped: ${skippedImports}`);
+	logger?.info(`  - Import errors: ${erroredImports}`);
 
 	return imports;
 };
