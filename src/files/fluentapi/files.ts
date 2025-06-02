@@ -1024,9 +1024,7 @@ export class EnhancedMatchPatternFileCondition implements Checkable {
 				.tsConfigFilePath;
 		const graph = await extractGraph(configFileName, options?.clearCache);
 
-		const projectedNodes = projectToNodes(graph, {
-			includeExternals: true, // X-TODO : just temp!
-		});
+		const projectedNodes = projectToNodes(graph);
 		logger.logProgress(
 			`Processing ${projectedNodes.length} files with enhanced pattern matching`
 		);

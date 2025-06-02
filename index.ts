@@ -8,6 +8,13 @@ export * from './src/metrics/fluentapi/metrics';
 export * from './src/metrics/calculation/count';
 export * from './src/metrics/fluentapi/metrics/count-metrics';
 
+// Graph extraction and debugging
+export {
+	extractGraph,
+	clearGraphCache,
+	setGraphExtractionLogger,
+} from './src/common/extraction/extract-graph';
+
 // Testing framework integrations
 export * from './src/testing/index';
 
