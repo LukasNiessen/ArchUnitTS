@@ -38,9 +38,6 @@ import { projectFiles, metrics } from 'archunit';
 
 it('should not have circular dependencies', async () => {
   const rule = projectFiles().inFolder('src').should().haveNoCycles();
-
-  // toPassAsync is syntax support we added for Jest, Vitest
-  // and Jasmine, but ArchUnitTS works with any testing framework
   await expect(rule).toPassAsync();
 });
 ```
@@ -54,7 +51,6 @@ it('presentation layer should not depend on database layer', async () => {
     .shouldNot()
     .dependOnFiles()
     .inFolder('src/database');
-
   await expect(rule).toPassAsync();
 });
 
@@ -64,7 +60,6 @@ it('business layer should not depend on database layer', async () => {
     .shouldNot()
     .dependOnFiles()
     .inFolder('src/database');
-
   await expect(rule).toPassAsync();
 });
 
@@ -80,8 +75,7 @@ it('should not contain too large files', () => {
 });
 
 it('should only have classes with high cohesion', async () => {
-  // LCOM metric (lack of cohesion of methods)
-  // Low LCOM means high cohesion
+  // LCOM metric (lack of cohesion of methods), low = high cohesion
   const rule = metrics().lcom().lcom96b().shouldBeBelow(0.3);
   await expect(rule).toPassAsync();
 });
@@ -942,3 +936,7 @@ The graph will contain:
 - **Self edges**: Every project file references itself (ensures inclusion)
 
 This guarantees comprehensive architectural analysis across your entire codebase.
+
+---
+
+TODO: dependabot?
