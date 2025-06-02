@@ -1,4 +1,4 @@
-import { Checkable } from '../../common/fluentapi/checkable';
+import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
 import { ResultFactory } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 
@@ -17,7 +17,7 @@ export function extendJasmineMatchers() {
 			beforeEachFn(() => {
 				jasmineObj.addMatchers!({
 					toPassAsync: () => ({
-						compare: async (checkable: Checkable) => {
+						compare: async (checkable: Checkable, options?: CheckOptions) => {
 							if (!checkable) {
 								return {
 									pass: false,
@@ -25,7 +25,7 @@ export function extendJasmineMatchers() {
 										'expected something checkable as an argument for expect()',
 								};
 							}
-							const violations = await checkable.check();
+							const violations = await checkable.check(options);
 							const testViolations = violations.map((v) =>
 								ViolationFactory.from(v)
 							);

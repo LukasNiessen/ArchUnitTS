@@ -18,5 +18,7 @@ export {
 // Testing framework integrations
 export * from './src/testing/index';
 
+export * from './src/common/fluentapi/checkable';
+
 // Legacy Jest export for backward compatibility
 export { JestViolationFactory, JestResultFactory } from './src/jest/arch-matchers';
