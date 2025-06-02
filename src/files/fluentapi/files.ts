@@ -33,10 +33,52 @@ export class FileConditionBuilder {
 		return new FilesShouldCondition(this, [pattern]);
 	}
 
+	/**
+	 * Matches all files that have this name. You must include the file extension.
+	 *
+	 * For example, if the input is 'my-component.ts':
+	 * - Matches: 'src/cool-components/my-component.ts
+	 * - Matches: 'src/other-components/my-component.ts
+	 * - NOT matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * However, if the input is 'my-component':
+	 * - NOT matching: 'src/cool-components/my-component.ts
+	 * - NOT matching: 'src/other-components/my-component.ts
+	 * - Matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * @param name
+	 * @returns
+	 */
 	public withName(name: string): FilesShouldCondition {
 		return new FilesShouldCondition(this, [RegexFactory.fileNameMatcher(name)]);
 	}
 
+	/**
+	 * This will return all files that are in a folder as you specified.
+	 * You can specify a path as well though, like so: src/components
+	 *
+	 * What happens is, the input is is converted to: .\*\/?${escapedFolder}/.*
+	 * and we check if a file path matches this or not.
+	 *
+	 * For example, if the input is 'components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - Matches: 'src/domain/helper/components/helper-component.ts    <-- notice /components/ is in the path
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
+	 *
+	 * However, if the input is 'src/components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - NOT Matches: 'src/domain/helper/components/helper-component.ts
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
+	 *
+	 * @param folder string
+	 * @returns
+	 */
 	public inFolder(folder: string): FilesShouldCondition {
 		return new FilesShouldCondition(this, [RegexFactory.folderMatcher(folder)]);
 	}
@@ -59,6 +101,24 @@ export class FilesShouldCondition {
 		return new FilesShouldCondition(this, [...this.patterns, pattern]);
 	}
 
+	/**
+	 * Matches all files that have this name. You must include the file extension.
+	 *
+	 * For example, if the input is 'my-component.ts':
+	 * - Matches: 'src/cool-components/my-component.ts
+	 * - Matches: 'src/other-components/my-component.ts
+	 * - NOT matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * However, if the input is 'my-component':
+	 * - NOT matching: 'src/cool-components/my-component.ts
+	 * - NOT matching: 'src/other-components/my-component.ts
+	 * - Matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * @param name
+	 * @returns
+	 */
 	public withName(name: string): FilesShouldCondition {
 		return new FilesShouldCondition(this, [
 			...this.patterns,
@@ -66,6 +126,30 @@ export class FilesShouldCondition {
 		]);
 	}
 
+	/**
+	 * This will return all files that are in a folder as you specified.
+	 * You can specify a path as well though, like so: src/components
+	 *
+	 * What happens is, the input is is converted to: .\*\/?${escapedFolder}/.*
+	 * and we check if a file path matches this or not.
+	 *
+	 * For example, if the input is 'components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - Matches: 'src/domain/helper/components/helper-component.ts    <-- notice /components/ is in the path
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
+	 *
+	 * However, if the input is 'src/components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - NOT Matches: 'src/domain/helper/components/helper-component.ts
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
+	 *
+	 * @param folder string
+	 * @returns
+	 */
 	public inFolder(folder: string): FilesShouldCondition {
 		return new FilesShouldCondition(this, [
 			...this.patterns,
@@ -79,10 +163,57 @@ export class NegatedMatchPatternFileConditionBuilder {
 
 	constructor(readonly filesShouldCondition: FilesShouldCondition) {}
 
+	/**
+	 * This filters all files that match this pattern. The pattern can be a string or a regex. It will internally be converted to a regex.
+	 * Strings can be glob pattern, that is, they can contain * and ?, and this will be treated as it is in a normal RegEx, that is:
+	 * --> * means zero or more chars, excluding /
+	 * --> ? means a single char
+	 *
+	 * For example, if the input is '*component-*.ts':
+	 * - Matches: 'src/cool-components/my-component-a.ts
+	 * - Matches: 'src/cool-components/my-component.ts
+	 * - Matches: 'src/cool-components/component-abc.ts
+	 * - NOT matching: 'src/other-components/my-component.ts    <-- the -* is missing
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * If the input is 'component-?.ts':
+	 * - Matches: 'src/cool-components/component-a.ts
+	 * - Matches: 'src/cool-components/component-b.ts
+	 * - NOT matching: 'src/cool-components/component-abc.ts
+	 * - NOT matching: 'src/cool-components/my-component-a.ts
+	 *
+	 *
+	 * @param pattern
+	 * @returns
+	 */
 	public matchPattern(pattern: string): MatchPatternFileCondition {
 		return new MatchPatternFileCondition(this, pattern);
 	}
 
+	/**
+	 * This will return all files that are in a folder as you specified.
+	 * You can specify a path as well though, like so: src/components
+	 *
+	 * What happens is, the input is is converted to: .\*\/?${escapedFolder}/.*
+	 * and we check if a file path matches this or not.
+	 *
+	 * For example, if the input is 'components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - Matches: 'src/domain/helper/components/helper-component.ts    <-- notice /components/ is in the path
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
+	 *
+	 * However, if the input is 'src/components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - NOT Matches: 'src/domain/helper/components/helper-component.ts
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
+	 *
+	 * @param folder string
+	 * @returns
+	 */
 	public beInFolder(folder: string): MatchPatternFileCondition {
 		return new MatchPatternFileCondition(this, RegexFactory.folderMatcher(folder));
 	}
@@ -181,11 +312,27 @@ export class PositiveMatchPatternFileConditionBuilder {
 	constructor(readonly filesShouldCondition: FilesShouldCondition) {}
 
 	/**
-	 * @deprecated Use more specific methods like matchFilename, matchPath, etc.
-	 * Creates a basic pattern matching condition using string patterns.
+	 * This filters all files that match this pattern. The pattern can be a string or a regex. It will internally be converted to a regex.
+	 * Strings can be glob pattern, that is, they can contain * and ?, and this will be treated as it is in a normal RegEx, that is:
+	 * --> * means zero or more chars, excluding /
+	 * --> ? means a single char
 	 *
-	 * @param pattern String pattern to match against file paths
-	 * @returns MatchPatternFileCondition for checking the rule
+	 * For example, if the input is '*component-*.ts':
+	 * - Matches: 'src/cool-components/my-component-a.ts
+	 * - Matches: 'src/cool-components/my-component.ts
+	 * - Matches: 'src/cool-components/component-abc.ts
+	 * - NOT matching: 'src/other-components/my-component.ts    <-- the -* is missing
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * If the input is 'component-?.ts':
+	 * - Matches: 'src/cool-components/component-a.ts
+	 * - Matches: 'src/cool-components/component-b.ts
+	 * - NOT matching: 'src/cool-components/component-abc.ts
+	 * - NOT matching: 'src/cool-components/my-component-a.ts
+	 *
+	 *
+	 * @param pattern
+	 * @returns
 	 */
 	public matchPattern(pattern: string): MatchPatternFileCondition {
 		return new MatchPatternFileCondition(this, pattern);
@@ -219,8 +366,25 @@ export class PositiveMatchPatternFileConditionBuilder {
 	}
 
 	/**
-	 * Asserts that files should be located in the specified folder.
-	 * Supports exact folder matching and glob patterns.
+	 * This will return all files that are in a folder as you specified.
+	 * You can specify a path as well though, like so: src/components
+	 *
+	 * What happens is, the input is is converted to: .\*\/?${escapedFolder}/.*
+	 * and we check if a file path matches this or not.
+	 *
+	 * For example, if the input is 'components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - Matches: 'src/domain/helper/components/helper-component.ts    <-- notice /components/ is in the path
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
+	 *
+	 * However, if the input is 'src/components':
+	 * - Matches: 'src/components/component-a.ts
+	 * - Matches: 'src/components/component-b.ts
+	 * - NOT Matches: 'src/domain/helper/components/helper-component.ts
+	 * - NOT matching: 'src/views/view-a.ts
+	 * - NOT matching: 'src/views/view-b.ts
 	 *
 	 * @example
 	 * ```typescript
@@ -438,8 +602,19 @@ export class DependOnFileConditionBuilder {
 	}
 
 	/**
-	 * Specifies dependency on a file with exact filename.
-	 * The filename should include the extension.
+	 * Matches all files that have this name. You must include the file extension.
+	 *
+	 * For example, if the input is 'my-component.ts':
+	 * - Matches: 'src/cool-components/my-component.ts
+	 * - Matches: 'src/other-components/my-component.ts
+	 * - NOT matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * However, if the input is 'my-component':
+	 * - NOT matching: 'src/cool-components/my-component.ts
+	 * - NOT matching: 'src/other-components/my-component.ts
+	 * - Matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
 	 *
 	 * @example
 	 * ```typescript
@@ -533,13 +708,6 @@ export class DependOnFileCondition implements Checkable {
 		readonly subjectPatterns: string[]
 	) {}
 
-	/**
-	 * @deprecated Use more specific methods like withName or inFolder
-	 * Adds an additional dependency pattern using string matching.
-	 *
-	 * @param pattern String pattern to match additional dependency files
-	 * @returns DependOnFileCondition with the added pattern
-	 */
 	public matchingPattern(pattern: string): DependOnFileCondition {
 		return new DependOnFileCondition(this.dependOnFileConditionBuilder, [
 			...this.subjectPatterns,
@@ -548,8 +716,19 @@ export class DependOnFileCondition implements Checkable {
 	}
 
 	/**
-	 * Adds an additional dependency on a file with exact filename.
-	 * This extends the dependency requirements - files must depend on ALL specified patterns.
+	 * Matches all files that have this name. You must include the file extension.
+	 *
+	 * For example, if the input is 'my-component.ts':
+	 * - Matches: 'src/cool-components/my-component.ts
+	 * - Matches: 'src/other-components/my-component.ts
+	 * - NOT matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
+	 *
+	 * However, if the input is 'my-component':
+	 * - NOT matching: 'src/cool-components/my-component.ts
+	 * - NOT matching: 'src/other-components/my-component.ts
+	 * - Matching: 'src/cool-components/component
+	 * - NOT matching: 'src/views/view-a.ts
 	 *
 	 * @example
 	 * ```typescript
@@ -682,22 +861,6 @@ export class CycleFreeFileCondition implements Checkable {
 	}
 }
 
-/**
- * Basic pattern matching condition using string patterns.
- * This is a simpler version of pattern matching that works with string patterns only.
- *
- * @deprecated Consider using EnhancedMatchPatternFileCondition for more flexible pattern matching
- *
- * @example
- * ```typescript
- * // Using basic pattern matching (legacy)
- * projectFiles()
- *   .inFolder('services')
- *   .should()
- *   .matchPattern('.*Service\\.ts$')
- *   .check();
- * ```
- */
 export class MatchPatternFileCondition implements Checkable {
 	constructor(
 		readonly matchPatternFileConditionBuilder: NegatedMatchPatternFileConditionBuilder,
