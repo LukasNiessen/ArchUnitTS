@@ -35,7 +35,7 @@ export const gatherDependOnFileViolations = (
 	const empty = edgesInSource.length === 0 || edgesInTarget.length === 0;
 
 	if (empty && !allowEmptyTests) {
-		return [new EmptyTestViolation(objectPatterns)];
+		return [new EmptyTestViolation([...objectPatterns, ...subjectPatterns])];
 	}
 
 	const violatingEdgesFilter = isNegated

@@ -10,8 +10,8 @@ import { Logger } from '../util';
 
 // Constant to control whether node_modules files should be excluded from the graph
 // TODO: introduce a .archignore file instead a la .gitignore
-const EXCLUDE_NODE_MODULES = true;
-const EXCLUDE_DIST = true;
+const EXCLUDE_NODE_MODULES = false;
+const EXCLUDE_DIST = false;
 
 // Logger instance for debugging graph extraction
 let logger: Logger | undefined;
