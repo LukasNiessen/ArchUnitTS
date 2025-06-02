@@ -20,4 +20,5 @@
     [uml] -> [assertion]
     [calculation] -> [extraction]
     [util] -> [fluentapi]
+    [logging] -> [fluentapi]
 @enduml

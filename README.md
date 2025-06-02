@@ -744,15 +744,21 @@ Here's how ArchUnitTS compares to other TypeScript architecture testing librarie
 | **Documentation**                 | ✅ Comprehensive                                  | ⚠️ Basic              | ⚠️ Minimal         | ⚠️ Minimal       |
 | **Community Support**             | ✅ Active maintenance                             | ✅ Active maintenance | ❌ Inactive        | ❌ Inactive      |
 
-As you see in the table, there are some features that as of now only we support. Here is a brief highlight of those that we believe are the most critical ones of them:
+As you see in the table, there are some features that are only supported by us. Here is a brief highlight of those that we believe are the most critical of them:
 
-- **Empty Test Protection**: This one is extremely important. Let's say you define architectural boundaries that shall not be crossed - but you have a typo in the path to some folder. **Your test will just pass with other libraries!** They will 'check the rule' on 0 files and 'pass'. ArchUnitTS detects what we call _empty tests_ and your test fails if it's an empty test. This is the default behvaior, you can customize it to allow empty tests.
-- **Testing framework support**: ArchUnitTS works with any testing framework, plus we have special syntax extension for Jest, Vitest and Jasmine. Other libraries such as ts-arch only have special support for Jest or no special support at all.
+- **Empty Test Protection**: This one is extremely important. Let's say you define architectural boundaries that shall not be crossed - but you have a typo in the path to some folder. **Your test will just pass with other libraries!** They will _'check the rule'_ on _0 files_ and the test _'passes'_. ArchUnitTS detects this, we call it an _empty test_, and your test fails. This is the default behvaior, you can customize it to allow empty tests if you want to.
+
+- **Testing framework support**: ArchUnitTS works with any testing framework, plus we have special syntax extensions for Jest, Vitest and Jasmine. Other libraries such as ts-arch only have special support for Jest, or no special support at all.
+
 - **Logging**: We have great support for logs and different log levels. This can help to understand what files are being analyzed and why tests pass/fail. Other libraries have no logging support at all.
-- **Code Metrics**: Metrics such as cohesion, coupling metrics, distance from main sequence, and even custom metrics provide important insights into any projects code. But also here, ArchUnitTS is the only library supporting this.
+
+- **Code Metrics**: Metrics such as cohesion, coupling metrics, distance from main sequence, and even custom metrics provide important insights into any projects code. ArchUnitTS is the only library with code metrics support.
+
 - **Intelligent Error Messages**: Our error messages contain clickable file paths and detailed violation descriptions. Again, other libraries do not have this.
-- **Custom rules**: ArchUnitTS is the only library that allows you to define custom rules and metrics.
-- **HTML Reports**: Auto generated dashboards with charts and detailed breakdowns. Here again, other libraries do not support this at all.
+
+- **Custom rules**: ArchUnitTS is the only library that allows you to define custom rules and custom metrics.
+
+- **HTML Reports**: We support auto generated dashboards with charts and detailed breakdowns. Other libraries do not.
 
 ## 🔎 Informative Error Messages
 
