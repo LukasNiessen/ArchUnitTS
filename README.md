@@ -51,6 +51,7 @@ it('presentation layer should not depend on database layer', async () => {
     .shouldNot()
     .dependOnFiles()
     .inFolder('src/database');
+
   await expect(rule).toPassAsync();
 });
 
@@ -60,6 +61,7 @@ it('business layer should not depend on database layer', async () => {
     .shouldNot()
     .dependOnFiles()
     .inFolder('src/database');
+
   await expect(rule).toPassAsync();
 });
 
