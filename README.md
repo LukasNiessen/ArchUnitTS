@@ -421,6 +421,7 @@ it('should test files in specific folders', async () => {
 
 #### 2. Pattern-Based Filtering
 
+TODO: entire section needs rewrite. !!! matchingpattern is also removed.
 Use `matchingPattern()` for glob-style pattern matching:
 
 ```typescript

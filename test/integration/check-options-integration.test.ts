@@ -43,7 +43,7 @@ describe('CheckOptions Integration Test', () => {
 
 	it('should work with pattern matching and options', async () => {
 		const rule = projectFiles()
-			.matchingPattern('hey/nonexistent-*.ts')
+			.inPath('hey/nonexistent-*.ts')
 			.should()
 			.matchFilename(/.*\.ts$/);
 

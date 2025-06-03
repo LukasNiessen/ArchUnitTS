@@ -1,4 +1,3 @@
-import { ImportKind } from '../../../src/common/util/import-kinds';
 import { FileConditionBuilder, projectFiles } from '../../../src/files/fluentapi/files';
 import { ViolatingNode } from '../../../src/files/assertion/matching-files';
 import path from 'path';
@@ -69,7 +68,7 @@ describe('Integration test', () => {
 			.inFolder('src/components/ATest')
 			.shouldNot()
 			.dependOnFiles()
-			.matchingPattern('src/components/BTest')
+			.inFolder('src/components/BTest')
 			.check();
 
 		expect(violations).toMatchObject([

@@ -87,7 +87,7 @@ describe('Empty Test Detection', () => {
 	describe('when files do match patterns', () => {
 		it('should not create empty test violations when files are found', async () => {
 			const violations = await projectFiles(tsConfigPath)
-				.inFolder('controllers')
+				.inFolder('src/controllers/**')
 				.should()
 				.matchFilename('*.ts')
 				.check();
@@ -98,13 +98,13 @@ describe('Empty Test Detection', () => {
 
 		it('should work normally with existing files regardless of allowEmptyTests option', async () => {
 			const violationsDefault = await projectFiles(tsConfigPath)
-				.inFolder('controllers')
+				.inFolder('src/controllers/**')
 				.should()
 				.matchFilename('Service*')
 				.check();
 
 			const violationsWithOption = await projectFiles(tsConfigPath)
-				.inFolder('controllers')
+				.inFolder('src/controllers/**')
 				.should()
 				.matchFilename('Service*')
 				.check({ allowEmptyTests: true });

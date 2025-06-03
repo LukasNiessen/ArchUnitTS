@@ -4,7 +4,7 @@ import {
 	matchesAnyPattern,
 } from '../../src/files/assertion/pattern-matching';
 import { ProjectedNode } from '../../src/common/projection/project-nodes';
-import { RegexFactory } from '../../src/files/fluentapi/regex-factory';
+import { RegexFactory } from '../../src/common/regex-factory';
 
 describe('Pattern Matching', () => {
 	const createProjectedNode = (path: string): ProjectedNode => {

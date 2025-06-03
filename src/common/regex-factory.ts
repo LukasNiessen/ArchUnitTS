@@ -1,5 +1,5 @@
 import { minimatch } from 'minimatch';
-import { Filter, Pattern } from '../../common/type';
+import { Filter, Pattern } from './type';
 
 export class RegexFactory {
 	private static escapeRegex(str: string): string {

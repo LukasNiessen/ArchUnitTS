@@ -1,5 +1,4 @@
 import { extractGraph } from '../../common/extraction/extract-graph';
-import { RegexFactory } from './regex-factory';
 import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
 import { CheckLogger } from '../../common/util/logger';
 import { projectEdges } from '../../common/projection/project-edges';
@@ -14,6 +13,7 @@ import {
 	CustomFileCondition,
 } from '../assertion/custom-file-logic';
 import { Filter, Pattern } from '../../common/type';
+import { RegexFactory } from '../../common/regex-factory';
 
 // Re-export types for external use
 export type { FileInfo, CustomFileCondition } from '../assertion/custom-file-logic';
@@ -30,13 +30,6 @@ export const files = projectFiles;
  */
 export class FileConditionBuilder {
 	constructor(readonly tsConfigFilePath?: string) {}
-
-	/*
-	public matchingPattern(pattern: Pattern): FilesShouldCondition {
-		const patterns = typeof pattern === 'string' ? [RegexFactory.] : [pattern.source];
-		return new FilesShouldCondition(this, patterns);
-	}
-	*/
 
 	/**
 	 * Matches all files that have this name. You must include the file extension.
@@ -111,12 +104,6 @@ export class FilesShouldCondition {
 		return new NegatedMatchPatternFileConditionBuilder(this);
 	}
 
-	/*
-	public matchingPattern(pattern: string): FilesShouldCondition {
-		return new FilesShouldCondition(this, [...this.filters, pattern]);
-	}
-	*/
-
 	/**
 	 * Matches all files that have this name. You must include the file extension.
 	 *
@@ -136,11 +123,6 @@ export class FilesShouldCondition {
 	 * @returns
 	 */
 	public withName(name: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.fileNameMatcher(name)]);
-	}
-
-	// X-TODO: great doc comments here
-	public containsInFilename(name: Pattern): FilesShouldCondition {
 		return new FilesShouldCondition(this, [RegexFactory.fileNameMatcher(name)]);
 	}
 
@@ -602,14 +584,6 @@ export class DependOnFileConditionBuilder {
 	) {}
 
 	/**
-	 * @param pattern String pattern to match dependency files
-	 * @returns DependOnFileCondition for further chaining or checking
-	 */
-	public matchingPattern(pattern: Pattern): DependOnFileCondition {
-		return new DependOnFileCondition(this, [RegexFactory.fileNameMatcher(pattern)]);
-	}
-
-	/**
 	 * Matches all files that have this name. You must include the file extension.
 	 *
 	 * For example, if the input is 'my-component.ts':
@@ -679,6 +653,10 @@ export class DependOnFileConditionBuilder {
 	public inFolder(folder: Pattern): DependOnFileCondition {
 		return new DependOnFileCondition(this, [RegexFactory.folderMatcher(folder)]);
 	}
+
+	public inPath(folder: Pattern): DependOnFileCondition {
+		return new DependOnFileCondition(this, [RegexFactory.pathMatcher(folder)]);
+	}
 }
 
 /**
@@ -716,10 +694,10 @@ export class DependOnFileCondition implements Checkable {
 		readonly dependencyFilters: Filter[]
 	) {}
 
-	public matchingPattern(pattern: Pattern): DependOnFileCondition {
+	public inPath(pattern: Pattern): DependOnFileCondition {
 		return new DependOnFileCondition(this.dependOnFileConditionBuilder, [
 			...this.dependencyFilters,
-			RegexFactory.fileNameMatcher(pattern),
+			RegexFactory.pathMatcher(pattern),
 		]);
 	}
 
