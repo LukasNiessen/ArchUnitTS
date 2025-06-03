@@ -52,19 +52,19 @@ The heart of ArchUnitTS lies in `src/common/extraction/extract-graph.ts`. This m
 
 ```typescript
 function visitNode(node: ts.Node, sourceFile: ts.SourceFile) {
-	switch (node.kind) {
-		case ts.SyntaxKind.ImportDeclaration:
-			handleImportDeclaration(node as ts.ImportDeclaration);
-			break;
-		case ts.SyntaxKind.ClassDeclaration:
-			handleClassDeclaration(node as ts.ClassDeclaration);
-			break;
-		case ts.SyntaxKind.CallExpression:
-			handleCallExpression(node as ts.CallExpression);
-			break;
-		// ... more node types
-	}
-	ts.forEachChild(node, (child) => visitNode(child, sourceFile));
+  switch (node.kind) {
+    case ts.SyntaxKind.ImportDeclaration:
+      handleImportDeclaration(node as ts.ImportDeclaration);
+      break;
+    case ts.SyntaxKind.ClassDeclaration:
+      handleClassDeclaration(node as ts.ClassDeclaration);
+      break;
+    case ts.SyntaxKind.CallExpression:
+      handleCallExpression(node as ts.CallExpression);
+      break;
+    // ... more node types
+  }
+  ts.forEachChild(node, (child) => visitNode(child, sourceFile));
 }
 ```
 
@@ -130,25 +130,25 @@ Simplified pseudo code:
 
 ```typescript
 declare global {
-	namespace jest {
-		interface Matchers<R> {
-			toPassAsync(): Promise<R>;
-		}
-	}
+  namespace jest {
+    interface Matchers<R> {
+      toPassAsync(): Promise<R>;
+    }
+  }
 }
 
 expect.extend({
-	async toPassAsync(rule: ArchRule) {
-		const violations = await rule.evaluate();
+  async toPassAsync(rule: ArchRule) {
+    const violations = await rule.evaluate();
 
-		return {
-			pass: violations.length === 0,
-			message: () =>
-				violations.length > 0
-					? `Architecture rule failed:\n${violations.map((v) => v.message).join('\n')}`
-					: 'Architecture rule passed',
-		};
-	},
+    return {
+      pass: violations.length === 0,
+      message: () =>
+        violations.length > 0
+          ? `Architecture rule failed:\n${violations.map((v) => v.message).join('\n')}`
+          : 'Architecture rule passed',
+    };
+  },
 });
 ```
 
@@ -192,3 +192,35 @@ await expect(rule).toPassAsync();
 ## Performance Optimizations
 
 ArchUnitTS implements several optimizations for large codebases including caching and lazy loading.
+
+### All Files Inclusion
+
+ArchUnitTS ensures that **all project files** appear in the dependency graph, even if they don't import other project files. This is achieved by adding self-referencing edges for every file in the project.
+
+**Why this matters:**
+
+- Standalone utility files are included in architectural analysis
+- Entry point files without imports are visible in the graph
+- Complete project coverage for architectural rules
+- No files are accidentally excluded from analysis
+
+**Example:**
+
+```typescript
+// Even if utils.ts doesn't import anything from your project,
+// it will still appear in the graph with a self-edge: utils.ts -> utils.ts
+
+// This ensures files like these are always analyzed:
+// - Configuration files
+// - Standalone utilities
+// - Entry points
+// - Constants files
+// - Type definition files
+```
+
+The graph will contain:
+
+- **Import edges**: Real dependencies between files (A imports B)
+- **Self edges**: Every project file references itself (ensures inclusion)
+
+This guarantees comprehensive architectural analysis across your entire codebase.
