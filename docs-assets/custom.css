@@ -4,41 +4,42 @@
 /* Import modern fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
 
-/* CSS Variables for Modern Cursor-Inspired Color Palette */
+/* CSS Variables for Modern Cursor-Inspired Color Palette - DARK MODE ENFORCED */
 :root {
 	/* Primary Cursor-inspired colors */
-	--primary-indigo: #6366f1;
-	--primary-indigo-dark: #4f46e5;
-	--primary-indigo-hover: #9b97e8;
-	--primary-indigo-light: #818cf8;
-	--primary-indigo-extra-light: #c7d2fe;
+	--primary-indigo: #6366f1 !important;
+	--primary-indigo-dark: #4f46e5 !important;
+	--primary-indigo-hover: #9b97e8 !important;
+	--primary-indigo-light: #818cf8 !important;
+	--primary-indigo-extra-light: #c7d2fe !important;
 
-	/* Modern neutral grays */
-	--gray-50: #f9fafb;
-	--gray-100: #f3f4f6;
-	--gray-200: #e5e7eb;
-	--gray-300: #d1d5db;
-	--gray-400: #9ca3af;
-	--gray-500: #6b7280;
-	--gray-600: #4b5563;
-	--gray-700: #374151;
-	--gray-800: #1f2937;
-	--gray-900: #111827;
-	/* Background colors - Darker theme */
-	--bg-primary: #f8fafc;
-	--bg-secondary: #f1f5f9;
-	--bg-th: #1b1d21;
-	--bg-td: #191b20;
-	--bg-tertiary: #e2e8f0;
-	--bg-dark: #0f1012;
-	--bg-dark-secondary: #1e293b;
-	--bg-page: #f3f4f6;
+	/* Modern neutral grays - DARK THEME */
+	--gray-50: #0a0a0b !important;
+	--gray-100: #111115 !important;
+	--gray-200: #16161b !important;
+	--gray-300: #1e1e24 !important;
+	--gray-400: #2a2a32 !important;
+	--gray-500: #3a3a44 !important;
+	--gray-600: #4a4a56 !important;
+	--gray-700: #5a5a68 !important;
+	--gray-800: #6a6a7a !important;
+	--gray-900: #e4e4e7 !important;
 
-	/* Text colors */
-	--text-primary: #0f172a;
-	--text-secondary: #374151;
-	--text-tertiary: #64748b;
-	--text-inverse: #ececec;
+	/* Background colors - DARKER THEME */
+	--bg-primary: #0a0a0b !important;
+	--bg-secondary: #111115 !important;
+	--bg-th: #16161b !important;
+	--bg-td: #1a1a1f !important;
+	--bg-tertiary: #1e1e24 !important;
+	--bg-dark: #0a0a0b !important;
+	--bg-dark-secondary: #16161b !important;
+	--bg-page: #0a0a0b !important;
+
+	/* Text colors - DARK THEME */
+	--text-primary: #e4e4e7 !important;
+	--text-secondary: #a1a1aa !important;
+	--text-tertiary: #71717a !important;
+	--text-inverse: #0a0a0b !important;
 
 	--tw-shadow: 0px 5px 18px rgba(204, 204, 204, 0.1);
 	--tw-shadow-colored: 0px 5px 18px var(--tw-shadow-color);
@@ -66,18 +67,31 @@
 		'Fira Code', 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace;
 }
 
-/* Dark mode variables */
-@media (prefers-color-scheme: dark) {
-	:root {
-		--bg-primary: #07080a;
-		--bg-secondary: #1e293b;
-		--bg-tertiary: #334155;
-		--text-primary: #f1f5f9;
-		--text-secondary: #cbd5e1;
-		--text-tertiary: #94a3b8;
-		--border-light: #334155;
-		--border-medium: #475569;
-	}
+/* Force dark mode - override light mode variables */
+:root {
+	--bg-primary: #07080a !important;
+	--bg-secondary: #1e293b !important;
+	--bg-tertiary: #334155 !important;
+	--text-primary: #f1f5f9 !important;
+	--text-secondary: #cbd5e1 !important;
+	--text-tertiary: #94a3b8 !important;
+	--border-light: #334155 !important;
+	--border-medium: #475569 !important;
+}
+
+/* Force dark mode script injection */
+html {
+	color-scheme: dark !important;
+}
+
+html[data-theme='light'],
+html[data-theme='os'] {
+	filter: none !important;
+}
+
+/* Override any light theme styles */
+* {
+	color-scheme: dark !important;
 }
 
 /* Base styles */
@@ -109,14 +123,22 @@ body {
 	top: 1rem;
 	z-index: 1000;
 	margin: 1rem auto;
-	max-width: 85%;
+	max-width: 900px;
+	width: 85%;
 	border-radius: 1rem;
+	padding: 0;
 	box-shadow:
 		var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
 		var(--tw-shadow);
 	background-color: var(--bg-dark);
 	border: 0;
 }
+
+/* Hide the text (ArchUnitTS version xyz) */
+/*#tsd-search > a {
+	opacity: 1;
+}
+*/
 
 .tsd-toolbar-contents {
 	max-width: 1200px;
@@ -131,7 +153,25 @@ body {
 	font-weight: 700;
 	font-size: 1.4rem;
 	letter-spacing: -0.02em;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
 }
+
+/*
+.tsd-toolbar-contents::before {
+	content: '';
+	background-image: url('logo-rounded.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	margin-right: 13px;
+	width: 22px;
+	height: 22px;
+	margin: auto;
+	display: inline-block;
+}
+*/
 
 .tsd-toolbar-icon:hover {
 	opacity: 0.9;
@@ -243,8 +283,6 @@ body {
 	font-weight: 600;
 	margin: 0 0 1rem 0;
 	color: var(--text-primary);
-	border-bottom: 2px solid var(--primary-indigo);
-	padding-bottom: 0.5rem;
 }
 
 .page-menu ul {
@@ -274,6 +312,30 @@ body {
 	transform: translateX(4px);
 	font-weight: 600;
 	border-color: var(--primary-indigo-light);
+}
+
+/* Remove arrows from page menu */
+.page-menu .tsd-accordion-summary::before,
+.page-menu .tsd-accordion-summary::after,
+.page-menu details > summary::before,
+.page-menu details > summary::after,
+.page-menu summary::before,
+.page-menu summary::after {
+	display: none !important;
+}
+
+.page-menu details > summary {
+	list-style: none;
+}
+
+.page-menu details > summary::-webkit-details-marker {
+	display: none;
+}
+
+#tsd-toolbar-links {
+	align-items: center;
+	justify-content: center;
+	width: 100%;
 }
 
 /* Typography */
@@ -348,7 +410,7 @@ a {
 }
 
 pre {
-	background: linear-gradient(135deg, #1b1e28 0%, #19202c 100%);
+	background: linear-gradient(135deg, #1a1d29 0%, #1e293b 100%);
 	border: 1px solid #374151;
 	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 	color: #e2e8f0;
@@ -719,4 +781,9 @@ th {
 	.page-menu {
 		border-color: #64748b;
 	}
+}
+
+/* Hide theme selector */
+.tsd-theme {
+	display: none !important;
 }
