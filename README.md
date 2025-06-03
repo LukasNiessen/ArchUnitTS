@@ -173,7 +173,7 @@ This is an overview of you can do with ArchUnitTS.
 
 ```typescript
 it('services should be free of cycles', async () => {
-  const rule = projectFiles().inFolder('src/services').should().haveNoCycles();
+  const rule = projectFiles().inFolder('**/services/**').should().haveNoCycles();
   await expect(rule).toPassAsync();
 });
 ```
@@ -204,7 +204,11 @@ it('business layer should not depend on presentation', async () => {
 
 ```typescript
 it('should follow naming patterns', async () => {
-  const rule = projectFiles().inFolder('services').should().matchFilename('*Service.ts'); // Modern glob pattern approach
+  const rule = projectFiles()
+    .inFolder('**/services/**')
+    .withName('*Service.ts')
+    .should()
+    .beInFolder('services');
   await expect(rule).toPassAsync();
 });
 ```
@@ -387,23 +391,69 @@ The export functionality can be customized, for example by specifying an output 
 
 We offer three targeting options for pattern matching across all modules:
 
-- **`withName(pattern)`** - Match only the filename (e.g., 'Service.ts' from 'src/services/Service.ts')
-- **`inPath(pattern)`** - Match against the full relative path (e.g., 'src/services/Service.ts')
-- **`inFolder(pattern)`** - Match against the path without filename (e.g., 'src/services' from 'src/services/Service.ts')
+- **`withName(pattern)`** - Match only the filename (eg. `Service.ts` from `src/services/Service.ts`)
+- **`inPath(pattern)`** - Match against the full relative path (eg. `src/services/Service.ts`)
+- **`inFolder(pattern)`** - Match against the path without filename (eg. `src/services` from `src/services/Service.ts`)
 
 ### Pattern Types
 
 Both string patterns (with glob support) and regular expressions are supported:
 
 ```typescript
-// String patterns with glob support
+// String patterns with glob support (case insensitive)
 .withName('*.service.ts')     // All files ending with .service.ts
 .inFolder('**/services')      // All files in any services folder
 .inPath('src/api/**/*.ts')    // All TypeScript files under src/api
 
-// Regular expressions
-.withName(/^.*Service\.ts$/)  // Same as *.service.ts but as regex
-.inFolder(/services$/)        // Folders ending with 'services'
+// Regular expressions (case sensitive - use when you need exact case matching)
+.withName(/^.*Service\.ts$/)  // Same as *.service.ts but case-sensitive
+.inFolder(/services$/)        // Folders ending with 'services' (case-sensitive)
+```
+
+### Case Sensitivity
+
+- **Glob patterns (strings)**: Case **insensitive** by default
+- **Regular expressions**: Case **sensitive** by default
+
+If you need case-sensitive matching, use regular expressions. If you need case-insensitive regex matching, use the `i` flag:
+
+```typescript
+// Case insensitive regex
+.withName(/^.*service\.ts$/i)  // Matches Service.ts, service.ts, SERVICE.ts
+```
+
+### Glob Patterns Guide
+
+Glob patterns provide powerful wildcard matching for paths and filenames:
+
+#### Basic Wildcards
+
+- `*` - Matches any characters within a single path segment (doesn't cross `/`)
+- `**` - Matches any characters across multiple path segments (recursive)
+- `?` - Matches exactly one character
+- `[abc]` - Matches any character in the bracket set
+- `[a-z]` - Matches any character in the range
+
+#### Common Glob Examples
+
+```typescript
+// Filename patterns
+.withName('*.ts')           // All TypeScript files
+.withName('*.{js,ts}')      // All JavaScript or TypeScript files
+.withName('*Service.ts')    // Files ending with 'Service.ts'
+.withName('User*.ts')       // Files starting with 'User'
+.withName('?est.ts')        // test.ts, nest.ts, etc.
+
+// Folder patterns
+.inFolder('**/services')    // Any 'services' folder at any depth
+.inFolder('src/services')   // Exact 'src/services' folder
+.inFolder('**/test/**')     // Any folder containing 'test' in path
+.inFolder('src/*')          // Direct subfolders of 'src'
+
+// Path patterns
+.inPath('src/**/*.service.ts')     // Service files anywhere under src
+.inPath('**/test/**/*.spec.ts')    // Test files in any test folder
+.inPath('src/domain/*/*.ts')       // TypeScript files one level under domain
 ```
 
 ### Basic Pattern Matching Examples
@@ -412,22 +462,26 @@ Both string patterns (with glob support) and regular expressions are supported:
 import { projectFiles, metrics } from 'archunit';
 
 // Files module - Test architectural rules
-await projectFiles().withName('*.service.ts').should().beInFolder('services').check();
+await projectFiles()
+  .withName('*.service.ts')
+  .should()
+  .beInFolder('**/services/**')
+  .check();
 
 // Metrics module - Test only service classes
 await metrics().withName('*.service.ts').lcom().lcom96b().shouldBeBelow(0.7).check();
 
 // Files module - Test classes in specific folders
 await projectFiles()
-  .inFolder('**/controllers')
+  .inFolder('**/controllers/**')
   .shouldNot()
   .dependOnFiles()
-  .inFolder('**/database')
+  .inFolder('**/database/**')
   .check();
 
 // Metrics module - Test classes in specific folders
 await metrics()
-  .inFolder('**/controllers')
+  .inFolder('**/controllers/**')
   .count()
   .methodCount()
   .shouldBeBelow(20)
@@ -447,15 +501,15 @@ You can combine multiple pattern matching methods for precise targeting across a
 ```typescript
 // Files module - Combine folder and filename patterns
 await projectFiles()
-  .inFolder('**/services')
+  .inFolder('**/services/**')
   .withName('*.service.ts')
   .should()
-  .beInFolder('services')
+  .beInFolder('**/services/**')
   .check();
 
 // Metrics module - Combine folder and filename patterns
 await metrics()
-  .inFolder('**/services')
+  .inFolder('**/services/**')
   .withName('*.service.ts')
   .lcom()
   .lcom96b()
@@ -477,6 +531,88 @@ await metrics()
   .count()
   .methodCount()
   .shouldBeBelow(15)
+  .check();
+```
+
+### PascalCase and Naming Convention Examples
+
+Pattern matching is particularly useful for enforcing naming conventions:
+
+```typescript
+// Match PascalCase service classes
+await projectFiles()
+  .withName(/^[A-Z][a-zA-Z]*Service\.ts$/)
+  .should()
+  .beInFolder('**/services/**')
+  .check();
+
+// Match camelCase test files
+await projectFiles()
+  .withName(/^[a-z][a-zA-Z]*\.spec\.ts$/)
+  .should()
+  .beInFolder('**/test/**')
+  .check();
+
+// Match interface files (starting with I)
+await projectFiles()
+  .withName(/^I[A-Z][a-zA-Z]*\.ts$/)
+  .should()
+  .beInFolder('**/interfaces/**')
+  .check();
+
+// Match constant files (all uppercase)
+await projectFiles()
+  .withName(/^[A-Z_]+\.ts$/)
+  .should()
+  .beInFolder('**/constants/**')
+  .check();
+
+// Metrics for PascalCase controllers
+await metrics()
+  .withName(/^[A-Z][a-zA-Z]*Controller\.ts$/)
+  .lcom()
+  .lcom96b()
+  .shouldBeBelow(0.5)
+  .check();
+```
+
+### Complex Pattern Matching Scenarios
+
+Here are more advanced use cases combining different pattern types:
+
+```typescript
+// Ensure all TypeScript files in feature folders follow naming conventions
+await projectFiles()
+  .inPath('src/features/**/*.ts')
+  .withName(/^[A-Z][a-zA-Z]*\.(service|controller|model)\.ts$/)
+  .should()
+  .exist()
+  .check();
+
+// Test that utility files have low complexity
+await metrics()
+  .inFolder('**/utils/**')
+  .withName('*.util.ts')
+  .complexity()
+  .cyclomaticComplexity()
+  .shouldBeBelow(5)
+  .check();
+
+// Ensure test files don't depend on implementation details
+await projectFiles()
+  .withName('*.spec.ts')
+  .shouldNot()
+  .dependOnFiles()
+  .inPath('src/**/internal/**')
+  .check();
+
+// Check cohesion of domain entities
+await metrics()
+  .inPath('src/domain/entities/**/*.ts')
+  .withName(/^[A-Z][a-zA-Z]*Entity\.ts$/)
+  .lcom()
+  .lcom96a()
+  .shouldBeBelow(0.6)
   .check();
 ```
 
@@ -665,12 +801,12 @@ All existing methods continue to work alongside the new pattern matching capabil
 
 ```typescript
 // Files module - Legacy methods still supported
-await projectFiles().inFolder('services').should().haveNoCycles().check();
+await projectFiles().inFolder('**/services/**').should().haveNoCycles().check();
 
 await projectFiles()
   .matchingPattern('**/*.service.ts')
   .should()
-  .beInFolder('services')
+  .beInFolder('**/services/**')
   .check();
 
 // Metrics module - Legacy methods still supported
@@ -704,7 +840,7 @@ The `inFolder()` method is the most common way to select files within specific d
 ```typescript
 it('should test files in specific folders', async () => {
   // Test all files in the 'services' folder
-  const rule = projectFiles().inFolder('services').should().haveNoCycles();
+  const rule = projectFiles().inFolder('**/services/**').should().haveNoCycles();
 
   await expect(rule).toPassAsync();
 });
@@ -712,14 +848,14 @@ it('should test files in specific folders', async () => {
 
 **How `inFolder()` works:**
 
-- **Input:** `'components'`
+- **Input:** `'**/components/**'`
 
   - ✅ Matches: `'src/components/component-a.ts'`
   - ✅ Matches: `'src/components/component-b.ts'`
-  - ✅ Matches: `'src/domain/helper/components/helper-component.ts'` ← notice `/components/` is in the path
+  - ✅ Matches: `'src/domain/helper/components/helper-component.ts'`
   - ❌ NOT matching: `'src/views/view-a.ts'`
 
-- **Input:** `'src/components'` (more specific path)
+- **Input:** `'src/components/**'` (more specific path)
   - ✅ Matches: `'src/components/component-a.ts'`
   - ✅ Matches: `'src/components/component-b.ts'`
   - ❌ NOT matching: `'src/domain/helper/components/helper-component.ts'`
@@ -745,7 +881,10 @@ Use `withName()` for exact filename matching:
 
 ```typescript
 it('should match specific file names', async () => {
-  const rule = projectFiles().withName('UserService.ts').should().beInFolder('services');
+  const rule = projectFiles()
+    .withName('UserService.ts')
+    .should()
+    .beInFolder('**/services/**');
 
   await expect(rule).toPassAsync();
 });
@@ -767,18 +906,19 @@ it('should match specific file names', async () => {
 
 ### Enhanced Pattern Matching API
 
-ArchUnitTS provides four enhanced pattern matching methods for more precise file selection:
+ArchUnitTS provides sophisticated pattern matching methods for precise file selection:
 
-#### 1. `matchFilename()` - Exact Filename Matching (Recommended)
+#### 1. `withName()` - Filename Pattern Matching (Recommended)
 
 Matches patterns against the filename only (not the full path). This is the recommended approach for most use cases.
 
 ```typescript
 it('should enforce service naming convention', async () => {
   const violations = await projectFiles()
-    .inFolder('services')
+    .inFolder('**/services/**')
+    .withName('*Service.ts') // Glob pattern
     .should()
-    .matchFilename('*Service.ts') // Glob pattern
+    .beInFolder('services')
     .check();
 
   // Files like 'UserService.ts', 'ProductService.ts' will match
@@ -786,98 +926,78 @@ it('should enforce service naming convention', async () => {
 });
 ```
 
-**Examples of `matchFilename()` patterns:**
+**Examples of `withName()` patterns:**
 
 ```typescript
 // Glob patterns (recommended)
-.matchFilename('Service*.ts')     // ✅ Service.ts, ServiceA.ts, ServiceImpl.ts
-.matchFilename('*Controller.ts')  // ✅ UserController.ts, AdminController.ts
-.matchFilename('Test?.spec.ts')   // ✅ TestA.spec.ts, TestB.spec.ts (? = single char)
-.matchFilename('*Util*')          // ✅ StringUtil.ts, DateUtils.ts, MathUtility.ts
+.withName('Service*.ts')     // ✅ Service.ts, ServiceA.ts, ServiceImpl.ts
+.withName('*Controller.ts')  // ✅ UserController.ts, AdminController.ts
+.withName('Test?.spec.ts')   // ✅ TestA.spec.ts, TestB.spec.ts (? = single char)
+.withName('*Util*')          // ✅ StringUtil.ts, DateUtils.ts, MathUtility.ts
 
 // Regular expressions
-.matchFilename(/^Service.*\.ts$/) // ✅ Matches files starting with "Service"
-.matchFilename(/.*\.(test|spec)\.ts$/) // ✅ Matches test files
+.withName(/^Service.*\.ts$/) // ✅ Matches files starting with "Service"
+.withName(/.*\.(test|spec)\.ts$/) // ✅ Matches test files
 
 // Exact string matching
-.matchFilename('UserService.ts')  // ✅ Matches exactly "UserService.ts"
+.withName('UserService.ts')  // ✅ Matches exactly "UserService.ts"
 ```
 
-#### 2. `matchPath()` - Full Path Matching
+#### 2. `inPath()` - Full Path Pattern Matching
 
 Matches patterns against the complete relative file path from the project root:
 
 ```typescript
 it('should match specific path patterns', async () => {
   const violations = await projectFiles()
+    .inPath('src/services/*Service.ts') // Full path pattern
     .should()
-    .matchPath('src/services/*Service.ts') // Full path pattern
+    .beInFolder('services')
     .check();
 });
 ```
 
-**Examples of `matchPath()` patterns:**
-
-TODO: does this really work? also, why two stars?
+**Examples of `inPath()` patterns:**
 
 ```typescript
 // Glob patterns for paths
-.matchPath('src/*/services/*.ts')     // ✅ Service files in any module
-.matchPath('**/test/**/*.spec.ts')    // ✅ Test files in any test directory
-.matchPath('src/components/**/*.tsx') // ✅ All TSX files in components
+.inPath('src/*/services/*.ts')     // ✅ Service files in any module
+.inPath('**/test/**/*.spec.ts')    // ✅ Test files in any test directory
+.inPath('src/components/**/*.tsx') // ✅ All TSX files in components
 
 // Regular expressions for paths
-.matchPath(/^src\/services\/.*Service\.ts$/) // ✅ Services in specific folder
-.matchPath(/^src\/.*\/.*\.component\.ts$/)   // ✅ Component files anywhere in src
+.inPath(/^src\/services\/.*Service\.ts$/) // ✅ Services in specific folder
+.inPath(/^src\/.*\/.*\.component\.ts$/)   // ✅ Component files anywhere in src
 ```
 
-#### 3. `containInFilename()` - Partial Filename Matching
+#### 3. `inFolder()` - Folder Pattern Matching
 
-Checks if the filename contains the specified pattern as a substring:
+Matches patterns against the folder path (path without filename):
 
 ```typescript
-it('should find files containing specific terms', async () => {
+it('should find files in specific folders', async () => {
   const violations = await projectFiles()
-    .shouldNot()
-    .containInFilename('Test') // Files shouldn't contain "Test" in filename
-    .check();
-});
-```
-
-**Examples of `containInFilename()` patterns:**
-
-```typescript
-.containInFilename('Service')    // ✅ UserService.ts, ServiceHelper.ts, MyServiceImpl.ts
-.containInFilename('test')       // ✅ user.test.ts, test-utils.ts, testing.ts
-.containInFilename(/service/i)   // ✅ Case-insensitive: UserService.ts, user-service.ts
-```
-
-#### 4. `containInPath()` - Partial Path Matching
-
-Checks if the full file path contains the specified pattern as a substring:
-
-```typescript
-it('should find files with path containing specific terms', async () => {
-  const violations = await projectFiles()
+    .inFolder('**/test/**') // Files in any test folder
     .should()
-    .containInPath('components') // Files should have 'components' in their path
+    .haveNoCycles()
     .check();
 });
 ```
 
-**Examples of `containInPath()` patterns:**
+**Examples of `inFolder()` patterns:**
 
 ```typescript
-.containInPath('test')        // ✅ src/test/file.ts, src/components/test/file.ts
-.containInPath('services')    // ✅ src/services/file.ts, lib/services/impl/file.ts
-.containInPath(/spec|test/)   // ✅ Files with 'spec' or 'test' anywhere in path
+.inFolder('**/services/**')    // ✅ Files in any services folder
+.inFolder('src/components/**') // ✅ Files in src/components and subfolders
+.inFolder(/test/i)             // ✅ Case-insensitive: test, Test, TEST folders
 ```
 
-### Pattern Matching
+### Pattern Matching Examples
 
 ```typescript
-.matchFilename('*Controller.ts')  // or
-.matchFilename(/.*Controller\.ts$/)
+.withName('*Controller.ts')  // Filename patterns
+.inPath('src/api/**/*.ts')   // Full path patterns
+.inFolder('**/services/**')  // Folder patterns
 ```
 
 ### Pattern Types and Syntax
@@ -938,23 +1058,24 @@ Plain strings for exact or substring matching:
 it('should validate complex architectural rules', async () => {
   // Services should follow naming convention
   const serviceViolations = await projectFiles()
-    .inFolder('services')
+    .inFolder('**/services/**')
+    .withName(/^[A-Z].*Service\.ts$/) // PascalCase services
     .should()
-    .matchFilename(/^[A-Z].*Service\.ts$/) // PascalCase services
+    .beInFolder('services')
     .check();
 
   // Components should be in components folder
   const componentViolations = await projectFiles()
-    .matchFilename('*.component.tsx')
+    .withName('*.component.tsx')
     .should()
-    .beInFolder('components')
+    .beInFolder('**/components/**')
     .check();
 
   // Test files should not be in production code
   const testViolations = await projectFiles()
-    .containInFilename(/\.(test|spec)\./)
+    .withName(/\.(test|spec)\.ts$/)
     .shouldNot()
-    .beInFolder('src/production')
+    .beInFolder('src/production/**')
     .check();
 
   expect(serviceViolations).toEqual([]);
@@ -969,23 +1090,26 @@ it('should validate complex architectural rules', async () => {
 it('should enforce layered architecture', async () => {
   // Controllers should follow naming convention
   const controllerViolations = await projectFiles()
-    .inFolder('controllers')
+    .inFolder('**/controllers/**')
+    .withName('*Controller.ts')
     .should()
-    .matchFilename('*Controller.ts')
+    .beInFolder('controllers')
     .check();
 
   // Services should follow naming convention
   const serviceViolations = await projectFiles()
-    .inFolder('services')
+    .inFolder('**/services/**')
+    .withName('*Service.ts')
     .should()
-    .matchFilename('*Service.ts')
+    .beInFolder('services')
     .check();
 
   // Repositories should follow naming convention
   const repoViolations = await projectFiles()
-    .inFolder('repositories')
+    .inFolder('**/repositories/**')
+    .withName('*Repository.ts')
     .should()
-    .matchFilename('*Repository.ts')
+    .beInFolder('repositories')
     .check();
 
   expect(controllerViolations).toEqual([]);
@@ -1000,16 +1124,18 @@ it('should enforce layered architecture', async () => {
 it('should enforce test file conventions', async () => {
   // Unit tests should end with .spec.ts
   const unitTestViolations = await projectFiles()
-    .inFolder('tests/unit')
+    .inFolder('**/tests/unit/**')
+    .withName('*.spec.ts')
     .should()
-    .matchFilename('*.spec.ts')
+    .beInFolder('tests')
     .check();
 
   // Integration tests should end with .integration.ts
   const integrationTestViolations = await projectFiles()
-    .inFolder('tests/integration')
+    .inFolder('**/tests/integration/**')
+    .withName('*.integration.ts')
     .should()
-    .matchFilename('*.integration.ts')
+    .beInFolder('tests')
     .check();
 
   expect(unitTestViolations).toEqual([]);
