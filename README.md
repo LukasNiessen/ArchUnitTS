@@ -19,7 +19,7 @@ Enforce architecture rules in TypeScript and JavaScript projects. Check for depe
 
 _Inspired by the amazing ArchUnit library but we are not affiliated with ArchUnit._
 
-[Documentation](#readme) • [Use Cases](#-use-cases) • [Features](#-features) • [Contributing](CONTRIBUTING.md)
+[Documentation](https://lukasniessen.github.io/ArchUnitTS/) • [Use Cases](#-use-cases) • [Features](#-features) • [Contributing](CONTRIBUTING.md)
 
 ## ⚡ 5 min Quickstart
 
@@ -981,6 +981,8 @@ How does ArchUnitTS work under the hood? See [here](info/TECHNICAL.md) for a dee
 ## 🦊 Contributing
 
 We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but with proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed. See more in [Contributing](CONTRIBUTING.md). See also our _'[Backlog](TODO.md)'_.
+
+Note that _deploy_ here means updating the docs. We consider auto deploying the library to npm too risky given the fact that there are no full time maintainers.
 
 ## ℹ️ FAQ
 

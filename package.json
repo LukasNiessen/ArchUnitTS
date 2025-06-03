@@ -55,7 +55,7 @@
 	"bugs": {
 		"url": "https://github.com/LukasNiessen/ArchUnitTS/issues"
 	},
-	"homepage": "https://github.com/LukasNiessen/ArchUnitTS#readme",
+	"homepage": "https://lukasniessen.github.io/ArchUnitTS/",
 	"license": "MIT",
 	"engines": {
 		"node": ">=14.0.0",
@@ -68,7 +68,9 @@
 		"minorpub": "npm run clean && tsc && npm version minor && npm publish",
 		"majorpub": "npm run clean && tsc && npm version major && npm publish",
 		"build": "tsc",
-		"docs": "typedoc --entryPointStrategy expand src",
+		"docs": "typedoc --options typedoc.json",
+		"docs:watch": "typedoc --options typedoc.json --watch",
+		"docs:serve": "npm run docs && npx --yes serve docs",
 		"format": "prettier --ignore-path .gitignore --write '**/*.ts*'",
 		"format:check": "prettier --ignore-path .gitignore --check '**/*.ts*'",
 		"test": "jest --no-cache",
