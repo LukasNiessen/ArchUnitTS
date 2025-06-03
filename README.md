@@ -945,6 +945,8 @@ TODO: include toPassAsync explanation!
 
 TODO: dependabot?
 
+TODO: further documentation for project
+
 ---
 
 ## Notes
