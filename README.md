@@ -37,7 +37,7 @@ Simply add tests to your existing test suites. The following is an example using
 import { projectFiles, metrics } from 'archunit';
 
 it('should not have circular dependencies', async () => {
-  const rule = projectFiles().inFolder('src').should().haveNoCycles();
+  const rule = projectFiles().inFolder('src/**').should().haveNoCycles();
   await expect(rule).toPassAsync();
 });
 ```
@@ -47,20 +47,20 @@ Next we ensure that our layered architecture is respected.
 ```typescript
 it('presentation layer should not depend on database layer', async () => {
   const rule = projectFiles()
-    .inFolder('src/presentation')
+    .inFolder('src/presentation/**')
     .shouldNot()
     .dependOnFiles()
-    .inFolder('src/database');
+    .inFolder('src/database/**');
 
   await expect(rule).toPassAsync();
 });
 
 it('business layer should not depend on database layer', async () => {
   const rule = projectFiles()
-    .inFolder('src/business')
+    .inFolder('src/business/**')
     .shouldNot()
     .dependOnFiles()
-    .inFolder('src/database');
+    .inFolder('src/database/**');
 
   await expect(rule).toPassAsync();
 });
@@ -121,7 +121,7 @@ https://github.com/user-attachments/assets/426f7b47-5157-4e92-98a3-f5ab4f7a388a
 
 ## 🐹 Use Cases
 
-Many common uses cases are covered in our examples folder. Here is an overview.
+Many common uses cases are covered in our examples folder. Note that they are not fully working repositories but code snippets. Here is an overview.
 
 **Layered Architecture:**
 
@@ -173,7 +173,7 @@ This is an overview of you can do with ArchUnitTS.
 
 ```typescript
 it('services should be free of cycles', async () => {
-  const rule = projectFiles().inFolder('**/services/**').should().haveNoCycles();
+  const rule = projectFiles().inFolder('src/services/**').should().haveNoCycles();
   await expect(rule).toPassAsync();
 });
 ```
@@ -183,19 +183,19 @@ it('services should be free of cycles', async () => {
 ```typescript
 it('should respect clean architecture layers', async () => {
   const rule = projectFiles()
-    .inFolder('src/presentation')
+    .inFolder('src/presentation/**')
     .shouldNot()
     .dependOnFiles()
-    .inFolder('src/database');
+    .inFolder('src/database/**');
   await expect(rule).toPassAsync();
 });
 
 it('business layer should not depend on presentation', async () => {
   const rule = projectFiles()
-    .inFolder('src/business')
+    .inFolder('src/business/**')
     .shouldNot()
     .dependOnFiles()
-    .inFolder('src/presentation');
+    .inFolder('src/presentation/**');
   await expect(rule).toPassAsync();
 });
 ```
@@ -204,11 +204,15 @@ it('business layer should not depend on presentation', async () => {
 
 ```typescript
 it('should follow naming patterns', async () => {
+  const rule = projectFiles().inFolder('src/services').should().haveName('*-service.ts'); // my-service.ts for example
+  await expect(rule).toPassAsync();
+});
+
+it('components should be PascalCase', async () => {
   const rule = projectFiles()
-    .inFolder('**/services/**')
-    .withName('*Service.ts')
+    .inFolder('src/components')
     .should()
-    .beInFolder('services');
+    .haveName(/^[A-Z][a-zA-Z]*Commponent\.ts$/); // MyComponent.ts for example
   await expect(rule).toPassAsync();
 });
 ```
@@ -273,7 +277,7 @@ const myCustomRule = (file: FileInfo) => {
 };
 
 const violations = await projectFiles()
-  .inPath('**/*.ts')
+  .withName('*.ts') // all ts files
   .should()
   .adhereTo(myCustomRule, ruleDesc)
   .check();
@@ -322,38 +326,7 @@ it('should not contain forbidden dependencies', async () => {
 });
 ```
 
-### Filtering and Targeting
-
-```typescript
-it('should filter by folder pattern', async () => {
-  const rule = metrics()
-    .inFolder(/src\/services/)
-    .count()
-    .methodCount()
-    .shouldBeBelow(15);
-  await expect(rule).toPassAsync();
-});
-
-it('should filter by class pattern', async () => {
-  const rule = metrics()
-    .forClassesMatching(/.*Service$/)
-    .lcom()
-    .lcom96b()
-    .shouldBeBelow(0.5);
-  await expect(rule).toPassAsync();
-});
-
-it('should target specific files', async () => {
-  const rule = metrics()
-    .forFile('user-service.ts')
-    .count()
-    .linesOfCode()
-    .shouldBeBelow(200);
-  await expect(rule).toPassAsync();
-});
-```
-
-### Export & Reporting
+### Reports
 
 Generate beautiful HTML reports for your metrics. _Note that this features is in beta._
 
@@ -391,13 +364,13 @@ The export functionality can be customized, for example by specifying an output 
 
 We offer three targeting options for pattern matching across all modules:
 
-- **`withName(pattern)`** - Match only the filename (eg. `Service.ts` from `src/services/Service.ts`)
-- **`inPath(pattern)`** - Match against the full relative path (eg. `src/services/Service.ts`)
-- **`inFolder(pattern)`** - Match against the path without filename (eg. `src/services` from `src/services/Service.ts`)
+- **`withName(pattern)`** - Pattern is checked against the filename (eg. `Service.ts` from `src/services/Service.ts`)
+- **`inPath(pattern)`** - Pattern is checked against against the full relative path (eg. `src/services/Service.ts`)
+- **`inFolder(pattern)`** - Pattern is checked against the path without filename (eg. `src/services` from `src/services/Service.ts`)
 
 ### Pattern Types
 
-Both string patterns (with glob support) and regular expressions are supported:
+We support string patterns and regular expressions. String patterns support glob, see below.
 
 ```typescript
 // String patterns with glob support (case insensitive)
@@ -412,14 +385,24 @@ Both string patterns (with glob support) and regular expressions are supported:
 
 ### Case Sensitivity
 
-- **Glob patterns (strings)**: Case **insensitive** by default
+- **Strings**: Case **insensitive** by default
 - **Regular expressions**: Case **sensitive** by default
 
 If you need case-sensitive matching, use regular expressions. If you need case-insensitive regex matching, use the `i` flag:
 
 ```typescript
 // Case insensitive regex
+.withName(/^.*service\.ts$/)  // Matches service.ts
+```
+
+```typescript
+// Case insensitive regex
 .withName(/^.*service\.ts$/i)  // Matches Service.ts, service.ts, SERVICE.ts
+```
+
+```typescript
+// Case insensitive regex
+.withName('*service.ts')  // Matches Service.ts, service.ts, SERVICE.ts
 ```
 
 ### Glob Patterns Guide
@@ -428,8 +411,8 @@ Glob patterns provide powerful wildcard matching for paths and filenames:
 
 #### Basic Wildcards
 
-- `*` - Matches any characters within a single path segment (doesn't cross `/`)
-- `**` - Matches any characters across multiple path segments (recursive)
+- `*` - Matches any characters within a single path segment (except `/`)
+- `**` - Matches any characters across multiple path segments
 - `?` - Matches exactly one character
 - `[abc]` - Matches any character in the bracket set
 - `[a-z]` - Matches any character in the range
@@ -442,7 +425,7 @@ Glob patterns provide powerful wildcard matching for paths and filenames:
 .withName('*.{js,ts}')      // All JavaScript or TypeScript files
 .withName('*Service.ts')    // Files ending with 'Service.ts'
 .withName('User*.ts')       // Files starting with 'User'
-.withName('?est.ts')        // test.ts, nest.ts, etc.
+.withName('?est.ts')        // test.ts, nest.ts, etc
 
 // Folder patterns
 .inFolder('**/services')    // Any 'services' folder at any depth
@@ -456,42 +439,34 @@ Glob patterns provide powerful wildcard matching for paths and filenames:
 .inPath('src/domain/*/*.ts')       // TypeScript files one level under domain
 ```
 
+### TODO: add explanation about .check() vs toPassAsync. And await.
+
 ### Basic Pattern Matching Examples
 
 ```typescript
 import { projectFiles, metrics } from 'archunit';
 
 // Files module - Test architectural rules
-await projectFiles()
-  .withName('*.service.ts')
-  .should()
-  .beInFolder('**/services/**')
-  .check();
+await projectFiles().withName('*.service.ts').should().beInFolder('**/services/**');
 
 // Metrics module - Test only service classes
-await metrics().withName('*.service.ts').lcom().lcom96b().shouldBeBelow(0.7).check();
+await metrics().withName('*.service.ts').lcom().lcom96b().shouldBeBelow(0.7);
 
 // Files module - Test classes in specific folders
 await projectFiles()
   .inFolder('**/controllers/**')
   .shouldNot()
   .dependOnFiles()
-  .inFolder('**/database/**')
-  .check();
+  .inFolder('**/database/**');
 
 // Metrics module - Test classes in specific folders
-await metrics()
-  .inFolder('**/controllers/**')
-  .count()
-  .methodCount()
-  .shouldBeBelow(20)
-  .check();
+await metrics().inFolder('**/controllers/**').count().methodCount().shouldBeBelow(20);
 
 // Files module - Test classes matching full path patterns
-await projectFiles().inPath('src/domain/**/*.ts').should().haveNoCycles().check();
+await projectFiles().inPath('src/domain/**/*.ts').should().haveNoCycles();
 
 // Metrics module - Test classes matching full path patterns
-await metrics().inPath('src/domain/**/*.ts').lcom().lcom96a().shouldBeBelow(0.8).check();
+await metrics().inPath('src/domain/**/*.ts').lcom().lcom96a().shouldBeBelow(0.8);
 ```
 
 ### Advanced Pattern Matching
@@ -504,25 +479,17 @@ await projectFiles()
   .inFolder('**/services/**')
   .withName('*.service.ts')
   .should()
-  .beInFolder('**/services/**')
-  .check();
+  .haveNoCycles();
 
 // Metrics module - Combine folder and filename patterns
-await metrics()
-  .inFolder('**/services/**')
-  .withName('*.service.ts')
-  .lcom()
-  .lcom96b()
-  .shouldBeBelow(0.6)
-  .check();
+await metrics().inFolder('**/services/**').withName('*.service.ts').lcom().lcom96b();
 
 // Files module - Mix pattern matching with dependency rules
 await projectFiles()
   .inPath('src/api/**')
   .shouldNot()
   .dependOnFiles()
-  .inPath('src/database/**')
-  .check();
+  .inPath('src/database/**');
 
 // Metrics module - Mix pattern matching with class name matching
 await metrics()
@@ -530,22 +497,14 @@ await metrics()
   .forClassesMatching(/.*Controller/)
   .count()
   .methodCount()
-  .shouldBeBelow(15)
-  .check();
+  .shouldBeBelow(15);
 ```
 
-### PascalCase and Naming Convention Examples
+### Naming Convention Examples
 
 Pattern matching is particularly useful for enforcing naming conventions:
 
 ```typescript
-// Match PascalCase service classes
-await projectFiles()
-  .withName(/^[A-Z][a-zA-Z]*Service\.ts$/)
-  .should()
-  .beInFolder('**/services/**')
-  .check();
-
 // Match camelCase test files
 await projectFiles()
   .withName(/^[a-z][a-zA-Z]*\.spec\.ts$/)
@@ -586,8 +545,7 @@ await projectFiles()
   .inPath('src/features/**/*.ts')
   .withName(/^[A-Z][a-zA-Z]*\.(service|controller|model)\.ts$/)
   .should()
-  .exist()
-  .check();
+  .haveNoCycles();
 
 // Test that utility files have low complexity
 await metrics()
@@ -595,16 +553,14 @@ await metrics()
   .withName('*.util.ts')
   .complexity()
   .cyclomaticComplexity()
-  .shouldBeBelow(5)
-  .check();
+  .shouldBeBelow(5);
 
 // Ensure test files don't depend on implementation details
 await projectFiles()
   .withName('*.spec.ts')
   .shouldNot()
   .dependOnFiles()
-  .inPath('src/**/internal/**')
-  .check();
+  .inPath('src/**/internal/**');
 
 // Check cohesion of domain entities
 await metrics()
@@ -612,8 +568,7 @@ await metrics()
   .withName(/^[A-Z][a-zA-Z]*Entity\.ts$/)
   .lcom()
   .lcom96a()
-  .shouldBeBelow(0.6)
-  .check();
+  .shouldBeBelow(0.6);
 ```
 
 ### Supported Metrics Types
@@ -624,10 +579,10 @@ The LCOM metrics measure how well the methods and fields of a class are connecte
 
 ```typescript
 // LCOM96a (Handerson et al.)
-await metrics().lcom().lcom96a().shouldBeBelow(0.8).check();
+await metrics().lcom().lcom96a().shouldBeBelow(0.8);
 
 // LCOM96b (Handerson et al.)
-await metrics().lcom().lcom96b().shouldBeBelow(0.7).check();
+await metrics().lcom().lcom96b().shouldBeBelow(0.7);
 ```
 
 The LCOM96b metric is calculated as:
@@ -652,13 +607,13 @@ Measure various counts within classes:
 
 ```typescript
 // Method count
-await metrics().count().methodCount().shouldBeBelow(20).check();
+await metrics().count().methodCount().shouldBeBelow(20);
 
 // Field count
-await metrics().count().fieldCount().shouldBeBelow(15).check();
+await metrics().count().fieldCount().shouldBeBelow(15).;
 
 // Lines of code
-await metrics().count().linesOfCode().shouldBeBelow(200).check();
+await metrics().count().linesOfCode().shouldBeBelow(200);
 ```
 
 #### Distance Metrics
@@ -667,13 +622,13 @@ Measure architectural distance metrics:
 
 ```typescript
 // Abstractness
-await metrics().distance().abstractness().shouldBeAbove(0.3).check();
+await metrics().distance().abstractness().shouldBeAbove(0.3);
 
 // Instability
-await metrics().distance().instability().shouldBeBelow(0.8).check();
+await metrics().distance().instability().shouldBeBelow(0.8);
 
 // Distance from main sequence
-await metrics().distance().distanceFromMainSequence().shouldBeBelow(0.5).check();
+await metrics().distance().distanceFromMainSequence().shouldBeBelow(0.5);
 ```
 
 #### Custom Metrics
@@ -687,49 +642,22 @@ await metrics()
     'Ratio of methods to fields',
     (classInfo) => classInfo.methods.length / Math.max(classInfo.fields.length, 1)
   )
-  .shouldBeBelow(3.0)
-  .check();
+  .shouldBeBelow(3.0);
 ```
 
 ### Testing Framework Integration
 
-#### Jest Integration
+#### Jest, Vitest, Jasmine
 
-```typescript
-import { projectFiles, metrics } from 'archunit';
+TODO: explain toPassAsync.
 
-describe('Architecture Rules with Pattern Matching', () => {
-  it('service files should follow naming convention', async () => {
-    const violations = await projectFiles()
-      .withName('*.service.ts')
-      .should()
-      .beInFolder('services')
-      .check();
+### TODO: explain what you can pass into both check() and toPassAsync()
 
-    expect(violations).toHaveLength(0);
-  });
+#### Other frameworks
 
-  it('service classes should have high cohesion', async () => {
-    const violations = await metrics()
-      .withName('*.service.ts')
-      .lcom()
-      .lcom96b()
-      .shouldBeBelow(0.7)
-      .check();
+TODO: explain that they must use check() and check violations array.
 
-    expect(violations).toHaveLength(0);
-  });
-
-  it('should use toPassAsync syntax', async () => {
-    await expect(
-      projectFiles().withName('*.service.ts').should().beInFolder('services')
-    ).toPassAsync();
-    await expect(metrics().lcom().lcom96b().shouldHaveCohesionAbove(0.7)).toPassAsync();
-  });
-});
-```
-
-#### Mocha Integration
+Here an example using Mocha.
 
 ```typescript
 import { projectFiles, metrics } from 'archunit';
@@ -757,389 +685,6 @@ describe('Architecture Rules with Pattern Matching', () => {
 
     expect(violations).to.have.length(0);
   });
-});
-```
-
-### Integration with Architecture Rules
-
-The pattern matching system works seamlessly across all ArchUnitTS modules to ensure both structural compliance and code quality:
-
-```typescript
-it('core domain should follow all architectural rules', async () => {
-  // Files module - No circular dependencies
-  const cycleViolations = await projectFiles()
-    .inPath('src/domain/**/*.ts')
-    .should()
-    .haveNoCycles()
-    .check();
-
-  // Files module - Proper layering
-  const layerViolations = await projectFiles()
-    .inPath('src/domain/**/*.ts')
-    .shouldNot()
-    .dependOnFiles()
-    .inPath('src/infrastructure/**/*.ts')
-    .check();
-
-  // Metrics module - High cohesion
-  const cohesionViolations = await metrics()
-    .inPath('src/domain/**/*.ts')
-    .lcom()
-    .lcom96b()
-    .shouldHaveCohesionAbove(0.6)
-    .check();
-
-  expect(cycleViolations).toHaveLength(0);
-  expect(layerViolations).toHaveLength(0);
-  expect(cohesionViolations).toHaveLength(0);
-});
-```
-
-### Backwards Compatibility
-
-All existing methods continue to work alongside the new pattern matching capabilities across all modules:
-
-```typescript
-// Files module - Legacy methods still supported
-await projectFiles().inFolder('**/services/**').should().haveNoCycles().check();
-
-await projectFiles()
-  .matchingPattern('**/*.service.ts')
-  .should()
-  .beInFolder('**/services/**')
-  .check();
-
-// Metrics module - Legacy methods still supported
-await metrics()
-  .inFile('src/services/user.service.ts')
-  .count()
-  .methodCount()
-  .shouldBeBelow(10)
-  .check();
-
-await metrics()
-  .forClassesMatching(/.*Service/)
-  .lcom()
-  .lcom96a()
-  .shouldBeBelow(0.7)
-  .check();
-```
-
-## 🎯 File and Folder Filtering
-
-TODO: needs to be way better. Where can you use glob pattern? Which are just name related, which entire path related? etc. which allow just string? which regex? which glob pattern? explain glob pattern!
-
-ArchUnitTS provides powerful and flexible file filtering capabilities that allow you to precisely select files for architectural testing. The API offers multiple methods to match files based on different criteria, making it easy to enforce architectural rules.
-
-### Core Filtering Methods
-
-#### 1. Folder-Based Filtering
-
-The `inFolder()` method is the most common way to select files within specific directories:
-
-```typescript
-it('should test files in specific folders', async () => {
-  // Test all files in the 'services' folder
-  const rule = projectFiles().inFolder('**/services/**').should().haveNoCycles();
-
-  await expect(rule).toPassAsync();
-});
-```
-
-**How `inFolder()` works:**
-
-- **Input:** `'**/components/**'`
-
-  - ✅ Matches: `'src/components/component-a.ts'`
-  - ✅ Matches: `'src/components/component-b.ts'`
-  - ✅ Matches: `'src/domain/helper/components/helper-component.ts'`
-  - ❌ NOT matching: `'src/views/view-a.ts'`
-
-- **Input:** `'src/components/**'` (more specific path)
-  - ✅ Matches: `'src/components/component-a.ts'`
-  - ✅ Matches: `'src/components/component-b.ts'`
-  - ❌ NOT matching: `'src/domain/helper/components/helper-component.ts'`
-  - ❌ NOT matching: `'src/views/view-a.ts'`
-
-#### 2. Pattern-Based Filtering
-
-TODO: entire section needs rewrite. !!! matchingpattern is also removed.
-Use `matchingPattern()` for glob-style pattern matching:
-
-```typescript
-it('should match files with glob patterns', async () => {
-  // Match all TypeScript files recursively
-  const rule = projectFiles().matchingPattern('**/*.ts').should().haveNoCycles();
-
-  await expect(rule).toPassAsync();
-});
-```
-
-#### 3. Name-Based Filtering
-
-Use `withName()` for exact filename matching:
-
-```typescript
-it('should match specific file names', async () => {
-  const rule = projectFiles()
-    .withName('UserService.ts')
-    .should()
-    .beInFolder('**/services/**');
-
-  await expect(rule).toPassAsync();
-});
-```
-
-**How `withName()` works:**
-
-- **Input:** `'my-component.ts'` (with extension)
-
-  - ✅ Matches: `'src/cool-components/my-component.ts'`
-  - ✅ Matches: `'src/other-components/my-component.ts'`
-  - ❌ NOT matching: `'src/cool-components/component'`
-  - ❌ NOT matching: `'src/views/view-a.ts'`
-
-- **Input:** `'my-component'` (without extension)
-  - ❌ NOT matching: `'src/cool-components/my-component.ts'`
-  - ❌ NOT matching: `'src/other-components/my-component.ts'`
-  - ✅ Matches: `'src/cool-components/my-component'` (if such file exists)
-
-### Enhanced Pattern Matching API
-
-ArchUnitTS provides sophisticated pattern matching methods for precise file selection:
-
-#### 1. `withName()` - Filename Pattern Matching (Recommended)
-
-Matches patterns against the filename only (not the full path). This is the recommended approach for most use cases.
-
-```typescript
-it('should enforce service naming convention', async () => {
-  const violations = await projectFiles()
-    .inFolder('**/services/**')
-    .withName('*Service.ts') // Glob pattern
-    .should()
-    .beInFolder('services')
-    .check();
-
-  // Files like 'UserService.ts', 'ProductService.ts' will match
-  // Files like 'ServiceHelper.ts' will NOT match
-});
-```
-
-**Examples of `withName()` patterns:**
-
-```typescript
-// Glob patterns (recommended)
-.withName('Service*.ts')     // ✅ Service.ts, ServiceA.ts, ServiceImpl.ts
-.withName('*Controller.ts')  // ✅ UserController.ts, AdminController.ts
-.withName('Test?.spec.ts')   // ✅ TestA.spec.ts, TestB.spec.ts (? = single char)
-.withName('*Util*')          // ✅ StringUtil.ts, DateUtils.ts, MathUtility.ts
-
-// Regular expressions
-.withName(/^Service.*\.ts$/) // ✅ Matches files starting with "Service"
-.withName(/.*\.(test|spec)\.ts$/) // ✅ Matches test files
-
-// Exact string matching
-.withName('UserService.ts')  // ✅ Matches exactly "UserService.ts"
-```
-
-#### 2. `inPath()` - Full Path Pattern Matching
-
-Matches patterns against the complete relative file path from the project root:
-
-```typescript
-it('should match specific path patterns', async () => {
-  const violations = await projectFiles()
-    .inPath('src/services/*Service.ts') // Full path pattern
-    .should()
-    .beInFolder('services')
-    .check();
-});
-```
-
-**Examples of `inPath()` patterns:**
-
-```typescript
-// Glob patterns for paths
-.inPath('src/*/services/*.ts')     // ✅ Service files in any module
-.inPath('**/test/**/*.spec.ts')    // ✅ Test files in any test directory
-.inPath('src/components/**/*.tsx') // ✅ All TSX files in components
-
-// Regular expressions for paths
-.inPath(/^src\/services\/.*Service\.ts$/) // ✅ Services in specific folder
-.inPath(/^src\/.*\/.*\.component\.ts$/)   // ✅ Component files anywhere in src
-```
-
-#### 3. `inFolder()` - Folder Pattern Matching
-
-Matches patterns against the folder path (path without filename):
-
-```typescript
-it('should find files in specific folders', async () => {
-  const violations = await projectFiles()
-    .inFolder('**/test/**') // Files in any test folder
-    .should()
-    .haveNoCycles()
-    .check();
-});
-```
-
-**Examples of `inFolder()` patterns:**
-
-```typescript
-.inFolder('**/services/**')    // ✅ Files in any services folder
-.inFolder('src/components/**') // ✅ Files in src/components and subfolders
-.inFolder(/test/i)             // ✅ Case-insensitive: test, Test, TEST folders
-```
-
-### Pattern Matching Examples
-
-```typescript
-.withName('*Controller.ts')  // Filename patterns
-.inPath('src/api/**/*.ts')   // Full path patterns
-.inFolder('**/services/**')  // Folder patterns
-```
-
-### Pattern Types and Syntax
-
-#### 1. Glob Patterns (Recommended for Strings)
-
-TODO: do we really allow two stars?
-
-Glob patterns provide intuitive wildcard matching:
-
-- `*` - Matches zero or more characters (excluding path separators)
-- `?` - Matches exactly one character
-- `**` - Matches zero or more path segments (in path matching)
-
-```typescript
-// Glob pattern examples
-'Service*'; // Service.ts, ServiceA.ts, ServiceImpl.ts
-'*Controller.ts'; // UserController.ts, AdminController.ts
-'Test?.spec.ts'; // TestA.spec.ts, TestB.spec.ts
-'*Util*'; // StringUtil.ts, DateUtils.ts, MathUtility.ts
-
-// Path glob patterns
-'src/*/services/*.ts'; // Service files in any module
-'**/test/**/*.spec.ts'; // Test files in any test directory
-```
-
-#### 2. Regular Expressions
-
-Use RegExp objects for complex pattern matching:
-
-```typescript
-// Regular expression examples
-/^Service.*\.ts$/           // Files starting with "Service"
-/.*\.(test|spec)\.ts$/     // Test files (.test.ts or .spec.ts)
-/^[A-Z].*Service\.ts$/     // PascalCase service files
-/service/i                 // Case-insensitive matching
-```
-
-#### 3. Literal Strings
-
-Plain strings for exact or substring matching:
-
-```typescript
-// Exact matching (with matchFilename/matchPath)
-'UserService.ts'; // Matches exactly "UserService.ts"
-'src/services/UserService.ts'; // Matches exact path
-
-// Substring matching (with containInFilename/containInPath)
-'Service'; // Contains "Service" anywhere
-'test'; // Contains "test" anywhere
-```
-
-### Advanced Filtering Examples
-
-#### Complex File Selection
-
-```typescript
-it('should validate complex architectural rules', async () => {
-  // Services should follow naming convention
-  const serviceViolations = await projectFiles()
-    .inFolder('**/services/**')
-    .withName(/^[A-Z].*Service\.ts$/) // PascalCase services
-    .should()
-    .beInFolder('services')
-    .check();
-
-  // Components should be in components folder
-  const componentViolations = await projectFiles()
-    .withName('*.component.tsx')
-    .should()
-    .beInFolder('**/components/**')
-    .check();
-
-  // Test files should not be in production code
-  const testViolations = await projectFiles()
-    .withName(/\.(test|spec)\.ts$/)
-    .shouldNot()
-    .beInFolder('src/production/**')
-    .check();
-
-  expect(serviceViolations).toEqual([]);
-  expect(componentViolations).toEqual([]);
-  expect(testViolations).toEqual([]);
-});
-```
-
-#### Layered Architecture Validation
-
-```typescript
-it('should enforce layered architecture', async () => {
-  // Controllers should follow naming convention
-  const controllerViolations = await projectFiles()
-    .inFolder('**/controllers/**')
-    .withName('*Controller.ts')
-    .should()
-    .beInFolder('controllers')
-    .check();
-
-  // Services should follow naming convention
-  const serviceViolations = await projectFiles()
-    .inFolder('**/services/**')
-    .withName('*Service.ts')
-    .should()
-    .beInFolder('services')
-    .check();
-
-  // Repositories should follow naming convention
-  const repoViolations = await projectFiles()
-    .inFolder('**/repositories/**')
-    .withName('*Repository.ts')
-    .should()
-    .beInFolder('repositories')
-    .check();
-
-  expect(controllerViolations).toEqual([]);
-  expect(serviceViolations).toEqual([]);
-  expect(repoViolations).toEqual([]);
-});
-```
-
-#### Test File Organization
-
-```typescript
-it('should enforce test file conventions', async () => {
-  // Unit tests should end with .spec.ts
-  const unitTestViolations = await projectFiles()
-    .inFolder('**/tests/unit/**')
-    .withName('*.spec.ts')
-    .should()
-    .beInFolder('tests')
-    .check();
-
-  // Integration tests should end with .integration.ts
-  const integrationTestViolations = await projectFiles()
-    .inFolder('**/tests/integration/**')
-    .withName('*.integration.ts')
-    .should()
-    .beInFolder('tests')
-    .check();
-
-  expect(unitTestViolations).toEqual([]);
-  expect(integrationTestViolations).toEqual([]);
 });
 ```
 
@@ -1202,20 +747,19 @@ We support logging to help you understand what files are being analyzed and trou
 ```typescript
 it('should respect layered architecture', async () => {
   const rule = projectFiles()
-    .inFolder('src/presentation')
+    .inFolder('src/presentation/**')
     .shouldNot()
     .dependOnFiles()
     .inFolder('src/database');
 
-  // Enable debug logging
-  const violations = await rule.check({
+  const options = {
     logging: {
       enabled: true,
       level: 'debug', // 'error' | 'warn' | 'info' | 'debug'
     },
-  });
+  };
 
-  expect(violations).toEqual([]);
+  await expect(rule).toPassAsync(options);
 });
 ```
 
@@ -1231,21 +775,6 @@ When debug logging is enabled, you'll see detailed information about the analysi
 [2025-06-02T12:08:26.478Z] [DEBUG] Checking dependencies against 'src/database' pattern
 [2025-06-02T12:08:26.489Z] [DEBUG] Violation detected: src/presentation/controllers/UserController.ts depends on src/database/UserRepository.ts
 [2025-06-02T12:08:26.772Z] [WARN] Completed architecture rule check: Dependency check: patterns [(^|.*/)src/database/.*] (1 violations)
-```
-
-### Logging Configuration Options
-
-TODO: these options are false!!
-
-```typescript
-const violations = await rule.check({
-  logging: {
-    enabled: true, // Enable/disable logging (default: false)
-    level: 'info', // Log level: 'error' | 'warn' | 'info' | 'debug'
-    logTiming: true, // Add timestamps to log messages (default: true)
-    colorOutput: true, // Colorized console output (default: true)
-  },
-});
 ```
 
 ## 🏈 Architecture Fitness Functions
@@ -1271,7 +800,7 @@ How does ArchUnitTS work under the hood? See [here](info/TECHNICAL.md) for a dee
 
 ## 🦊 Contributing
 
-We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but with proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed. See more in [Contributing](CONTRIBUTING.md).
+We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but with proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed. See more in [Contributing](CONTRIBUTING.md). See also our _'[Backlog](TODO.md)'_.
 
 ## ℹ️ FAQ
 
@@ -1291,7 +820,9 @@ Use the filtering and targeting capabilities to exclude specific files or patter
 
 File-based rules analyze import relationships between files, while class-based rules examine dependencies between classes and their members. Choose based on your architecture validation needs.
 
-## 👥 Maintainers
+## 💟 Big Thanks To...
+
+## Maintainers
 
 • **[LukasNiessen](https://github.com/LukasNiessen)** - Creator and main maintainer
 
@@ -1299,13 +830,13 @@ File-based rules analyze import relationships between files, while class-based r
 
 • **[draugang](https://github.com/draugang)** - Maintainer
 
-## 💟 Contributors
+## Contributors
 
 <a href="https://github.com/LukasNiessen/ArchUnitTS/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS" />
 </a>
 
-## 🤝 Community & Support
+## Community & Support
 
 Found a bug? Want to discuss features?
 
@@ -1321,7 +852,7 @@ If ArchUnitTS helps your project, please consider:
 - Suggesting new features 💭
 - Contributing code or documentation ⌨️
 
-## ⭐ Star History
+## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#Fosowl/agenticSeek&Date)
 
@@ -1337,51 +868,14 @@ This project is under the **MIT** license.
 
 ---
 
-TODO: add elsewhere or just in docs. more info needed
-TODO: add doc comments to extract-graph.ts
-
-### All Files Inclusion
-
-ArchUnitTS ensures that **all project files** appear in the dependency graph, even if they don't import other project files. This is achieved by adding self-referencing edges for every file in the project.
-
-**Why this matters:**
-
-- Standalone utility files are included in architectural analysis
-- Entry point files without imports are visible in the graph
-- Complete project coverage for architectural rules
-- No files are accidentally excluded from analysis
-
-**Example:**
-
-```typescript
-// Even if utils.ts doesn't import anything from your project,
-// it will still appear in the graph with a self-edge: utils.ts -> utils.ts
-
-// This ensures files like these are always analyzed:
-// - Configuration files
-// - Standalone utilities
-// - Entry points
-// - Constants files
-// - Type definition files
-```
-
-The graph will contain:
-
-- **Import edges**: Real dependencies between files (A imports B)
-- **Self edges**: Every project file references itself (ensures inclusion)
-
-This guarantees comprehensive architectural analysis across your entire codebase.
-
----
-
 TODO: include toPassAsync explanation!
 
 TODO: dependabot?
 
-TODO: further documentation for project
-
 ---
 
-## Notes
+## P.S.
+
+# ## Notes
 
 **Special Note on Cycle-Free Checks**: Empty checks are particularly nuanced for cycle-free assertions. Consider this scenario: folder A contains one file that only depends on folder B. When testing `.inFolder("A").should().haveNoCycles()`, we want to check for cycles _within_ folder A only. However, if we report an empty test error, users might be confused since folder A does contain a file. Therefore, cycle-free checks use a more permissive approach and check the unfiltered file set for emptiness, rather than the filtered set that's actually analyzed for cycles.
