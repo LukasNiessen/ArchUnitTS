@@ -13,7 +13,7 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('src/controllers/**')
 			.should()
-			.matchFilename(/.*Controller\.ts/)
+			.haveName(/.*Controller\.ts/)
 			.check();
 
 		expect(violations).toEqual([]);
@@ -23,7 +23,7 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('src/controllers/**')
 			.should()
-			.matchFilename('.*Service*.ts')
+			.haveName('.*Service*.ts')
 			.check();
 
 		expect(violations).toHaveLength(1);
@@ -33,7 +33,7 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('src/services/**')
 			.should()
-			.matchFilename('Service*')
+			.haveName('Service*')
 			.check();
 		expect(violations).toHaveLength(1);
 		expect((violations[0] as ViolatingNode).projectedNode.label).toBe(
@@ -45,7 +45,7 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('src/controllers/**')
 			.shouldNot()
-			.matchFilename('Controller.ts')
+			.haveName('Controller.ts')
 			.check();
 
 		expect(violations).toEqual([
@@ -94,7 +94,7 @@ describe('Integration test', () => {
 		const violations = await files
 			.inFolder('src/controllers/**')
 			.shouldNot()
-			.matchFilename('Service.ts')
+			.haveName('Service.ts')
 			.check();
 
 		expect(violations).toEqual([]);

@@ -41,18 +41,6 @@ export function matchesPattern(file: ProjectedNode | string, filter: Filter): bo
 	}
 
 	return filter.regExp.test(targetString);
-
-	/* TODO: matching options
-		 if (options.matching === 'exact') {
-			// Exact matching for literal strings
-			const exactRegex = new RegExp(`^${escapeRegexSpecialChars(pattern)}$`);
-			return exactRegex.test(targetString);
-		} else {
-			// Partial matching for literal strings
-			const partialRegex = new RegExp(escapeRegexSpecialChars(pattern));
-			return partialRegex.test(targetString);
-		}
-	*/
 }
 
 /**

@@ -16,7 +16,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.inFolder('nonexistent-folder')
 				.should()
-				.matchFilename('*.ts')
+				.haveName('*.ts')
 				.check();
 
 			expect(violations).toHaveLength(1);
@@ -34,7 +34,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.withName('nonexistent-pattern-.*')
 				.should()
-				.matchFilename(/.*Service\.ts/)
+				.haveName(/.*Service\.ts/)
 				.check();
 
 			expect(violations).toHaveLength(1);
@@ -45,7 +45,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.inFolder('nonexistent')
 				.should()
-				.matchPath('src/nonexistent/File.ts')
+				.beInPath('src/nonexistent/File.ts')
 				.check();
 
 			expect(violations).toHaveLength(1);
@@ -58,7 +58,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.inFolder('nonexistent-folder')
 				.should()
-				.matchFilename('*.ts')
+				.haveName('*.ts')
 				.check({ allowEmptyTests: true });
 
 			expect(violations).toHaveLength(0);
@@ -67,7 +67,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.withName('nonexistent-pattern-.*')
 				.should()
-				.matchFilename(/.*Service\.ts/)
+				.haveName(/.*Service\.ts/)
 				.check({ allowEmptyTests: true });
 
 			expect(violations).toHaveLength(0);
@@ -77,7 +77,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.inFolder('nonexistent')
 				.should()
-				.matchPath('src/nonexistent/File.ts')
+				.beInPath('src/nonexistent/File.ts')
 				.check({ allowEmptyTests: true });
 
 			expect(violations).toHaveLength(0);
@@ -89,7 +89,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.inFolder('src/controllers/**')
 				.should()
-				.matchFilename('*.ts')
+				.haveName('*.ts')
 				.check();
 
 			// Should only contain file pattern violations, no empty test violations
@@ -100,13 +100,13 @@ describe('Empty Test Detection', () => {
 			const violationsDefault = await projectFiles(tsConfigPath)
 				.inFolder('src/controllers/**')
 				.should()
-				.matchFilename('Service*')
+				.haveName('Service*')
 				.check();
 
 			const violationsWithOption = await projectFiles(tsConfigPath)
 				.inFolder('src/controllers/**')
 				.should()
-				.matchFilename('Service*')
+				.haveName('Service*')
 				.check({ allowEmptyTests: true });
 
 			// Both should have the same violations (no empty test violations)
@@ -120,7 +120,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.inFolder('nonexistent-folder')
 				.shouldNot()
-				.matchFilename('*.ts')
+				.haveName('*.ts')
 				.check();
 
 			expect(violations).toHaveLength(1);
@@ -131,7 +131,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.inFolder('nonexistent-folder')
 				.shouldNot()
-				.matchFilename('*.ts')
+				.haveName('*.ts')
 				.check({ allowEmptyTests: true });
 
 			expect(violations).toHaveLength(0);
@@ -143,7 +143,7 @@ describe('Empty Test Detection', () => {
 			const violations = await projectFiles(tsConfigPath)
 				.inFolder('nonexistent')
 				.should()
-				.matchFilename('*.ts')
+				.haveName('*.ts')
 				.check();
 
 			expect(violations).toHaveLength(1);

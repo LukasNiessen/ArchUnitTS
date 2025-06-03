@@ -45,7 +45,7 @@ describe('CheckOptions Integration Test', () => {
 		const rule = projectFiles()
 			.inPath('hey/nonexistent-*.ts')
 			.should()
-			.matchFilename(/.*\.ts$/);
+			.haveName(/.*\.ts$/);
 
 		await expect(rule).toPassAsync({
 			allowEmptyTests: true,

@@ -1,8 +1,8 @@
 import {
-	byFolderPath,
 	bySingleFile,
 	byClassName,
 	combineFilters,
+	byFilter,
 } from '../projection/project-metrics';
 import { ClassFilter, ClassInfo, Metric } from '../extraction/interface';
 import { DistanceMetricsBuilder } from './metrics/distance-metrics';
@@ -15,6 +15,7 @@ import { CheckLogger } from '../../common/util/logger';
 import { extractClassInfo } from '../extraction/extract-class-info';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 import { Pattern } from '../../common/type';
+import { RegexFactory } from '../../common/regex-factory';
 
 /**
  * Type for user-defined custom metric calculation functions
@@ -78,11 +79,29 @@ export class MetricsBuilder {
 	constructor(readonly tsConfigFilePath?: string) {}
 
 	/**
-	 * Filter classes by folder path using regex pattern
-	 * @param folderPattern String or regex pattern matching folder paths
+	 * Filter classes by filename using regex pattern with glob support
+	 * @param name String or regex pattern matching filenames only
+	 */
+	public withName(name: Pattern): MetricsBuilder {
+		this.filters.push(byFilter(RegexFactory.fileNameMatcher(name)));
+		return this;
+	}
+
+	/**
+	 * Filter classes by folder path (without filename) using regex pattern with glob support
+	 * @param folder String or regex pattern matching folder paths
 	 */
 	public inFolder(folderPattern: Pattern): MetricsBuilder {
-		this.filters.push(byFolderPath(folderPattern));
+		this.filters.push(byFilter(RegexFactory.folderMatcher(folderPattern)));
+		return this;
+	}
+
+	/**
+	 * Filter classes by full path using regex pattern with glob support
+	 * @param path String or regex pattern matching full file paths
+	 */
+	public inPath(path: Pattern): MetricsBuilder {
+		this.filters.push(byFilter(RegexFactory.pathMatcher(path)));
 		return this;
 	}
 
