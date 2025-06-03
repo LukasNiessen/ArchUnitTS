@@ -139,6 +139,7 @@
 	"dependencies": {
 		"@zerollup/ts-helpers": "^1.7.18",
 		"archunit": "file:",
+		"minimatch": "^10.0.1",
 		"plantuml-parser": "^0.4.0",
 		"typescript": "^5.3.3"
 	}

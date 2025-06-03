@@ -4,6 +4,7 @@ import {
 	matchesAnyPattern,
 } from '../../src/files/assertion/pattern-matching';
 import { ProjectedNode } from '../../src/common/projection/project-nodes';
+import { RegexFactory } from '../../src/files/fluentapi/regex-factory';
 
 describe('Pattern Matching', () => {
 	const createProjectedNode = (path: string): ProjectedNode => {
@@ -19,19 +20,18 @@ describe('Pattern Matching', () => {
 			const file = createProjectedNode('src/services/UserService.ts');
 			const patterns = [
 				{
-					pattern: 'Service',
+					regExp: /.*Service.*/,
 					options: {
 						target: 'filename' as const,
-						matching: 'partial' as const,
 					},
 				},
 				{
-					pattern: /\.ts$/,
-					options: { target: 'filename' as const, matching: 'exact' as const },
+					regExp: /\.ts$/,
+					options: { target: 'filename' as const },
 				},
 				{
-					pattern: 'services',
-					options: { target: 'path' as const, matching: 'partial' as const },
+					regExp: /.*services.*/,
+					options: { target: 'path' as const },
 				},
 			];
 
@@ -42,19 +42,19 @@ describe('Pattern Matching', () => {
 			const file = createProjectedNode('src/services/UserService.ts');
 			const patterns = [
 				{
-					pattern: 'Service',
+					regExp: /.*Service.*/,
 					options: {
 						target: 'filename' as const,
 						matching: 'partial' as const,
 					},
 				},
 				{
-					pattern: /\.js$/,
-					options: { target: 'filename' as const, matching: 'exact' as const },
+					regExp: /\.js$/,
+					options: { target: 'filename' as const },
 				}, // This won't match
 				{
-					pattern: 'services',
-					options: { target: 'path' as const, matching: 'partial' as const },
+					regExp: /.*services.*/,
+					options: { target: 'path' as const },
 				},
 			];
 
@@ -72,18 +72,18 @@ describe('Pattern Matching', () => {
 			const file = createProjectedNode('src/services/UserService.ts');
 			const patterns = [
 				{
-					pattern: 'Repository',
+					regExp: /Repository/,
 					options: {
 						target: 'filename' as const,
 						matching: 'partial' as const,
 					},
 				}, // Won't match
 				{
-					pattern: /\.js$/,
+					regExp: /\.js$/,
 					options: { target: 'filename' as const, matching: 'exact' as const },
 				}, // Won't match
 				{
-					pattern: 'Service',
+					regExp: /Service/,
 					options: {
 						target: 'filename' as const,
 						matching: 'partial' as const,
@@ -98,18 +98,18 @@ describe('Pattern Matching', () => {
 			const file = createProjectedNode('src/services/UserService.ts');
 			const patterns = [
 				{
-					pattern: 'Repository',
+					regExp: /Repository/,
 					options: {
 						target: 'filename' as const,
 						matching: 'partial' as const,
 					},
 				},
 				{
-					pattern: /\.js$/,
+					regExp: /\.js$/,
 					options: { target: 'filename' as const, matching: 'exact' as const },
 				},
 				{
-					pattern: 'controllers',
+					regExp: /controllers/,
 					options: { target: 'path' as const, matching: 'partial' as const },
 				},
 			];
@@ -130,20 +130,27 @@ describe('Pattern Matching', () => {
 			const userServiceFile = createProjectedNode('src/services/UserService.ts');
 
 			// Using filename-only exact matching, "Service.*" should not match "SService.ts"
-			expect(matchesPattern(serviceFile, /^Service.*/)).toBe(false);
-			expect(matchesPattern(userServiceFile, /^Service.*/)).toBe(false);
+			expect(
+				matchesPattern(serviceFile, RegexFactory.fileNameMatcher(/^Service.*/))
+			).toBe(false);
+			expect(
+				matchesPattern(
+					userServiceFile,
+					RegexFactory.fileNameMatcher(/^Service.*/)
+				)
+			).toBe(false);
 
 			// But using partial matching would match
 			expect(
 				matchesPattern(serviceFile, {
-					pattern: 'Service',
-					options: { matching: 'partial' },
+					regExp: /Service/,
+					options: { target: 'filename', matching: 'partial' },
 				})
 			).toBe(true);
 			expect(
 				matchesPattern(userServiceFile, {
-					pattern: 'Service',
-					options: { matching: 'partial' },
+					regExp: /Service/,
+					options: { target: 'filename', matching: 'partial' },
 				})
 			).toBe(true);
 		});
@@ -158,15 +165,13 @@ describe('Pattern Matching', () => {
 			];
 
 			// Test that only files ending with "Service.ts" match the service pattern
-			const servicePattern = {
-				pattern: /Service\.ts$/,
-				options: { target: 'filename' as const, matching: 'exact' as const },
-			};
+			const servicePattern = RegexFactory.fileNameMatcher(/Service\.ts$/);
 
-			expect(matchesPattern(files[0], servicePattern.pattern)).toBe(false); // Controller
-			expect(matchesPattern(files[1], servicePattern.pattern)).toBe(true); // Service
-			expect(matchesPattern(files[2], servicePattern.pattern)).toBe(false); // Repository      expect(matchesPattern(files[3], servicePattern.pattern, servicePattern.options)).toBe(false); // Model
-			expect(matchesPattern(files[4], servicePattern.pattern)).toBe(false); // Utils
+			expect(matchesPattern(files[0], servicePattern)).toBe(false); // Controller
+			expect(matchesPattern(files[1], servicePattern)).toBe(true); // Service
+			expect(matchesPattern(files[2], servicePattern)).toBe(false); // Repository
+			expect(matchesPattern(files[3], servicePattern)).toBe(false); // Model
+			expect(matchesPattern(files[4], servicePattern)).toBe(false); // Utils
 		});
 	});
 
@@ -175,25 +180,41 @@ describe('Pattern Matching', () => {
 			const file = createProjectedNode('src/services/UserService.ts');
 
 			// Test * wildcard
-			expect(matchesPattern(file, 'User*')).toBe(true);
-			expect(matchesPattern(file, 'Service*')).toBe(false);
-			expect(matchesPattern(file, '*Service.ts')).toBe(true);
-			expect(matchesPattern(file, '*User*')).toBe(true);
+			expect(matchesPattern(file, RegexFactory.fileNameMatcher('User*'))).toBe(
+				true
+			);
+			expect(matchesPattern(file, RegexFactory.fileNameMatcher('Service*'))).toBe(
+				false
+			);
+			expect(
+				matchesPattern(file, RegexFactory.fileNameMatcher('*Service.ts'))
+			).toBe(true);
+			expect(matchesPattern(file, RegexFactory.fileNameMatcher('*User*'))).toBe(
+				true
+			);
 		});
 
 		it('should handle question mark wildcards', () => {
 			const file = createProjectedNode('src/test/TestA.ts');
 
-			expect(matchesPattern(file, 'Test?.ts')).toBe(true);
-			expect(matchesPattern(file, 'Test??.ts')).toBe(false);
+			expect(matchesPattern(file, RegexFactory.fileNameMatcher('Test?.ts'))).toBe(
+				true
+			);
+			expect(matchesPattern(file, RegexFactory.fileNameMatcher('Test??.ts'))).toBe(
+				false
+			);
 		});
 
 		it('should distinguish glob patterns from exact patterns', () => {
 			const file = createProjectedNode('src/literal/Service*.ts');
 
 			// When there are no wildcards, should match exactly
-			expect(matchesPattern(file, 'Service*.ts')).toBe(true);
-			expect(matchesPattern(file, 'Service.ts')).toBe(false);
+			expect(
+				matchesPattern(file, RegexFactory.fileNameMatcher('Service*.ts'))
+			).toBe(true);
+			expect(matchesPattern(file, RegexFactory.fileNameMatcher('Service.ts'))).toBe(
+				false
+			);
 		});
 
 		it('should correctly handle the original Service pattern issue', () => {
@@ -205,10 +226,18 @@ describe('Pattern Matching', () => {
 			];
 
 			// Service* should match files starting with "Service"
-			expect(matchesPattern(files[0], 'Service*')).toBe(true); // Service.ts
-			expect(matchesPattern(files[1], 'Service*')).toBe(true); // ServiceA.ts
-			expect(matchesPattern(files[2], 'Service*')).toBe(true); // ServiceB.ts
-			expect(matchesPattern(files[3], 'Service*')).toBe(false); // SService.ts
+			expect(
+				matchesPattern(files[0], RegexFactory.fileNameMatcher('Service*'))
+			).toBe(true); // Service.ts
+			expect(
+				matchesPattern(files[1], RegexFactory.fileNameMatcher('Service*'))
+			).toBe(true); // ServiceA.ts
+			expect(
+				matchesPattern(files[2], RegexFactory.fileNameMatcher('Service*'))
+			).toBe(true); // ServiceB.ts
+			expect(
+				matchesPattern(files[3], RegexFactory.fileNameMatcher('Service*'))
+			).toBe(false); // SService.ts
 		});
 	});
 });

@@ -11,7 +11,7 @@ describe('architecture', () => {
 
 		const rules = ['common', 'files', 'slices', 'metrics'].map((c) => {
 			return projectSlices()
-				.definedBy('src/' + c + '/(**)/')
+				.definedBy(`src/${c}/(**)/`)
 				.should()
 				.adhereToDiagramInFile(diagramLocation);
 		});
@@ -24,10 +24,10 @@ describe('architecture', () => {
 	it('common should not depend on specific components', async () => {
 		for (const c of ['files', 'jest', 'slices', 'metrics']) {
 			const rule = projectFiles()
-				.inFolder('src/common')
+				.inFolder('src/common/**')
 				.shouldNot()
 				.dependOnFiles()
-				.inFolder('src/' + c);
+				.inFolder(`src/${c}/**`);
 
 			await expect(rule).toPassAsync();
 		}
@@ -36,10 +36,10 @@ describe('architecture', () => {
 	it('files should not depend on forbidden components', async () => {
 		for (const c of ['slices', 'jest', 'metrics']) {
 			const rule = projectFiles()
-				.inFolder('src/files')
+				.inFolder('src/files/**')
 				.shouldNot()
 				.dependOnFiles()
-				.inFolder('src/' + c);
+				.inFolder(`src/${c}/**`);
 
 			await expect(rule).toPassAsync();
 		}
@@ -48,10 +48,10 @@ describe('architecture', () => {
 	it('metrics should not depend on forbidden components', async () => {
 		for (const c of ['files', 'jest', 'slices']) {
 			const rule = projectFiles()
-				.inFolder('src/metrics')
+				.inFolder('src/metrics/**')
 				.shouldNot()
 				.dependOnFiles()
-				.inFolder('src/' + c);
+				.inFolder(`src/${c}/**`);
 
 			await expect(rule).toPassAsync();
 		}
@@ -60,10 +60,10 @@ describe('architecture', () => {
 	it('slices should not depend on forbidden components', async () => {
 		for (const c of ['files', 'jest', 'metrics']) {
 			const rule = projectFiles()
-				.inFolder('src/slices')
+				.inFolder('src/slices/**')
 				.shouldNot()
 				.dependOnFiles()
-				.inFolder('src/' + c);
+				.inFolder(`src/${c}/**`);
 
 			await expect(rule).toPassAsync();
 		}

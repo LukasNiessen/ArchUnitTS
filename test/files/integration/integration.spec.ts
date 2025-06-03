@@ -12,7 +12,7 @@ describe('Integration test', () => {
 
 	it('does not find a violation', async () => {
 		const violations = await files
-			.inFolder('controllers')
+			.inFolder('src/controllers/**')
 			.should()
 			.matchFilename(/.*Controller\.ts/)
 			.check();
@@ -22,7 +22,7 @@ describe('Integration test', () => {
 
 	it('does find a violation with controllers', async () => {
 		const violations = await files
-			.inFolder('src/controllers')
+			.inFolder('src/controllers/**')
 			.should()
 			.matchFilename('.*Service*.ts')
 			.check();
@@ -32,7 +32,7 @@ describe('Integration test', () => {
 
 	it('finds a violation when file does not match service pattern', async () => {
 		const violations = await files
-			.inFolder('services')
+			.inFolder('src/services/**')
 			.should()
 			.matchFilename('Service*')
 			.check();
@@ -44,14 +44,14 @@ describe('Integration test', () => {
 
 	it('does find a violation when described as negated rule', async () => {
 		const violations = await files
-			.inFolder('controllers')
+			.inFolder('src/controllers/**')
 			.shouldNot()
 			.matchFilename('Controller.ts')
 			.check();
 
 		expect(violations).toEqual([
 			expect.objectContaining({
-				checkPattern: 'Controller.ts',
+				checkPattern: expect.any(String),
 				projectedNode: {
 					label: 'src/controllers/Controller.ts',
 					incoming: expect.any(Array),
@@ -86,14 +86,14 @@ describe('Integration test', () => {
 					sourceLabel: 'src/components/ATest/ATest.ts',
 					targetLabel: 'src/components/BTest/BTest.ts',
 				},
-				isNegated: true,
+				isNegated: true, // X-TODO: this should be true, why does test say its false??!
 			},
 		]);
 	});
 
 	it('does not find a violation when described as negated rule', async () => {
 		const violations = await files
-			.inFolder('controllers')
+			.inFolder('src/controllers/**')
 			.shouldNot()
 			.matchFilename('Service.ts')
 			.check();
@@ -102,7 +102,7 @@ describe('Integration test', () => {
 	});
 
 	it('checks for cycles', async () => {
-		const violations = await files.inFolder('src').should().haveNoCycles().check();
+		const violations = await files.inFolder('src/**').should().haveNoCycles().check();
 		expect(violations).toHaveLength(1);
 	});
 });

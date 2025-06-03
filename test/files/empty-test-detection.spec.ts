@@ -65,7 +65,7 @@ describe('Empty Test Detection', () => {
 		});
 		it('should not create violations for filename regex when allowEmptyTests is true', async () => {
 			const violations = await projectFiles(tsConfigPath)
-				.containsInFilename('nonexistent-pattern-.*')
+				.withName('nonexistent-pattern-.*')
 				.should()
 				.matchFilename(/.*Service\.ts/)
 				.check({ allowEmptyTests: true });
