@@ -1036,7 +1036,7 @@ If ArchUnitTS helps your project, please consider:
 
 ### Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#Fosowl/agenticSeek&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#LukasNiessen/ArchUnitTS&Date)
 
 ## 📄 License
 
