@@ -145,7 +145,7 @@ Many common uses cases are covered in our examples folder. Here is an overview.
 
 **Clean Architecture:**
 
-- NestJS BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/clean-architecture/nestjs/README.md)
+- NestJS BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/clean-architecture/nestjs/README.md) 
 
 - React FrontEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/clean-architecture/react/README.md)
 
