@@ -71,5 +71,6 @@
 		"GitHub": "https://github.com/LukasNiessen/ArchUnitTS",
 		"NPM": "https://www.npmjs.com/package/archunit",
 		"Examples": "https://github.com/LukasNiessen/ArchUnitTS/tree/main/examples"
-	}
+	},
+	"customCss": "docs-assets/custom.css"
 }

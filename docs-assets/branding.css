@@ -1,0 +1,120 @@
+/* Additional branding and custom elements for ArchUnitTS docs */
+
+/* Custom logo/brand styling */
+.tsd-page-title::before {
+	content: '🏗️';
+	font-size: 3rem;
+	display: block;
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+/* Custom badges for different element types */
+.tsd-kind-class .tsd-kind-icon::before {
+	content: 'C';
+}
+
+.tsd-kind-interface .tsd-kind-icon::before {
+	content: 'I';
+}
+
+.tsd-kind-function .tsd-kind-icon::before {
+	content: 'F';
+}
+
+.tsd-kind-method .tsd-kind-icon::before {
+	content: 'M';
+}
+
+.tsd-kind-property .tsd-kind-icon::before {
+	content: 'P';
+}
+
+.tsd-kind-enum .tsd-kind-icon::before {
+	content: 'E';
+}
+
+.tsd-kind-type-alias .tsd-kind-icon::before {
+	content: 'T';
+}
+
+/* Enhanced code examples with copy button styling */
+.tsd-signature {
+	position: relative;
+}
+
+.tsd-signature::after {
+	content: 'TypeScript';
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	background: var(--accent-color);
+	color: white;
+	padding: 0.25rem 0.5rem;
+	border-radius: 4px;
+	font-size: 0.75rem;
+	font-weight: 500;
+}
+
+/* Architecture-specific styling for ArchUnit concepts */
+.tsd-signature:has([data-type*='Rule']) {
+	border-left: 4px solid #ff6b6b;
+}
+
+.tsd-signature:has([data-type*='Layer']) {
+	border-left: 4px solid #4ecdc4;
+}
+
+.tsd-signature:has([data-type*='Slice']) {
+	border-left: 4px solid #45b7d1;
+}
+
+.tsd-signature:has([data-type*='Metrics']) {
+	border-left: 4px solid #96ceb4;
+}
+
+/* Custom alert boxes for important documentation */
+.tsd-comment.warning {
+	background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+	border-left-color: #f39c12;
+}
+
+.tsd-comment.info {
+	background: linear-gradient(135deg, #d1ecf1, #74b9ff);
+	border-left-color: #0984e3;
+}
+
+.tsd-comment.success {
+	background: linear-gradient(135deg, #d4edda, #00b894);
+	border-left-color: #00b894;
+}
+
+/* Interactive examples section */
+.example-section {
+	background: linear-gradient(135deg, var(--secondary-bg), var(--tertiary-bg));
+	border-radius: var(--radius-large);
+	padding: 2rem;
+	margin: 2rem 0;
+	border: 2px solid var(--accent-color);
+}
+
+.example-section h4 {
+	color: var(--accent-color);
+	margin-top: 0;
+	display: flex;
+	align-items: center;
+}
+
+.example-section h4::before {
+	content: '💡';
+	margin-right: 0.5rem;
+}
+
+/* Footer enhancements */
+.tsd-generator::before {
+	content: 'Documentation generated with ❤️ for ArchUnitTS';
+	display: block;
+	font-weight: 600;
+	color: var(--accent-color);
+	margin-bottom: 0.5rem;
+}
