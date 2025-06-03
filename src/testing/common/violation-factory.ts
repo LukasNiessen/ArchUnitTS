@@ -5,6 +5,7 @@ import { ViolatingCycle } from '../../files/assertion/cycle-free';
 import { ViolatingFileDependency } from '../../files/assertion/depend-on-files';
 import { MetricViolation } from '../../metrics/assertion/metric-thresholds';
 import { FileCountViolation } from '../../metrics/fluentapi/metrics/count-metrics';
+import { CustomFileViolation } from '../../files/assertion/custom-file-logic';
 import { TestViolation } from './result-factory';
 import { ColorUtils } from './color-utils';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
@@ -40,6 +41,9 @@ export class ViolationFactory {
 		if (violation instanceof FileCountViolation) {
 			return this.fromFileCountViolation(violation);
 		}
+		if (violation instanceof CustomFileViolation) {
+			return this.fromCustomFileViolation(violation);
+		}
 		return new UnknownTestViolation(violation);
 	}
 	private static fromMetricViolation(metric: MetricViolation): TestViolation {
@@ -62,6 +66,24 @@ export class ViolationFactory {
    Metric: ${ColorUtils.formatMetricValue(violation.metricName)}
    Actual value: ${ColorUtils.formatMetricValue(violation.metricValue.toString())}
    Expected: ${ColorUtils.formatRule(`${comparisonText} ${violation.threshold}`)}`;
+
+		return {
+			message,
+			details: violation,
+		};
+	}
+	private static fromCustomFileViolation(
+		violation: CustomFileViolation
+	): TestViolation {
+		const message = `${ColorUtils.formatViolationType('Custom file condition violation')}:
+   File: ${ColorUtils.formatFilePath(`${violation.fileInfo.path}:1:1`)}
+   Rule: ${ColorUtils.formatRule(violation.message)}
+   
+   ${ColorUtils.dim('File details:')}
+   ${ColorUtils.dim(`• Name: ${violation.fileInfo.name}`)}
+   ${ColorUtils.dim(`• Extension: ${violation.fileInfo.extension}`)}
+   ${ColorUtils.dim(`• Directory: ${violation.fileInfo.directory}`)}
+   ${ColorUtils.dim(`• Lines of code: ${violation.fileInfo.linesOfCode}`)}`;
 
 		return {
 			message,
