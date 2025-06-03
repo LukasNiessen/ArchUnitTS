@@ -1027,6 +1027,7 @@ Found a bug? Want to discuss features?
 - Questions? Post on [Stack Overflow](https://stackoverflow.com/questions/tagged/ArchUnitTS) with the ArchUnitTS tag
 - Full documentation on our website [website](TODO)
 - Leave a comment or thoughts on our [X account](https://x.com/ArchUnitTS)
+- Visit our [documentation](https://lukasniessen.github.io/ArchUnitTS/)
 
 If ArchUnitTS helps your project, please consider:
 
