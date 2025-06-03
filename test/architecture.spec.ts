@@ -78,7 +78,7 @@ describe('architecture', () => {
 		//}
 	});
 
-	it('should have the right naming convetion for tests', async () => {
+	it('should have the right naming convention for tests', async () => {
 		//const rule = projectFiles().inFolder('test').should().matchFilename('*.spec.ts');
 		//await expect(rule).toPassAsync();
 	});

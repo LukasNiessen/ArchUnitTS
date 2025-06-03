@@ -1,4 +1,4 @@
-import { FileInfo, projectFiles } from '../../src/files/fluentapi/files';
+import { FileInfo, projectFiles } from '../..';
 
 describe('Custom File Logic', () => {
 	it('should allow custom file conditions with assertions', async () => {
@@ -17,21 +17,20 @@ describe('Custom File Logic', () => {
 	});
 
 	it.only('should support custom file filtering and assertions', async () => {
-		const violations = await projectFiles()
-			.withFilename('*.spec.ts')
+		const rule = projectFiles()
+			.withName('*.spec.ts')
 			.should()
 			.adhereTo((file: FileInfo) => {
 				// Custom logic: TypeScript files should contain export statements
-				return file.content.includes('import');
-			}, 'TypeScript files should export functionality')
-			.check();
+				return file.content.includes('impott');
+			}, 'Spec files should import something');
 
-		expect(violations).toStrictEqual([]);
+		await expect(rule).toPassAsync();
 	});
 
 	it('should create violations when custom conditions fail', async () => {
 		const rule = projectFiles()
-			.withFilename('*.ts')
+			.withName('*.ts')
 			.should()
 			.adhereTo((file: FileInfo) => {
 				// Custom logic that will fail: files should be empty

@@ -9,7 +9,26 @@ describe('dependOnFiles', () => {
 				simpleEdge('b', 'c'),
 				simpleEdge('a', 'c'),
 			];
-			const violations = gatherDependOnFileViolations(edges, ['a'], ['b'], true);
+			const violations = gatherDependOnFileViolations(
+				edges,
+				[
+					{
+						regExp: /a/,
+						options: {
+							target: 'path',
+						},
+					},
+				],
+				[
+					{
+						regExp: /b/,
+						options: {
+							target: 'path',
+						},
+					},
+				],
+				true
+			);
 			expect(violations).toMatchObject([
 				{
 					dependency: {
@@ -30,8 +49,22 @@ describe('dependOnFiles', () => {
 			];
 			const violations = gatherDependOnFileViolations(
 				edges,
-				['a.'],
-				['(b|c)'],
+				[
+					{
+						regExp: /a./,
+						options: {
+							target: 'path',
+						},
+					},
+				],
+				[
+					{
+						regExp: /(b|c)/,
+						options: {
+							target: 'path',
+						},
+					},
+				],
 				true
 			);
 			expect(violations).toMatchObject([
@@ -74,7 +107,26 @@ describe('dependOnFiles', () => {
 				simpleEdge('b', 'c'),
 				simpleEdge('a', 'c'),
 			];
-			const violations = gatherDependOnFileViolations(edges, ['a'], ['b'], false);
+			const violations = gatherDependOnFileViolations(
+				edges,
+				[
+					{
+						regExp: /a/,
+						options: {
+							target: 'path',
+						},
+					},
+				],
+				[
+					{
+						regExp: /b/,
+						options: {
+							target: 'path',
+						},
+					},
+				],
+				false
+			);
 			expect(violations).toHaveLength(2);
 			expect(violations[0]).toMatchObject({
 				dependency: {
@@ -110,7 +162,26 @@ describe('dependOnFiles', () => {
 
 		it('should not find violations', () => {
 			const edges = [simpleEdge('a', 'b')];
-			const violations = gatherDependOnFileViolations(edges, ['a'], ['b'], false);
+			const violations = gatherDependOnFileViolations(
+				edges,
+				[
+					{
+						regExp: /a/,
+						options: {
+							target: 'path',
+						},
+					},
+				],
+				[
+					{
+						regExp: /b/,
+						options: {
+							target: 'path',
+						},
+					},
+				],
+				false
+			);
 			expect(violations).toEqual([]);
 		});
 	});

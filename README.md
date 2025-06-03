@@ -269,7 +269,7 @@ const myCustomRule = (file: FileInfo) => {
 };
 
 const violations = await projectFiles()
-  .matchingPattern('**/*.ts')
+  .inPath('**/*.ts')
   .should()
   .adhereTo(myCustomRule, ruleDesc)
   .check();

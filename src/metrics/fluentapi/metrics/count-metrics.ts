@@ -410,9 +410,10 @@ export class CountThresholdBuilder implements Checkable {
 		);
 
 		logger.logProgress('Gathering metric violations from results');
-		const violations = gatherMetricViolations(results, options?.allowEmptyTests, [
-			'extracted classes',
-		]);
+		const violations = gatherMetricViolations(results, options?.allowEmptyTests, []);
+		// X-TODO
+		//'extracted classes',
+		//]);
 
 		// Log violations if enabled
 		violations.forEach((violation) => {
@@ -489,7 +490,7 @@ export class FileCountThresholdBuilder implements Checkable {
 
 		// Check for empty test condition
 		if (sourceFiles.length === 0 && !options?.allowEmptyTests) {
-			const emptyViolation = new EmptyTestViolation(['source files']);
+			const emptyViolation = new EmptyTestViolation([]); // X-TODO: 'source files']);
 			logger.logViolation(emptyViolation.toString());
 			logger.endCheck(ruleName, 1);
 			return [emptyViolation];

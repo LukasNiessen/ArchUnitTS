@@ -56,16 +56,8 @@ export class FileConditionBuilder {
 	 * @param name
 	 * @returns
 	 */
-	public withFilename(name: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [
-			RegexFactory.fileNameMatcher(name, 'exact'),
-		]);
-	}
-
-	public containsInFilename(name: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [
-			RegexFactory.fileNameMatcher(name, 'partial'),
-		]);
+	public withName(name: Pattern): FilesShouldCondition {
+		return new FilesShouldCondition(this, [RegexFactory.fileNameMatcher(name)]);
 	}
 
 	/**
@@ -97,14 +89,12 @@ export class FileConditionBuilder {
 	 * @returns
 	 */
 	public inFolder(folder: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [
-			RegexFactory.folderMatcher(folder, 'exact'),
-		]);
+		return new FilesShouldCondition(this, [RegexFactory.folderMatcher(folder)]);
 	}
 
 	// X-TODO: great doc comments here. Also explain the diff of path and folder!
 	public inPath(path: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.pathMatcher(path, 'exact')]);
+		return new FilesShouldCondition(this, [RegexFactory.pathMatcher(path)]);
 	}
 }
 
@@ -145,17 +135,13 @@ export class FilesShouldCondition {
 	 * @param name
 	 * @returns
 	 */
-	public withFilename(name: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [
-			RegexFactory.fileNameMatcher(name, 'exact'),
-		]);
+	public withName(name: Pattern): FilesShouldCondition {
+		return new FilesShouldCondition(this, [RegexFactory.fileNameMatcher(name)]);
 	}
 
 	// X-TODO: great doc comments here
 	public containsInFilename(name: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [
-			RegexFactory.fileNameMatcher(name, 'partial'),
-		]);
+		return new FilesShouldCondition(this, [RegexFactory.fileNameMatcher(name)]);
 	}
 
 	/**
@@ -183,14 +169,12 @@ export class FilesShouldCondition {
 	 * @returns
 	 */
 	public inFolder(folder: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [
-			RegexFactory.folderMatcher(folder, 'exact'),
-		]);
+		return new FilesShouldCondition(this, [RegexFactory.folderMatcher(folder)]);
 	}
 
 	// X-TODO: great doc comments here. Also explain the diff of path and folder!
 	public inPath(path: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.pathMatcher(path, 'exact')]);
+		return new FilesShouldCondition(this, [RegexFactory.pathMatcher(path)]);
 	}
 }
 
@@ -222,10 +206,7 @@ export class NegatedMatchPatternFileConditionBuilder {
 	 * @returns
 	 */
 	public matchPattern(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.fileNameMatcher(pattern, 'exact')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.fileNameMatcher(pattern));
 	}
 
 	/**
@@ -253,10 +234,7 @@ export class NegatedMatchPatternFileConditionBuilder {
 	 * @returns
 	 */
 	public beInFolder(folder: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.folderMatcher(folder, 'exact')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.folderMatcher(folder));
 	}
 
 	public dependOnFiles(): DependOnFileConditionBuilder {
@@ -274,10 +252,7 @@ export class NegatedMatchPatternFileConditionBuilder {
 	 * ```
 	 */
 	public matchFilename(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.fileNameMatcher(pattern, 'exact')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.fileNameMatcher(pattern));
 	}
 
 	/**
@@ -291,10 +266,7 @@ export class NegatedMatchPatternFileConditionBuilder {
 	 * ```
 	 */
 	public matchPath(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.pathMatcher(pattern, 'exact')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.pathMatcher(pattern));
 	}
 
 	/**
@@ -307,10 +279,7 @@ export class NegatedMatchPatternFileConditionBuilder {
 	 * ```
 	 */
 	public containInFilename(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.fileNameMatcher(pattern, 'partial')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.fileNameMatcher(pattern));
 	}
 
 	/**
@@ -324,10 +293,7 @@ export class NegatedMatchPatternFileConditionBuilder {
 	 * ```
 	 */
 	public containInPath(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.pathMatcher(pattern, 'partial')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.pathMatcher(pattern));
 	}
 }
 
@@ -391,10 +357,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * @returns
 	 */
 	public matchPattern(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.fileNameMatcher(pattern, 'exact')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.fileNameMatcher(pattern));
 	}
 
 	/**
@@ -466,10 +429,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * @returns MatchPatternFileCondition for checking the rule
 	 */
 	public beInFolder(folder: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.folderMatcher(folder, 'exact')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.folderMatcher(folder));
 	}
 
 	/**
@@ -556,10 +516,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * ```
 	 */
 	public matchFilename(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.fileNameMatcher(pattern, 'exact')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.fileNameMatcher(pattern));
 	}
 
 	/**
@@ -573,10 +530,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * ```
 	 */
 	public matchPath(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.pathMatcher(pattern, 'exact')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.pathMatcher(pattern));
 	}
 
 	/**
@@ -589,10 +543,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * ```
 	 */
 	public containInFilename(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.fileNameMatcher(pattern, 'partial')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.fileNameMatcher(pattern));
 	}
 
 	/**
@@ -606,10 +557,7 @@ export class PositiveMatchPatternFileConditionBuilder {
 	 * ```
 	 */
 	public containInPath(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(
-			this,
-			RegexFactory.pathMatcher(pattern, 'partial')
-		);
+		return new MatchPatternFileCondition(this, RegexFactory.pathMatcher(pattern));
 	}
 }
 
@@ -658,9 +606,7 @@ export class DependOnFileConditionBuilder {
 	 * @returns DependOnFileCondition for further chaining or checking
 	 */
 	public matchingPattern(pattern: Pattern): DependOnFileCondition {
-		return new DependOnFileCondition(this, [
-			RegexFactory.fileNameMatcher(pattern, 'exact'),
-		]);
+		return new DependOnFileCondition(this, [RegexFactory.fileNameMatcher(pattern)]);
 	}
 
 	/**
@@ -701,9 +647,7 @@ export class DependOnFileConditionBuilder {
 	 * @returns DependOnFileCondition for further chaining or checking
 	 */
 	public withName(name: Pattern): DependOnFileCondition {
-		return new DependOnFileCondition(this, [
-			RegexFactory.fileNameMatcher(name, 'exact'),
-		]);
+		return new DependOnFileCondition(this, [RegexFactory.fileNameMatcher(name)]);
 	}
 
 	/**
@@ -733,9 +677,7 @@ export class DependOnFileConditionBuilder {
 	 * @returns DependOnFileCondition for further chaining or checking
 	 */
 	public inFolder(folder: Pattern): DependOnFileCondition {
-		return new DependOnFileCondition(this, [
-			RegexFactory.folderMatcher(folder, 'exact'),
-		]);
+		return new DependOnFileCondition(this, [RegexFactory.folderMatcher(folder)]);
 	}
 }
 
@@ -777,7 +719,7 @@ export class DependOnFileCondition implements Checkable {
 	public matchingPattern(pattern: Pattern): DependOnFileCondition {
 		return new DependOnFileCondition(this.dependOnFileConditionBuilder, [
 			...this.dependencyFilters,
-			RegexFactory.fileNameMatcher(pattern, 'exact'),
+			RegexFactory.fileNameMatcher(pattern),
 		]);
 	}
 
@@ -814,7 +756,7 @@ export class DependOnFileCondition implements Checkable {
 	public withName(name: Pattern): DependOnFileCondition {
 		return new DependOnFileCondition(this.dependOnFileConditionBuilder, [
 			...this.dependencyFilters,
-			RegexFactory.fileNameMatcher(name, 'exact'),
+			RegexFactory.fileNameMatcher(name),
 		]);
 	}
 
@@ -840,7 +782,7 @@ export class DependOnFileCondition implements Checkable {
 	public inFolder(folder: Pattern): DependOnFileCondition {
 		return new DependOnFileCondition(this.dependOnFileConditionBuilder, [
 			...this.dependencyFilters,
-			RegexFactory.folderMatcher(folder, 'exact'),
+			RegexFactory.folderMatcher(folder),
 		]);
 	}
 

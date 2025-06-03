@@ -1,7 +1,7 @@
 import { gatherCycleViolations } from './cycle-free';
 import { ProjectedEdge } from '../../common/projection/project-edges';
 
-describe('freeOfCycles', () => {
+describe('cycle-free', () => {
 	describe('when not negated', () => {
 		it('should find one violation', () => {
 			const edges = [
@@ -101,7 +101,14 @@ describe('freeOfCycles', () => {
 				simpleEdge('fd', 'fa'),
 				simpleEdge('fa', 'fd'),
 			];
-			const violations = gatherCycleViolations(edges, ['a.']);
+			const violations = gatherCycleViolations(edges, [
+				{
+					regExp: /a./,
+					options: {
+						target: 'path',
+					},
+				},
+			]);
 			expect(violations).toMatchObject([
 				{
 					cycle: [

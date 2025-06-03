@@ -30,37 +30,23 @@ export const gatherDependOnFileViolations = (
 	const edgesInSource = projectedEdges.filter((edge) =>
 		matchesAllPatterns(edge.sourceLabel, objectPatterns)
 	);
+	if (edgesInSource.length === 0 && !allowEmptyTests) {
+		return [new EmptyTestViolation(objectPatterns)];
+	}
+
 	const edgesInTarget = projectedEdges.filter((edge) =>
 		matchesAllPatterns(edge.targetLabel, subjectPatterns)
 	);
-	const empty = edgesInSource.length === 0 || edgesInTarget.length === 0;
-
-	if (empty && !allowEmptyTests) {
-		return [new EmptyTestViolation([...objectPatterns, ...subjectPatterns])];
+	if (edgesInTarget.length === 0 && !allowEmptyTests) {
+		return [new EmptyTestViolation(subjectPatterns)];
 	}
 
 	const violatingEdgesFilter = isNegated
 		? (edge: ProjectedEdge) => {
-				const sourceMatches = matchesAllPatterns(
-					edge.sourceLabel,
-					objectPatterns
-				);
-				const targetMatches = matchesAllPatterns(
-					edge.targetLabel,
-					subjectPatterns
-				);
-				return sourceMatches && targetMatches;
+				return edgesInSource.includes(edge) && edgesInTarget.includes(edge);
 			}
 		: (edge: ProjectedEdge) => {
-				const sourceMatches = matchesAllPatterns(
-					edge.sourceLabel,
-					objectPatterns
-				);
-				const targetMatches = matchesAllPatterns(
-					edge.targetLabel,
-					subjectPatterns
-				);
-				return !sourceMatches || !targetMatches;
+				return !edgesInSource.includes(edge) || !edgesInTarget.includes(edge);
 			};
 
 	return projectedEdges

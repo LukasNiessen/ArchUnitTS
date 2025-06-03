@@ -81,9 +81,14 @@ export class ViolationFactory {
 	}
 
 	private static fromEmptyTestViolation(emptyTest: EmptyTestViolation): TestViolation {
+		const patternString =
+			typeof emptyTest.filters === 'string'
+				? emptyTest.filters
+				: emptyTest.filters.map((filter) => filter.regExp).join(', ');
+
 		const message = `${ColorUtils.formatViolationType('Empty test violation')}:
    ${ColorUtils.formatRule('No files found matching the specified pattern(s)')}
-   Patterns: ${ColorUtils.formatMetricValue(emptyTest.patterns.join(', '))}
+   Patterns: ${ColorUtils.formatMetricValue(patternString)}
    
    ${ColorUtils.yellow('This usually indicates:')}
    ${ColorUtils.dim('• Pattern is too restrictive or incorrect')}
