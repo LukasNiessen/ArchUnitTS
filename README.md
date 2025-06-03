@@ -820,9 +820,9 @@ Use the filtering and targeting capabilities to exclude specific files or patter
 
 File-based rules analyze import relationships between files, while class-based rules examine dependencies between classes and their members. Choose based on your architecture validation needs.
 
-## 💟 Big Thanks To...
+## 💟 Community
 
-## Maintainers
+### Maintainers
 
 • **[LukasNiessen](https://github.com/LukasNiessen)** - Creator and main maintainer
 
@@ -830,13 +830,13 @@ File-based rules analyze import relationships between files, while class-based r
 
 • **[draugang](https://github.com/draugang)** - Maintainer
 
-## Contributors
+### Contributors
 
 <a href="https://github.com/LukasNiessen/ArchUnitTS/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS" />
 </a>
 
-## Community & Support
+### Questions
 
 Found a bug? Want to discuss features?
 
@@ -852,7 +852,7 @@ If ArchUnitTS helps your project, please consider:
 - Suggesting new features 💭
 - Contributing code or documentation ⌨️
 
-## Star History
+### Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#Fosowl/agenticSeek&Date)
 
