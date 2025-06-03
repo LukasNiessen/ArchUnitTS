@@ -125,37 +125,33 @@ Many common uses cases are covered in our examples folder. Note that they are no
 
 **Layered Architecture:**
 
-- Express BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/layered-architecture/express/README.md)
+- [Express BackEnd](examples/layered-architecture/express/README.md) - Complete guide for implementing layered architecture in Express.js applications
 
-- Fastify BackEnd using a UML Diagram: click here (TODO-add-Link: subfolder of examples. Eg examples/layered-architecture/fastify-uml/README.md)
+- [Fastify BackEnd using a UML Diagram](examples/layered-architecture/fastify-uml/README.md) - Fastify layered architecture with UML diagram validation
 
-- Angular FrontEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/layered-architecture/angular/README.md)
+- [Angular FrontEnd](examples/layered-architecture/angular/README.md) - Angular frontend layered architecture patterns and rules
 
 **Domain Partitioning:**
 
-- Express MicroServices using Nx: click here (TODO-add-Link: subfolder of examples. Eg examples/micro-services/express/README.md)
+- [Express MicroServices using Nx](examples/micro-services/express/README.md) - Microservices architecture patterns with Nx monorepo management
 
-- TODO: is this possible with ArchUnitTS, todo domain partitioning checks in Nx?
+- [Modular Monolith, Deno BackEnd](examples/domain-partitioning/deno/README.md) - Domain-driven modular monolith architecture with Deno
 
-- Modular monlith, Deno BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/domain-partitioning/deno/README.md)
-
-- React MicroFrontEnds using Nx: click here (TODO-add-Link: subfolder of examples. Eg examples/micro-frontends/react/README.md)
-
-- TODO: is this possible with ArchUnitTS, todo domain partitioning checks in Nx?
+- [React MicroFrontEnds using Nx](examples/micro-frontends/react/README.md) - Micro-frontends architecture with React and Module Federation
 
 **Clean Architecture:**
 
-- NestJS BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/clean-architecture/nestjs/README.md)
+- [NestJS BackEnd](examples/clean-architecture/nestjs/README.md) - Clean Architecture implementation with NestJS framework
 
-- React FrontEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/clean-architecture/react/README.md)
+- [React FrontEnd](examples/clean-architecture/react/README.md) - Clean Architecture principles applied to React applications
 
 **Hexagonal Architecture:**
 
-- Express BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/hexagonal-architecture/express/README.md)
+- [Express BackEnd](examples/hexagonal-architecture/express/README.md) - Ports and Adapters pattern implementation with Express.js
 
 **MVC:**
 
-- Spring BackEnd: click here (TODO-add-Link: subfolder of examples. Eg examples/mvc/spring/README.md)
+- [Spring BackEnd](examples/mvc/spring/README.md) - Model-View-Controller architecture with Spring Boot and TypeScript frontend
 
 ## 🐲 Example Repositories
 
@@ -439,7 +435,105 @@ Glob patterns provide powerful wildcard matching for paths and filenames:
 .inPath('src/domain/*/*.ts')       // TypeScript files one level under domain
 ```
 
-### TODO: add explanation about .check() vs toPassAsync. And await.
+### Check Methods: .check() vs toPassAsync()
+
+ArchUnitTS provides two main methods for executing architecture rules:
+
+#### toPassAsync() - For Jest, Vitest, and Jasmine
+
+The `toPassAsync()` method is designed for testing frameworks that support custom matchers (Jest, Vitest, Jasmine). It integrates seamlessly with `expect()` statements:
+
+```typescript
+// Jest/Vitest/Jasmine - Use toPassAsync()
+await expect(rule).toPassAsync();
+
+// With configuration options
+await expect(rule).toPassAsync({
+  logging: {
+    enabled: true,
+    level: 'debug',
+  },
+  failOnEmptyTests: true,
+});
+```
+
+#### check() - For Other Testing Frameworks
+
+The `check()` method returns a violations array and is designed for testing frameworks without custom matcher support (Mocha, Node.js assert, etc.):
+
+```typescript
+// Mocha/Other frameworks - Use check()
+const violations = await rule.check();
+expect(violations).to.have.length(0);
+
+// With configuration options
+const violations = await rule.check({
+  logging: {
+    enabled: true,
+    level: 'info',
+  },
+  failOnEmptyTests: false,
+});
+```
+
+#### Configuration Options
+
+Both methods accept the same configuration options:
+
+```typescript
+interface CheckOptions {
+  logging?: {
+    enabled: boolean;
+    level: 'error' | 'warn' | 'info' | 'debug';
+  };
+  failOnEmptyTests?: boolean; // Default: true
+  maxViolations?: number; // Stop after N violations
+  includeDetails?: boolean; // Include detailed violation info
+}
+```
+
+#### When to Use Which Method
+
+- **Use `toPassAsync()`** with Jest, Vitest, or Jasmine for better integration and error reporting
+- **Use `check()`** with Mocha, Node.js assert, or any other testing framework
+- **Use `check()`** when you need to inspect violations programmatically before deciding how to handle them
+
+#### Example with Different Frameworks
+
+```typescript
+// Jest/Vitest/Jasmine
+it('should respect architecture rules', async () => {
+  const rule = projectFiles()
+    .inFolder('src/controllers/**')
+    .shouldNot()
+    .dependOnFiles()
+    .inFolder('src/database/**');
+
+  await expect(rule).toPassAsync();
+});
+
+// Mocha
+it('should respect architecture rules', async () => {
+  const rule = projectFiles()
+    .inFolder('src/controllers/**')
+    .shouldNot()
+    .dependOnFiles()
+    .inFolder('src/database/**');
+
+  const violations = await rule.check();
+  expect(violations).to.have.length(0);
+});
+
+// Node.js assert
+const rule = projectFiles()
+  .inFolder('src/controllers/**')
+  .shouldNot()
+  .dependOnFiles()
+  .inFolder('src/database/**');
+
+const violations = await rule.check();
+assert.strictEqual(violations.length, 0, `Found ${violations.length} violations`);
+```
 
 ### Basic Pattern Matching Examples
 
@@ -647,15 +741,101 @@ await metrics()
 
 ### Testing Framework Integration
 
+### Testing Framework Integration
+
 #### Jest, Vitest, Jasmine
 
-TODO: explain toPassAsync.
+ArchUnitTS provides native integration with Jest, Vitest, and Jasmine through the `toPassAsync()` custom matcher. This provides better error messages and seamless integration with these testing frameworks.
 
-### TODO: explain what you can pass into both check() and toPassAsync()
+```typescript
+import { projectFiles, metrics } from 'archunit';
 
-#### Other frameworks
+describe('Architecture Rules', () => {
+  it('should enforce layer dependencies', async () => {
+    const rule = projectFiles()
+      .inFolder('src/controllers/**')
+      .shouldNot()
+      .dependOnFiles()
+      .inFolder('src/database/**');
 
-TODO: explain that they must use check() and check violations array.
+    await expect(rule).toPassAsync();
+  });
+
+  it('should maintain code quality metrics', async () => {
+    const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
+
+    await expect(rule).toPassAsync();
+  });
+});
+```
+
+You can pass configuration options to `toPassAsync()`:
+
+```typescript
+await expect(rule).toPassAsync({
+  logging: {
+    enabled: true,
+    level: 'debug',
+  },
+  failOnEmptyTests: true,
+  maxViolations: 10,
+});
+```
+
+#### Other Testing Frameworks
+
+For other testing frameworks (Mocha, Node.js assert, AVA, etc.), use the `check()` method which returns an array of violations:
+
+```typescript
+import { projectFiles, metrics } from 'archunit';
+import { expect } from 'chai'; // Mocha with Chai
+
+describe('Architecture Rules with Mocha', () => {
+  it('controller files should not depend on database', async () => {
+    const violations = await projectFiles()
+      .inFolder('src/controllers/**')
+      .shouldNot()
+      .dependOnFiles()
+      .inFolder('src/database/**')
+      .check();
+
+    expect(violations).to.have.length(0);
+  });
+
+  it('controller classes should not be too complex', async () => {
+    const violations = await metrics()
+      .inFolder('src/controllers/**')
+      .count()
+      .methodCount()
+      .shouldBeBelow(15)
+      .check();
+
+    expect(violations).to.have.length(0);
+  });
+});
+```
+
+You can also pass the same configuration options to `check()`:
+
+```typescript
+const violations = await rule.check({
+  logging: {
+    enabled: true,
+    level: 'info',
+  },
+  failOnEmptyTests: false,
+  includeDetails: true,
+});
+
+// Handle violations programmatically
+if (violations.length > 0) {
+  console.log(`Found ${violations.length} architecture violations:`);
+  violations.forEach((violation) => {
+    console.log(`- ${violation.message}`);
+    console.log(`  File: ${violation.file}`);
+  });
+}
+```
 
 Here an example using Mocha.
 
@@ -865,14 +1045,6 @@ This project is under the **MIT** license.
 <p align="center">
   <a href="#top"><strong>Go Back to Top</strong></a>
 </p>
-
----
-
-TODO: include toPassAsync explanation!
-
-TODO: dependabot?
-
-TODO: Add more in depth demo video
 
 ---
 
