@@ -28,7 +28,7 @@
 	--bg-primary: #f8fafc;
 	--bg-secondary: #f1f5f9;
 	--bg-th: #1b1d21;
-	--bg-td: #1f2228;
+	--bg-td: #191b20;
 	--bg-tertiary: #e2e8f0;
 	--bg-dark: #0f1012;
 	--bg-dark-secondary: #1e293b;
@@ -426,7 +426,6 @@ tr:hover {
 
 /* Architecture-specific styling */
 .tsd-member {
-	background: #ffffff;
 	border-radius: var(--radius-lg);
 	padding: 2rem;
 	margin: 2rem 0;
@@ -693,7 +692,6 @@ pre {
 
 /* Better table styling */
 table {
-	background: #ffffff;
 	border: 1px solid #e2e8f0;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
