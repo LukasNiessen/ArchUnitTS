@@ -730,7 +730,7 @@ As you see in the table, there are some features that are only supported by us. 
 
 - **HTML Reports**: We support auto generated dashboards with charts and detailed breakdowns. Other libraries do not.
 
-## ⚠️ Informative Error Messages
+## 📢 Informative Error Messages
 
 When tests fail, you get helpful, colorful output with clickable file paths.
 
