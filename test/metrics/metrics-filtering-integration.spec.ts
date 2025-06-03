@@ -1,4 +1,4 @@
-import { metrics } from '../../src/metrics/fluentapi/metrics';
+import { metrics } from '../../src/metrics';
 import path from 'path';
 
 describe('Metrics Filtering Integration', () => {

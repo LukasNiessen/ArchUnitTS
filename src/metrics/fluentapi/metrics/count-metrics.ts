@@ -1,9 +1,9 @@
 import * as ts from 'typescript';
 import * as path from 'path';
-import { Violation } from '../../../common/assertion/violation';
-import { Checkable, CheckOptions } from '../../../common/fluentapi/checkable';
-import { CheckLogger } from '../../../common/util/logger';
-import { gatherMetricViolations } from '../../assertion/metric-thresholds';
+import { Violation, EmptyTestViolation } from '../../../common/assertion';
+import { Checkable, CheckOptions } from '../../../common/fluentapi';
+import { CheckLogger } from '../../../common/util';
+import { gatherMetricViolations } from '../../assertion';
 import {
 	MethodCountMetric,
 	FieldCountMetric,
@@ -15,14 +15,12 @@ import {
 	FunctionCountMetric,
 	CountMetric,
 	FileCountMetric,
-} from '../../calculation/count';
-import { extractClassInfo } from '../../extraction/extract-class-info';
-import { ClassInfo } from '../../extraction/interface';
-import { projectToMetricResults } from '../../projection/project-metrics';
+} from '../../calculation';
+import { extractClassInfo, ClassInfo } from '../../extraction';
+import { projectToMetricResults } from '../../projection';
 import { MetricsBuilder } from '../metrics';
 import { MetricComparison } from '../types';
 import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
-import { EmptyTestViolation } from '../../../common/assertion/EmptyTestViolation';
 
 /**
  * File-level metric violation

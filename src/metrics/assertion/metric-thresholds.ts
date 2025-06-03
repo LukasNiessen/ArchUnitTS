@@ -1,8 +1,7 @@
-import { Violation } from '../../common/assertion/violation';
+import { Violation, EmptyTestViolation } from '../../common/assertion';
 import { MetricComparison } from './types';
-import { MetricResult } from '../projection/project-metrics';
-import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
-import { Filter } from '../../common/type';
+import { MetricResult } from '../projection';
+import { Filter } from '../../common';
 
 /**
  * Represents a class that violates a metric threshold

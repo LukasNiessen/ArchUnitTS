@@ -1,21 +1,13 @@
-import {
-	bySingleFile,
-	byClassName,
-	combineFilters,
-	byFilter,
-} from '../projection/project-metrics';
-import { ClassFilter, ClassInfo, Metric } from '../extraction/interface';
-import { DistanceMetricsBuilder } from './metrics/distance-metrics';
-import { LCOMMetricsBuilder } from './metrics/lcom-metrics';
-import { CountMetricsBuilder } from './metrics/count-metrics';
-import { MetricComparison } from './types';
-import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
-import { Violation } from '../../common/assertion/violation';
-import { CheckLogger } from '../../common/util/logger';
-import { extractClassInfo } from '../extraction/extract-class-info';
-import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
-import { Pattern } from '../../common/type';
-import { RegexFactory } from '../../common/regex-factory';
+import { bySingleFile, byClassName, combineFilters, byFilter } from '../../projection';
+import { ClassFilter, ClassInfo, Metric, extractClassInfo } from '../../extraction';
+import { DistanceMetricsBuilder } from './distance-metrics';
+import { LCOMMetricsBuilder } from './lcom-metrics';
+import { CountMetricsBuilder } from './count-metrics';
+import { MetricComparison } from '../types';
+import { Checkable, CheckOptions } from '../../../common/fluentapi';
+import { Violation, EmptyTestViolation } from '../../../common/assertion';
+import { CheckLogger } from '../../../common/util';
+import { Pattern, RegexFactory } from '../../../common';
 
 /**
  * Type for user-defined custom metric calculation functions

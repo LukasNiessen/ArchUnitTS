@@ -1,8 +1,5 @@
-import {
-	FileAnalysisResult,
-	extractEnhancedClassInfo,
-} from '../extraction/extract-class-info';
-import { countDeclarations } from '../../common/util/declaration-detector';
+import { FileAnalysisResult, extractEnhancedClassInfo } from '../extraction';
+import { countDeclarations } from '../../common/util';
 
 /**
  * Distance to Main Sequence metrics interface

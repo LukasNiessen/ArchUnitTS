@@ -1,7 +1,6 @@
 import * as ts from 'typescript';
 import * as path from 'path';
-import { Edge } from '../../common/extraction/graph';
-import { extractGraph } from '../../common/extraction/extract-graph';
+import { Edge, extractGraph } from '../../common/extraction';
 import { ClassInfo } from './interface';
 
 /**

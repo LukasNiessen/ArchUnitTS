@@ -6,6 +6,8 @@
     component [uml]
     component [calculation]
     component [util]
+    component [logging]
+    component [error]
     [fluentapi] -> [assertion]
     [fluentapi] -> [uml]
     [fluentapi] -> [extraction]
@@ -20,5 +22,6 @@
     [uml] -> [assertion]
     [calculation] -> [extraction]
     [util] -> [fluentapi]
+    [util] -> [logging]
     [logging] -> [fluentapi]
 @enduml

@@ -1,4 +1,4 @@
-import { metrics } from '../../src/metrics/fluentapi/metrics';
+import { metrics } from '../../src/metrics';
 
 // This is a demonstration file that shows how to use the metrics API in your project
 describe('Using LCOM metrics in your project', () => {

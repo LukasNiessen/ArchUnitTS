@@ -1,5 +1,5 @@
-import { ProjectedNode } from '../../common/projection/project-nodes';
-import { Filter } from '../../common/type';
+import { ProjectedNode } from '../../common/projection';
+import { Filter } from '../../common';
 
 /**
  * Extract filename from a file path

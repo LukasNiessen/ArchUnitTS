@@ -1,7 +1,7 @@
 import '../index';
 import path from 'path';
-import { projectSlices } from '../src/slices/fluentapi/slices';
-import { projectFiles } from '../src/files/fluentapi/files';
+import { projectSlices } from '../src/slices';
+import { projectFiles } from '../src/files';
 
 describe('architecture', () => {
 	jest.setTimeout(60000);

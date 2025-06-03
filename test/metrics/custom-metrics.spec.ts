@@ -1,5 +1,5 @@
-import { metrics } from '../../src/metrics/fluentapi/metrics';
-import { ClassInfo } from '../../src/metrics/extraction/interface';
+import { metrics } from '../../src/metrics';
+import { ClassInfo } from '../../src/metrics/extraction';
 
 describe('Custom Metrics Logic', () => {
 	describe('Custom Metric Builder', () => {

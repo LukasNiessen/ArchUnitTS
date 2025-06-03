@@ -1,4 +1,4 @@
-import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
+import { Checkable, CheckOptions } from '../../common/fluentapi';
 import { ResultFactory, TestResult } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 

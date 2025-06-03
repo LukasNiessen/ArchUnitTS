@@ -1,5 +1,5 @@
-import { ClassInfo } from '../../src/metrics/common/interface';
 import {
+	ClassInfo,
 	FolderPathFilter,
 	SingleFileFilter,
 	ClassNameFilter,
@@ -8,7 +8,7 @@ import {
 	bySingleFile,
 	byClassName,
 	combineFilters,
-} from '../../src/metrics/projection/project-metrics';
+} from '../../src/metrics';
 
 describe('Class Filtering', () => {
 	const sampleClasses: ClassInfo[] = [

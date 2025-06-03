@@ -1,4 +1,4 @@
-import { Logger, LogLevel, LoggingOptions } from '../fluentapi/checkable';
+import { Logger, LoggingOptions, LogLevel } from '../logging';
 
 export class DefaultLogger implements Logger {
 	private readonly level: LogLevel;

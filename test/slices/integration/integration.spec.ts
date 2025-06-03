@@ -1,17 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import { parse } from 'plantuml-parser';
-import { extractGraph } from '../../../src/common/extraction/extract-graph';
-import { extractNxGraph } from '../../../src/common/extraction/extract-nx-graph';
-import { Graph } from '../../../src/common/extraction/graph';
-import { projectEdges } from '../../../src/common/projection/project-edges';
-import { gatherPositiveViolations } from '../../../src/slices/assertion/admissible-edges';
-import { slicesOfNxProject, projectSlices } from '../../../src/slices/fluentapi/slices';
+import { extractGraph, extractNxGraph, Graph, projectEdges } from '../../../src/common';
 import {
+	gatherPositiveViolations,
+	slicesOfNxProject,
+	projectSlices,
 	sliceByFileSuffix,
 	sliceByPattern,
-} from '../../../src/slices/projection/slicing-projections';
-import { exportDiagram } from '../../../src/slices/uml/export-diagram';
+	exportDiagram,
+} from '../../../src/slices';
 
 describe('Integration test', () => {
 	afterEach(() => {

@@ -1,5 +1,5 @@
-import { Violation } from '../../common/assertion/violation';
-import { ProjectedEdge, ProjectedGraph } from '../../common/projection/project-edges';
+import { Violation } from '../../common/assertion';
+import { ProjectedEdge, ProjectedGraph } from '../../common/projection';
 
 export type Rule = {
 	source: string;

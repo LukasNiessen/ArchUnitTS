@@ -1,19 +1,13 @@
-import { generateRule } from '../uml/generate-rules';
-import { extractGraph } from '../../common/extraction/extract-graph';
-import { extractNxGraph } from '../../common/extraction/extract-nx-graph';
+import { generateRule } from '../uml';
+import { extractGraph, extractNxGraph, Graph } from '../../common/extraction';
 import * as fs from 'fs';
-import { TechnicalError } from '../../common/error/errors';
-import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
-import {
-	gatherPositiveViolations,
-	gatherViolations,
-	Rule,
-} from '../assertion/admissible-edges';
-import { Violation } from '../../common/assertion/violation';
-import { identity, sliceByPattern } from '../projection/slicing-projections';
-import { MapFunction, projectEdges } from '../../common/projection/project-edges';
-import { Graph } from '../../common/extraction/graph';
-import { CheckLogger } from '../../common/util/logger';
+import { TechnicalError } from '../../common/error';
+import { Checkable, CheckOptions } from '../../common/fluentapi';
+import { gatherPositiveViolations, gatherViolations, Rule } from '../assertion';
+import { Violation } from '../../common/assertion';
+import { identity, sliceByPattern } from '../projection';
+import { MapFunction, projectEdges } from '../../common/projection';
+import { CheckLogger } from '../../common/util';
 
 export const projectSlices = (filename?: string): SliceConditionBuilder => {
 	const graphProvider = () => extractGraph(filename);

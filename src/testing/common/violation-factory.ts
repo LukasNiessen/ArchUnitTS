@@ -1,14 +1,15 @@
-import { Violation } from '../../common/assertion/violation';
-import { ViolatingNode } from '../../files/assertion/matching-files';
-import { ViolatingEdge } from '../../slices/assertion/admissible-edges';
-import { ViolatingCycle } from '../../files/assertion/cycle-free';
-import { ViolatingFileDependency } from '../../files/assertion/depend-on-files';
-import { MetricViolation } from '../../metrics/assertion/metric-thresholds';
+import { Violation, EmptyTestViolation } from '../../common/assertion';
+import {
+	ViolatingNode,
+	ViolatingCycle,
+	ViolatingFileDependency,
+	CustomFileViolation,
+} from '../../files/assertion';
+import { ViolatingEdge } from '../../slices/assertion';
+import { MetricViolation } from '../../metrics/assertion';
 import { FileCountViolation } from '../../metrics/fluentapi/metrics/count-metrics';
-import { CustomFileViolation } from '../../files/assertion/custom-file-logic';
 import { TestViolation } from './result-factory';
 import { ColorUtils } from './color-utils';
-import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 
 class UnknownTestViolation implements TestViolation {
 	details: Object = Object();

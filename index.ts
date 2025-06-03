@@ -1,24 +1,23 @@
 // Auto-setup all testing frameworks
-import './src/testing/setup/auto-detect';
+import './src/testing/setup';
 
 // Core functionality exports
-export * from './src/slices/fluentapi/slices';
-export * from './src/files/fluentapi/files';
-export * from './src/metrics/fluentapi/metrics';
-export * from './src/metrics/calculation/count';
-export * from './src/metrics/fluentapi/metrics/count-metrics';
+export * from './src/slices';
+export * from './src/files';
+export * from './src/metrics';
 
 // Graph extraction and debugging
 export {
 	extractGraph,
 	clearGraphCache,
 	setGraphExtractionLogger,
-} from './src/common/extraction/extract-graph';
+} from './src/common/extraction';
 
 // Testing framework integrations
-export * from './src/testing/index';
+export * from './src/testing';
 
-export * from './src/common/fluentapi/checkable';
+// Common utilities
+export * from './src/common';
 
 // Legacy Jest export for backward compatibility
-export { JestViolationFactory, JestResultFactory } from './src/jest/arch-matchers';
+export { JestViolationFactory, JestResultFactory } from './src/jest';

@@ -1,7 +1,7 @@
-import { Pattern, Filter } from '../../common/type';
-import { ClassFilter, ClassInfo, Metric } from '../extraction/interface';
+import { matchesPattern } from '../../..';
+import { Pattern, Filter } from '../../common';
+import { ClassFilter, ClassInfo, Metric } from '../extraction';
 import { MetricComparison } from './types';
-import { matchesPattern } from '../../files/assertion/pattern-matching';
 import * as path from 'path';
 
 /**

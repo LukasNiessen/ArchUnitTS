@@ -1,6 +1,6 @@
-import { Checkable, CheckOptions } from '../../../common/fluentapi/checkable';
-import { Violation } from '../../../common/assertion/violation';
-import { CheckLogger } from '../../../common/util/logger';
+import { Checkable, CheckOptions } from '../../../common/fluentapi';
+import { Violation, EmptyTestViolation } from '../../../common/assertion';
+import { CheckLogger } from '../../../common/util';
 import {
 	Abstractness,
 	Instability,
@@ -9,12 +9,11 @@ import {
 	calculateDistanceMetricsForProject,
 	CouplingFactor,
 	NormalizedDistance,
-} from '../../calculation/distance';
-import { extractEnhancedClassInfo } from '../../extraction/extract-class-info';
+} from '../../calculation';
+import { extractEnhancedClassInfo } from '../../extraction';
 import { MetricComparison } from '../types';
 import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
 import * as path from 'path';
-import { EmptyTestViolation } from '../../../common/assertion/EmptyTestViolation';
 
 /**
  * Project summary for distance metrics

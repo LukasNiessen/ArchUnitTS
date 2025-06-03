@@ -1,10 +1,9 @@
-import { Violation } from '../../common/assertion/violation';
-import { ProjectedNode } from '../../common/projection/project-nodes';
-import { CheckLogger } from '../../common/util/logger';
-import { CheckOptions } from '../../common/fluentapi/checkable';
-import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
+import { Violation, EmptyTestViolation } from '../../common/assertion';
+import { ProjectedNode } from '../../common/projection';
+import { CheckLogger } from '../../common/util';
+import { CheckOptions } from '../../common/fluentapi';
+import { Filter } from '../../common';
 import { matchesAllPatterns, matchesPattern } from './pattern-matching';
-import { Filter } from '../../common/type';
 
 export class ViolatingNode implements Violation {
 	public checkPattern: string;

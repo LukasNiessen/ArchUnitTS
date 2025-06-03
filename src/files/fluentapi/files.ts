@@ -1,19 +1,21 @@
-import { extractGraph } from '../../common/extraction/extract-graph';
-import { Checkable, CheckOptions } from '../../common/fluentapi/checkable';
-import { CheckLogger } from '../../common/util/logger';
-import { projectEdges } from '../../common/projection/project-edges';
-import { perEdge, perInternalEdge } from '../../common/projection/edge-projections';
-import { projectToNodes } from '../../common/projection/project-nodes';
-import { gatherRegexMatchingViolations } from '../assertion/matching-files';
-import { Violation } from '../../common/assertion/violation';
-import { gatherCycleViolations } from '../assertion/cycle-free';
-import { gatherDependOnFileViolations } from '../assertion/depend-on-files';
+import { extractGraph } from '../../common/extraction';
+import { Checkable, CheckOptions } from '../../common/fluentapi';
+import { CheckLogger } from '../../common/util';
 import {
+	projectEdges,
+	perEdge,
+	perInternalEdge,
+	projectToNodes,
+} from '../../common/projection';
+import {
+	gatherRegexMatchingViolations,
+	gatherCycleViolations,
+	gatherDependOnFileViolations,
 	gatherCustomFileViolations,
 	CustomFileCondition,
-} from '../assertion/custom-file-logic';
-import { Filter, Pattern } from '../../common/type';
-import { RegexFactory } from '../../common/regex-factory';
+} from '../assertion';
+import { Violation } from '../../common/assertion';
+import { Filter, Pattern, RegexFactory } from '../../common';
 
 // Re-export types for external use
 export type { FileInfo, CustomFileCondition } from '../assertion/custom-file-logic';

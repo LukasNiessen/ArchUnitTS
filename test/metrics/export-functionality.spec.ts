@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import * as fs from 'fs';
 import * as path from 'path';
-import { metrics } from '../../src/metrics/fluentapi/metrics';
-import { DistanceMetricsBuilder } from '../../src/metrics/fluentapi/metrics/distance-metrics';
+import { metrics } from '../../src/metrics';
+import { DistanceMetricsBuilder } from '../../src/metrics/fluentapi';
 
 describe('Export Functionality Tests', () => {
 	const testOutputDir = path.join(__dirname, 'test-output');

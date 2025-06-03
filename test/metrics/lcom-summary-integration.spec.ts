@@ -1,5 +1,5 @@
 import path from 'path';
-import { metrics } from '../../src/metrics/fluentapi/metrics';
+import { metrics } from '../../src/metrics';
 import '../../index';
 
 describe('LCOM metrics project summary', () => {

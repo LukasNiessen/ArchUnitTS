@@ -1,5 +1,5 @@
-import { EmptyTestViolation } from '../../src/common/assertion/EmptyTestViolation';
-import { projectFiles } from '../../src/files/fluentapi/files';
+import { EmptyTestViolation } from '../../src/common/assertion';
+import { projectFiles } from '../../src/files';
 import path from 'path';
 
 describe('Empty Test Detection', () => {

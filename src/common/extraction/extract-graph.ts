@@ -6,7 +6,7 @@ import { TechnicalError } from '../error/errors';
 import { normalizeWindowsPaths } from '../util/path-utils';
 import { ImportPathsResolver } from '@zerollup/ts-helpers';
 import { determineImportKinds } from '../util/import-kinds-helper';
-import { Logger } from '../util';
+import { Logger } from '..';
 
 // Constant to control whether node_modules files should be excluded from the graph
 // TODO: introduce a .archignore file instead a la .gitignore

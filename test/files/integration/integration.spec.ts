@@ -1,5 +1,5 @@
-import { FileConditionBuilder, projectFiles } from '../../../src/files/fluentapi/files';
-import { ViolatingNode } from '../../../src/files/assertion/matching-files';
+import { FileConditionBuilder, projectFiles } from '../../../src/files';
+import { ViolatingNode } from '../../../src/files/assertion';
 import path from 'path';
 
 describe('Integration test', () => {

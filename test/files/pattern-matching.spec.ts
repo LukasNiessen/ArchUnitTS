@@ -2,9 +2,9 @@ import {
 	matchesPattern,
 	matchesAllPatterns,
 	matchesAnyPattern,
-} from '../../src/files/assertion/pattern-matching';
-import { ProjectedNode } from '../../src/common/projection/project-nodes';
-import { RegexFactory } from '../../src/common/regex-factory';
+} from '../../src/files/assertion';
+import { ProjectedNode } from '../../src/common/projection';
+import { RegexFactory } from '../../src/common';
 
 describe('Pattern Matching', () => {
 	const createProjectedNode = (path: string): ProjectedNode => {

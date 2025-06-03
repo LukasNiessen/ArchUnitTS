@@ -1,7 +1,7 @@
 // Auto-detect and setup all available testing frameworks
-import { extendJestMatchers } from '../jest/jest-adapter';
-import { extendJasmineMatchers } from '../jasmine/jasmine-adapter';
-import { extendVitestMatchers } from '../vitest/vitest-adapter';
+import { extendJestMatchers } from '../jest';
+import { extendJasmineMatchers } from '../jasmine';
+import { extendVitestMatchers } from '../vitest';
 
 // Auto-detect and setup all available testing frameworks
 // Each adapter function already includes conditional checks for framework availability

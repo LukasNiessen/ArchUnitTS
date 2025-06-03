@@ -1,4 +1,4 @@
-import { metrics } from '../../src/metrics/fluentapi/metrics';
+import { metrics } from '../../src/metrics';
 
 describe('Metrics Pattern Matching Integration', () => {
 	const tsConfigPath = './tsconfig.test.json';

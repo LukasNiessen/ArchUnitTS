@@ -1,7 +1,7 @@
-import { Violation } from '../../../common/assertion/violation';
-import { Checkable, CheckOptions } from '../../../common/fluentapi/checkable';
-import { CheckLogger } from '../../../common/util/logger';
-import { gatherMetricViolations } from '../../assertion/metric-thresholds';
+import { Violation } from '../../../common/assertion';
+import { Checkable, CheckOptions } from '../../../common/fluentapi';
+import { CheckLogger } from '../../../common/util';
+import { gatherMetricViolations } from '../../assertion';
 import {
 	LCOM96a,
 	LCOM96b,
@@ -12,10 +12,9 @@ import {
 	LCOM5,
 	LCOMStar,
 	LCOMMetric,
-} from '../../calculation/lcom';
-import { extractClassInfo } from '../../extraction/extract-class-info';
-import { Metric } from '../../extraction/interface';
-import { projectToMetricResults } from '../../projection/project-metrics';
+} from '../../calculation';
+import { extractClassInfo, Metric } from '../../extraction';
+import { projectToMetricResults } from '../../projection';
 import { MetricsBuilder } from '../metrics';
 import { MetricComparison } from '../types';
 import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';

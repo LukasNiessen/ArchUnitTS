@@ -1,5 +1,5 @@
 import '../../../index';
-import { projectFiles } from '../../../src/files/fluentapi/files';
+import { projectFiles } from '../../../src/files';
 
 describe('Integration test', () => {
 	it('checks the created messages', async () => {

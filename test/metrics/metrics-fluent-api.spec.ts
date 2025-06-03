@@ -1,7 +1,4 @@
-import { metrics } from '../../src/metrics/fluentapi/metrics';
-import { extractClassInfo } from '../../src/metrics/extraction/extract-class-info';
-import { MetricViolation } from '../../src/metrics/assertion/metric-thresholds';
-import { ClassInfo } from '../../src/metrics/common/interface';
+import { metrics, extractClassInfo, MetricViolation, ClassInfo } from '../../src/metrics';
 
 // Mock the extractClassInfo function
 jest.mock('../../src/metrics/extraction/extract-class-info');

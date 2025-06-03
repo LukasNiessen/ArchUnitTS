@@ -1,4 +1,4 @@
-import { metrics } from '../../src/metrics/fluentapi/metrics';
+import { metrics } from '../../src/metrics';
 // Import auto-detection to enable Jest matchers
 import '../../src/testing/setup/auto-detect';
 

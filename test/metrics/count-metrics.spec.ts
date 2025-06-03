@@ -1,4 +1,4 @@
-import { metrics } from '../../src/metrics/fluentapi/metrics';
+import { metrics } from '../../src/metrics';
 import path from 'path';
 import {
 	MethodCountMetric,
@@ -9,8 +9,8 @@ import {
 	ClassCountMetric,
 	InterfaceCountMetric,
 	FunctionCountMetric,
-} from '../../src/metrics/calculation/count';
-import { ClassInfo } from '../../src/metrics/extraction/interface';
+} from '../../src/metrics/calculation';
+import { ClassInfo } from '../../src/metrics/extraction';
 import * as ts from 'typescript';
 
 describe('Count Metrics', () => {

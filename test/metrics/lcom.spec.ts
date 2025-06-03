@@ -1,5 +1,4 @@
-import { LCOM96b } from '../../src/metrics/calculation/lcom';
-import { ClassInfo } from '../../src/metrics/common/interface';
+import { LCOM96b, ClassInfo } from '../../src/metrics';
 
 describe('LCOM96b metric calculation', () => {
 	const lcom96b = new LCOM96b();

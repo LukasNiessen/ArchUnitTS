@@ -1,5 +1,5 @@
-import { Edge } from '../../common/extraction/graph';
-import { MapFunction, MappedEdge } from '../../common/projection/project-edges';
+import { Edge } from '../../common/extraction';
+import { MapFunction, MappedEdge } from '../../common/projection';
 
 export const identity = (): MapFunction => {
 	return (edge) => ({
