@@ -837,7 +837,7 @@ if (violations.length > 0) {
 }
 ```
 
-Here an example using Mocha.
+Here an example using .
 
 ```typescript
 import { projectFiles, metrics } from 'archunit';
