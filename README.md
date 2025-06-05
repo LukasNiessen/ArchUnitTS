@@ -1013,9 +1013,8 @@ File-based rules analyze import relationships between files, while class-based r
 • **[draugang](https://github.com/draugang)** - Maintainer
 
 ### Contributors
-
 <a href="https://github.com/LukasNiessen/ArchUnitTS/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS" />
+  <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS?max=1000&contributors=7" />
 </a>
 
 ### Questions
