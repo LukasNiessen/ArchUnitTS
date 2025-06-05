@@ -1014,7 +1014,7 @@ File-based rules analyze import relationships between files, while class-based r
 
 ### Contributors
 <a href="https://github.com/LukasNiessen/ArchUnitTS/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS?max=1000&contributors=7" />
+  <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS&max=1000&contributors=7" />
 </a>
 
 ### Questions
