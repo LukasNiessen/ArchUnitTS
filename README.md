@@ -163,7 +163,7 @@ Here are a few repositories with fully functioning examples that use ArchUnitTS 
 
 ## 🐣 Features
 
-This is an overview of you can do with ArchUnitTS.
+This is an overview of what you can do with ArchUnitTS.
 
 ### Circular Dependencies
 
@@ -200,13 +200,16 @@ it('business layer should not depend on presentation', async () => {
 
 ```typescript
 it('should follow naming patterns', async () => {
-  const rule = projectFiles().inFolder('src/services').should().haveName('*-service.ts'); // my-service.ts for example
+  const rule = projectFiles()
+    .inFolder('src/services/**')
+    .should()
+    .haveName('*-service.ts'); // my-service.ts for example
   await expect(rule).toPassAsync();
 });
 
 it('components should be PascalCase', async () => {
   const rule = projectFiles()
-    .inFolder('src/components')
+    .inFolder('src/components/**')
     .should()
     .haveName(/^[A-Z][a-zA-Z]*Commponent\.ts$/); // MyComponent.ts for example
   await expect(rule).toPassAsync();
@@ -387,18 +390,13 @@ We support string patterns and regular expressions. String patterns support glob
 If you need case-sensitive matching, use regular expressions. If you need case-insensitive regex matching, use the `i` flag:
 
 ```typescript
-// Case insensitive regex
+// Case sensitive regex
 .withName(/^.*service\.ts$/)  // Matches service.ts
 ```
 
 ```typescript
 // Case insensitive regex
 .withName(/^.*service\.ts$/i)  // Matches Service.ts, service.ts, SERVICE.ts
-```
-
-```typescript
-// Case insensitive regex
-.withName('*service.ts')  // Matches Service.ts, service.ts, SERVICE.ts
 ```
 
 ### Glob Patterns Guide
@@ -459,7 +457,8 @@ Here `options` can be used for enabling logging, disable caching, or to not fail
     enabled: true, // show logs
     level: 'debug', // show lots of logs
   },
-  allowEmptyTests: true, // if your rule 'passes' because it 'passed' zero files, the test normally fails. You can turn this off by setting this true
+  // if your rule 'passes' because it 'passed' zero files, the test normally fails. You can turn this off by setting this true
+  allowEmptyTests: true,
   clearCache: true // reading nodes, imports etc is normally cached
 }
 ```
@@ -510,26 +509,26 @@ interface CheckOptions {
 import { projectFiles, metrics } from 'archunit';
 
 // Files module - Test architectural rules
-await projectFiles().withName('*.service.ts').should().beInFolder('**/services/**');
+projectFiles().withName('*.service.ts').should().beInFolder('**/services/**');
 
 // Metrics module - Test only service classes
-await metrics().withName('*.service.ts').lcom().lcom96b().shouldBeBelow(0.7);
+metrics().withName('*.service.ts').lcom().lcom96b().shouldBeBelow(0.7);
 
 // Files module - Test classes in specific folders
-await projectFiles()
+projectFiles()
   .inFolder('**/controllers/**')
   .shouldNot()
   .dependOnFiles()
   .inFolder('**/database/**');
 
 // Metrics module - Test classes in specific folders
-await metrics().inFolder('**/controllers/**').count().methodCount().shouldBeBelow(20);
+metrics().inFolder('**/controllers/**').count().methodCount().shouldBeBelow(20);
 
 // Files module - Test classes matching full path patterns
-await projectFiles().inPath('src/domain/**/*.ts').should().haveNoCycles();
+projectFiles().inPath('src/domain/**/*.ts').should().haveNoCycles();
 
 // Metrics module - Test classes matching full path patterns
-await metrics().inPath('src/domain/**/*.ts').lcom().lcom96a().shouldBeBelow(0.8);
+metrics().inPath('src/domain/**/*.ts').lcom().lcom96a().shouldBeBelow(0.8);
 ```
 
 ### Advanced Pattern Matching
@@ -538,24 +537,20 @@ You can combine multiple pattern matching methods for precise targeting across a
 
 ```typescript
 // Files module - Combine folder and filename patterns
-await projectFiles()
+projectFiles()
   .inFolder('**/services/**')
   .withName('*.service.ts')
   .should()
   .haveNoCycles();
 
 // Metrics module - Combine folder and filename patterns
-await metrics().inFolder('**/services/**').withName('*.service.ts').lcom().lcom96b();
+metrics().inFolder('**/services/**').withName('*.service.ts').lcom().lcom96b();
 
 // Files module - Mix pattern matching with dependency rules
-await projectFiles()
-  .inPath('src/api/**')
-  .shouldNot()
-  .dependOnFiles()
-  .inPath('src/database/**');
+projectFiles().inPath('src/api/**').shouldNot().dependOnFiles().inPath('src/database/**');
 
 // Metrics module - Mix pattern matching with class name matching
-await metrics()
+metrics()
   .inPath('src/api/**')
   .forClassesMatching(/.*Controller/)
   .count()
@@ -569,28 +564,28 @@ Pattern matching is particularly useful for enforcing naming conventions:
 
 ```typescript
 // Match camelCase test files
-await projectFiles()
+projectFiles()
   .withName(/^[a-z][a-zA-Z]*\.spec\.ts$/)
   .should()
   .beInFolder('**/test/**')
   .check();
 
 // Match interface files (starting with I)
-await projectFiles()
+projectFiles()
   .withName(/^I[A-Z][a-zA-Z]*\.ts$/)
   .should()
   .beInFolder('**/interfaces/**')
   .check();
 
 // Match constant files (all uppercase)
-await projectFiles()
+projectFiles()
   .withName(/^[A-Z_]+\.ts$/)
   .should()
   .beInFolder('**/constants/**')
   .check();
 
 // Metrics for PascalCase controllers
-await metrics()
+metrics()
   .withName(/^[A-Z][a-zA-Z]*Controller\.ts$/)
   .lcom()
   .lcom96b()
@@ -604,14 +599,14 @@ Here are more advanced use cases combining different pattern types:
 
 ```typescript
 // Ensure all TypeScript files in feature folders follow naming conventions
-await projectFiles()
+projectFiles()
   .inPath('src/features/**/*.ts')
   .withName(/^[A-Z][a-zA-Z]*\.(service|controller|model)\.ts$/)
   .should()
   .haveNoCycles();
 
 // Test that utility files have low complexity
-await metrics()
+metrics()
   .inFolder('**/utils/**')
   .withName('*.util.ts')
   .complexity()
@@ -619,14 +614,14 @@ await metrics()
   .shouldBeBelow(5);
 
 // Ensure test files don't depend on implementation details
-await projectFiles()
+projectFiles()
   .withName('*.spec.ts')
   .shouldNot()
   .dependOnFiles()
   .inPath('src/**/internal/**');
 
 // Check cohesion of domain entities
-await metrics()
+metrics()
   .inPath('src/domain/entities/**/*.ts')
   .withName(/^[A-Z][a-zA-Z]*Entity\.ts$/)
   .lcom()
@@ -642,10 +637,10 @@ The LCOM metrics measure how well the methods and fields of a class are connecte
 
 ```typescript
 // LCOM96a (Handerson et al.)
-await metrics().lcom().lcom96a().shouldBeBelow(0.8);
+metrics().lcom().lcom96a().shouldBeBelow(0.8);
 
 // LCOM96b (Handerson et al.)
-await metrics().lcom().lcom96b().shouldBeBelow(0.7);
+metrics().lcom().lcom96b().shouldBeBelow(0.7);
 ```
 
 The LCOM96b metric is calculated as:
@@ -670,13 +665,13 @@ Measure various counts within classes:
 
 ```typescript
 // Method count
-await metrics().count().methodCount().shouldBeBelow(20);
+metrics().count().methodCount().shouldBeBelow(20);
 
 // Field count
-await metrics().count().fieldCount().shouldBeBelow(15).;
+metrics().count().fieldCount().shouldBeBelow(15).;
 
 // Lines of code
-await metrics().count().linesOfCode().shouldBeBelow(200);
+metrics().count().linesOfCode().shouldBeBelow(200);
 ```
 
 #### Distance Metrics
@@ -685,13 +680,13 @@ Measure architectural distance metrics:
 
 ```typescript
 // Abstractness
-await metrics().distance().abstractness().shouldBeAbove(0.3);
+metrics().distance().abstractness().shouldBeAbove(0.3);
 
 // Instability
-await metrics().distance().instability().shouldBeBelow(0.8);
+metrics().distance().instability().shouldBeBelow(0.8);
 
 // Distance from main sequence
-await metrics().distance().distanceFromMainSequence().shouldBeBelow(0.5);
+metrics().distance().distanceFromMainSequence().shouldBeBelow(0.5);
 ```
 
 #### Custom Metrics
@@ -699,142 +694,13 @@ await metrics().distance().distanceFromMainSequence().shouldBeBelow(0.5);
 Define your own metrics with custom calculation logic:
 
 ```typescript
-await metrics()
+metrics()
   .customMetric(
     'complexityRatio',
     'Ratio of methods to fields',
     (classInfo) => classInfo.methods.length / Math.max(classInfo.fields.length, 1)
   )
   .shouldBeBelow(3.0);
-```
-
-### Testing Framework Integration
-
-### Testing Framework Integration
-
-#### Jest, Vitest, Jasmine
-
-ArchUnitTS provides native integration with Jest, Vitest, and Jasmine through the `toPassAsync()` custom matcher. This provides better error messages and seamless integration with these testing frameworks.
-
-```typescript
-import { projectFiles, metrics } from 'archunit';
-
-describe('Architecture Rules', () => {
-  it('should enforce layer dependencies', async () => {
-    const rule = projectFiles()
-      .inFolder('src/controllers/**')
-      .shouldNot()
-      .dependOnFiles()
-      .inFolder('src/database/**');
-
-    await expect(rule).toPassAsync();
-  });
-
-  it('should maintain code quality metrics', async () => {
-    const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
-
-    await expect(rule).toPassAsync();
-  });
-});
-```
-
-You can pass configuration options to `toPassAsync()`:
-
-```typescript
-await expect(rule).toPassAsync({
-  logging: {
-    enabled: true,
-    level: 'debug',
-  },
-  failOnEmptyTests: true,
-  maxViolations: 10,
-});
-```
-
-#### Other Testing Frameworks
-
-For other testing frameworks (Mocha, Node.js assert, AVA, etc.), use the `check()` method which returns an array of violations:
-
-```typescript
-import { projectFiles, metrics } from 'archunit';
-import { expect } from 'chai'; // Mocha with Chai
-
-describe('Architecture Rules with Mocha', () => {
-  it('controller files should not depend on database', async () => {
-    const violations = await projectFiles()
-      .inFolder('src/controllers/**')
-      .shouldNot()
-      .dependOnFiles()
-      .inFolder('src/database/**')
-      .check();
-
-    expect(violations).to.have.length(0);
-  });
-
-  it('controller classes should not be too complex', async () => {
-    const violations = await metrics()
-      .inFolder('src/controllers/**')
-      .count()
-      .methodCount()
-      .shouldBeBelow(15)
-      .check();
-
-    expect(violations).to.have.length(0);
-  });
-});
-```
-
-You can also pass the same configuration options to `check()`:
-
-```typescript
-const violations = await rule.check({
-  logging: {
-    enabled: true,
-    level: 'info',
-  },
-  failOnEmptyTests: false,
-  includeDetails: true,
-});
-
-// Handle violations programmatically
-if (violations.length > 0) {
-  console.log(`Found ${violations.length} architecture violations:`);
-  violations.forEach((violation) => {
-    console.log(`- ${violation.message}`);
-    console.log(`  File: ${violation.file}`);
-  });
-}
-```
-
-Here an example using Mocha.
-
-```typescript
-import { projectFiles, metrics } from 'archunit';
-import { expect } from 'chai';
-
-describe('Architecture Rules with Pattern Matching', () => {
-  it('controller files should not depend on database', async () => {
-    const violations = await projectFiles()
-      .inFolder('**/controllers')
-      .shouldNot()
-      .dependOnFiles()
-      .inFolder('**/database')
-      .check();
-
-    expect(violations).to.have.length(0);
-  });
-
-  it('controller classes should not be too complex', async () => {
-    const violations = await metrics()
-      .inFolder('**/controllers')
-      .count()
-      .methodCount()
-      .shouldBeBelow(15)
-      .check();
-
-    expect(violations).to.have.length(0);
-  });
-});
 ```
 
 ## 📊 Library Comparison
