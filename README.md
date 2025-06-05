@@ -15,7 +15,7 @@
 
 Enforce architecture rules in TypeScript and JavaScript projects. Check for dependency directions, detect circular dependencies, enforce coding standards and much more. Integrates with every testing framework. Very simple setup and pipeline integration.
 
-<!--The #1 architecture testing library for TS and JS measured by GitHub stars! 💚  -->
+#1 architecture testing library for TypeScript, measured by GitHub stars.
 
 _Inspired by the amazing ArchUnit library but we are not affiliated with ArchUnit._
 
@@ -1013,9 +1013,8 @@ File-based rules analyze import relationships between files, while class-based r
 • **[draugang](https://github.com/draugang)** - Maintainer
 
 ### Contributors
-
 <a href="https://github.com/LukasNiessen/ArchUnitTS/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS" />
+  <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS&max=1000&contributors=7" />
 </a>
 
 ### Questions
@@ -1056,3 +1055,5 @@ This project is under the **MIT** license.
 ### Special Note on Cycle-Free Checks
 
 Empty checks are particularly nuanced for cycle-free assertions. Consider this scenario: folder A contains one file that only depends on folder B. When testing `.inFolder("A").should().haveNoCycles()`, we want to check for cycles _within_ folder A only. However, if we report an empty test error, users might be confused since folder A does contain a file. Therefore, cycle-free checks use a more permissive approach and check the unfiltered file set for emptiness, rather than the filtered set that's actually analyzed for cycles.
+
+
