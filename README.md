@@ -437,43 +437,49 @@ Glob patterns provide powerful wildcard matching for paths and filenames:
 
 ### Check Methods: .check() vs toPassAsync()
 
-ArchUnitTS provides two main methods for executing architecture rules:
+ArchUnitTS provides two main methods for executing architecture rules.
 
-#### toPassAsync() - For Jest, Vitest, and Jasmine
+#### `toPassAsync()`
 
-The `toPassAsync()` method is designed for testing frameworks that support custom matchers (Jest, Vitest, Jasmine). It integrates seamlessly with `expect()` statements:
+This is special syntax we have added for Jest, Vitest and Jasmine. If you're using one of these testing frameworks, you should always use `toPassAsync()`. Many benefits come with it, for example beautiful error messages in case of a failing tests.
 
 ```typescript
 // Jest/Vitest/Jasmine - Use toPassAsync()
 await expect(rule).toPassAsync();
 
 // With configuration options
-await expect(rule).toPassAsync({
-  logging: {
-    enabled: true,
-    level: 'debug',
-  },
-  failOnEmptyTests: true,
-});
+await expect(rule).toPassAsync(options);
 ```
 
-#### check() - For Other Testing Frameworks
+Here `options` can be used for enabling logging, disable caching, or to not fail on empty tests.
 
-The `check()` method returns a violations array and is designed for testing frameworks without custom matcher support (Mocha, Node.js assert, etc.):
+```javascript
+{
+  logging: {
+    enabled: true, // show logs
+    level: 'debug', // show lots of logs
+  },
+  allowEmptyTests: true, // if your rule 'passes' because it 'passed' zero files, the test normally fails. You can turn this off by setting this true
+  clearCache: true // reading nodes, imports etc is normally cached
+}
+```
+
+#### `check()`
+
+For all other testing frameworks we don't have special syntax support but you can still easily use ArchUnitTS as follows:
 
 ```typescript
-// Mocha/Other frameworks - Use check()
+// Mocha example
 const violations = await rule.check();
 expect(violations).to.have.length(0);
+```
 
-// With configuration options
-const violations = await rule.check({
-  logging: {
-    enabled: true,
-    level: 'info',
-  },
-  failOnEmptyTests: false,
-});
+The `check()` method works universally. It returns a violations array and is designed for testing frameworks without custom matcher support (Mocha, Node.js assert, etc.). You can assert the violations arrays length for example.
+
+```typescript
+// With configuration options, the same ones as mentioned above
+const violations = await rule.check(options);
+...
 ```
 
 #### Configuration Options
@@ -482,13 +488,13 @@ Both methods accept the same configuration options:
 
 ```typescript
 interface CheckOptions {
+  // default undefined, which is treated as no logging
   logging?: {
     enabled: boolean;
-    level: 'error' | 'warn' | 'info' | 'debug';
+    level: 'debug' | 'info' | 'warn' | 'error';
   };
-  failOnEmptyTests?: boolean; // Default: true
-  maxViolations?: number; // Stop after N violations
-  includeDetails?: boolean; // Include detailed violation info
+  allowEmptyTests?: boolean; // Default: false
+  clearCache?: boolean; // Default: false
 }
 ```
 
@@ -497,43 +503,6 @@ interface CheckOptions {
 - **Use `toPassAsync()`** with Jest, Vitest, or Jasmine for better integration and error reporting
 - **Use `check()`** with Mocha, Node.js assert, or any other testing framework
 - **Use `check()`** when you need to inspect violations programmatically before deciding how to handle them
-
-#### Example with Different Frameworks
-
-```typescript
-// Jest/Vitest/Jasmine
-it('should respect architecture rules', async () => {
-  const rule = projectFiles()
-    .inFolder('src/controllers/**')
-    .shouldNot()
-    .dependOnFiles()
-    .inFolder('src/database/**');
-
-  await expect(rule).toPassAsync();
-});
-
-// Mocha
-it('should respect architecture rules', async () => {
-  const rule = projectFiles()
-    .inFolder('src/controllers/**')
-    .shouldNot()
-    .dependOnFiles()
-    .inFolder('src/database/**');
-
-  const violations = await rule.check();
-  expect(violations).to.have.length(0);
-});
-
-// Node.js assert
-const rule = projectFiles()
-  .inFolder('src/controllers/**')
-  .shouldNot()
-  .dependOnFiles()
-  .inFolder('src/database/**');
-
-const violations = await rule.check();
-assert.strictEqual(violations.length, 0, `Found ${violations.length} violations`);
-```
 
 ### Basic Pattern Matching Examples
 
