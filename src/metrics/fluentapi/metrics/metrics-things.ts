@@ -115,10 +115,6 @@ export class MetricsBuilder {
 		return this;
 	}
 
-	/**
-	 * XXX-TODO: this was public before. should not though right?
-	 * Get the combined filter for all applied filters
-	 */
 	getFilter(): ClassFilter | null {
 		if (this.filters.length === 0) {
 			return null;

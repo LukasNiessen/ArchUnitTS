@@ -26,10 +26,6 @@ export const projectFiles = (tsConfigFilePath?: string): FileConditionBuilder =>
 
 export const files = projectFiles;
 
-/**
- * Supports glob everywhere. If its a string, glob is always applied, if its a regex,
- * its checked with the reges as it is. X-TODO: is it rly as it is?
- */
 export class FileConditionBuilder {
 	constructor(readonly tsConfigFilePath?: string) {}
 

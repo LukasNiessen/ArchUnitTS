@@ -85,7 +85,7 @@ describe('Integration test', () => {
 					sourceLabel: 'src/components/ATest/ATest.ts',
 					targetLabel: 'src/components/BTest/BTest.ts',
 				},
-				isNegated: true, // X-TODO: this should be true, why does test say its false??!
+				isNegated: true,
 			},
 		]);
 	});
