@@ -182,7 +182,7 @@ export class LCOMMetricsBuilder {
 		};
 
 		// Set default output path if not provided
-		const defaultPath = path.join('dist', 'lcom-metrics-report.html');
+		const defaultPath = path.join('reports', 'lcom-metrics-report.html');
 		const finalOutputPath = outputPath || defaultPath;
 
 		const exportOptions = {

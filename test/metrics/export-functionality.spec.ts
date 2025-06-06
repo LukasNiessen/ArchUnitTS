@@ -54,7 +54,7 @@ describe('Export Functionality Tests', () => {
 
 		it('should support default parameters for count export', async () => {
 			const countMetrics = metrics().count();
-			const distPath = path.join(process.cwd(), 'dist');
+			const distPath = path.join(process.cwd(), 'reports');
 			const expectedPath = path.join(distPath, 'count-metrics-report.html');
 
 			// Ensure dist directory exists for test
@@ -94,7 +94,7 @@ describe('Export Functionality Tests', () => {
 
 		it('should support default parameters for LCOM export', async () => {
 			const lcomMetrics = metrics().lcom();
-			const distPath = path.join(process.cwd(), 'dist');
+			const distPath = path.join(process.cwd(), 'reports');
 			const expectedPath = path.join(distPath, 'lcom-metrics-report.html');
 
 			// Ensure dist directory exists for test
@@ -133,7 +133,7 @@ describe('Export Functionality Tests', () => {
 
 		it('should support default parameters for distance export', async () => {
 			const distanceMetrics = new DistanceMetricsBuilder('./tsconfig.json');
-			const distPath = path.join(process.cwd(), 'dist');
+			const distPath = path.join(process.cwd(), 'reports');
 			const expectedPath = path.join(distPath, 'distance-metrics-report.html');
 
 			// Ensure dist directory exists for test

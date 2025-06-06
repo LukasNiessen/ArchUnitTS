@@ -160,7 +160,7 @@ export class DistanceMetricsBuilder {
 		};
 
 		// Set default output path if not provided
-		const defaultPath = path.join('dist', 'distance-metrics-report.html');
+		const defaultPath = path.join('reports', 'distance-metrics-report.html');
 		const finalOutputPath = outputPath || defaultPath;
 
 		const exportOptions = {
