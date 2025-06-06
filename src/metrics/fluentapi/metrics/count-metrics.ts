@@ -324,7 +324,7 @@ export class CountMetricsBuilder {
 		};
 
 		// Set default output path if not provided
-		const defaultPath = path.join('dist', 'count-metrics-report.html');
+		const defaultPath = path.join('reports', 'count-metrics-report.html');
 		const finalOutputPath = outputPath || defaultPath;
 
 		const exportOptions = {
