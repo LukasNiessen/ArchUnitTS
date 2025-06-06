@@ -227,7 +227,7 @@ describe('Export Functionality Tests', () => {
 				'../../src/metrics/fluentapi/export-utils'
 			);
 
-			const distPath = path.join(process.cwd(), 'dist');
+			const distPath = path.join(process.cwd(), 'reports');
 			const expectedPath = path.join(distPath, 'metrics-report.html');
 
 			// Ensure dist directory exists for test
