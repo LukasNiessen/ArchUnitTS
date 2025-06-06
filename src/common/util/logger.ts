@@ -1,4 +1,139 @@
 import { Logger, LoggingOptions, LogLevel } from '../logging';
+import * as fs from 'fs';
+import * as path from 'path';
+
+/**
+ * Generates a default log file path with timestamp
+ */
+function generateDefaultLogPath(): string {
+	const timestamp = new Date()
+		.toISOString()
+		.replace(/[:.]/g, '-') // Replace colons and dots with hyphens
+		.replace('T', '_') // Replace T with underscore
+		.slice(0, -5); // Remove milliseconds and Z
+
+	return path.join('logs', `archunit-${timestamp}.log`);
+}
+
+/**
+ * Logger that writes to both console and file
+ */
+export class FileLogger implements Logger {
+	private readonly consoleLogger: DefaultLogger;
+	private readonly filePath: string;
+	private readonly append: boolean;
+	private logFileInitialized = false;
+
+	constructor(filePath: string, level: LogLevel = 'info', append = false) {
+		this.consoleLogger = new DefaultLogger(level);
+		this.filePath = filePath;
+		this.append = append;
+
+		// Initialize log file
+		this.initializeLogFile();
+	}
+	private initializeLogFile(): void {
+		try {
+			// Ensure directory exists
+			const dir = path.dirname(this.filePath);
+			if (!fs.existsSync(dir)) {
+				fs.mkdirSync(dir, { recursive: true });
+			}
+
+			// Create or clear log file
+			if (!this.append || !fs.existsSync(this.filePath)) {
+				fs.writeFileSync(this.filePath, '');
+			}
+
+			this.logFileInitialized = true;
+			this.writeToFile(
+				`\n=== ArchUnitTS Logging Session Started at ${new Date().toISOString()} ===\n`
+			);
+		} catch (error) {
+			console.warn(`Failed to initialize log file ${this.filePath}:`, error);
+			this.logFileInitialized = false;
+		}
+	}
+
+	private writeToFile(message: string): void {
+		if (!this.logFileInitialized) return;
+
+		try {
+			fs.appendFileSync(this.filePath, message + '\n');
+		} catch (error) {
+			console.warn(`Failed to write to log file ${this.filePath}:`, error);
+		}
+	}
+
+	private formatLogMessage(level: LogLevel, message: string): string {
+		const timestamp = new Date().toISOString();
+		return `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+	}
+
+	debug(message: string, ...args: unknown[]): void {
+		this.consoleLogger.debug(message, ...args);
+		const formattedMessage = this.formatLogMessage('debug', message);
+		if (args.length > 0) {
+			this.writeToFile(
+				`${formattedMessage} ${args
+					.map((arg) =>
+						typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+					)
+					.join(' ')}`
+			);
+		} else {
+			this.writeToFile(formattedMessage);
+		}
+	}
+
+	info(message: string, ...args: unknown[]): void {
+		this.consoleLogger.info(message, ...args);
+		const formattedMessage = this.formatLogMessage('info', message);
+		if (args.length > 0) {
+			this.writeToFile(
+				`${formattedMessage} ${args
+					.map((arg) =>
+						typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+					)
+					.join(' ')}`
+			);
+		} else {
+			this.writeToFile(formattedMessage);
+		}
+	}
+
+	warn(message: string, ...args: unknown[]): void {
+		this.consoleLogger.warn(message, ...args);
+		const formattedMessage = this.formatLogMessage('warn', message);
+		if (args.length > 0) {
+			this.writeToFile(
+				`${formattedMessage} ${args
+					.map((arg) =>
+						typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+					)
+					.join(' ')}`
+			);
+		} else {
+			this.writeToFile(formattedMessage);
+		}
+	}
+
+	error(message: string, ...args: unknown[]): void {
+		this.consoleLogger.error(message, ...args);
+		const formattedMessage = this.formatLogMessage('error', message);
+		if (args.length > 0) {
+			this.writeToFile(
+				`${formattedMessage} ${args
+					.map((arg) =>
+						typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+					)
+					.join(' ')}`
+			);
+		} else {
+			this.writeToFile(formattedMessage);
+		}
+	}
+}
 
 export class DefaultLogger implements Logger {
 	private readonly level: LogLevel;
@@ -62,7 +197,21 @@ export class CheckLogger {
 			logProgress: false,
 			...options,
 		};
-		this.logger = this.options.logger!;
+		// Use FileLogger if logFile option is provided
+		if (this.options.logFile) {
+			const logFilePath =
+				typeof this.options.logFile === 'string'
+					? this.options.logFile
+					: generateDefaultLogPath();
+
+			this.logger = new FileLogger(
+				logFilePath,
+				this.options.level || 'info',
+				this.options.appendToLogFile
+			);
+		} else {
+			this.logger = this.options.logger!;
+		}
 	}
 
 	isEnabled(): boolean {

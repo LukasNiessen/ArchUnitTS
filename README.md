@@ -470,10 +470,11 @@ Here `options` can be used for enabling logging, disable caching, or to not fail
   logging: {
     enabled: true, // show logs
     level: 'debug', // show lots of logs
+    logFile: true // write logs to file inside ./logs folder. You can specify a custom path too.
   },
   // if your rule 'passes' because it 'passed' zero files, the test normally fails. You can turn this off by setting this true
   allowEmptyTests: true,
-  clearCache: true // reading nodes, imports etc is normally cached
+  clearCache: true // reading nodes, imports etc is normally cached,
 }
 ```
 
@@ -804,6 +805,80 @@ When debug logging is enabled, you'll see detailed information about the analysi
 [2025-06-02T12:08:26.478Z] [DEBUG] Checking dependencies against 'src/database' pattern
 [2025-06-02T12:08:26.489Z] [DEBUG] Violation detected: src/presentation/controllers/UserController.ts depends on src/database/UserRepository.ts
 [2025-06-02T12:08:26.772Z] [WARN] Completed architecture rule check: Dependency check: patterns [(^|.*/)src/database/.*] (1 violations)
+```
+
+### File Logging for CI/CD Integration
+
+ArchUnitTS supports writing logs to files, making it super easy to integrate into CI pipelines and save logs as artifacts for debugging purposes. This is particularly useful for analyzing test failures in production environments.
+
+#### Basic File Logging
+
+```typescript
+// Write logs to a specific file
+const options = {
+  logging: {
+    enabled: true,
+    level: 'debug',
+    logFile: './logs/architecture-tests.log', // Custom file path
+  },
+};
+
+await expect(rule).toPassAsync(options);
+```
+
+#### Easy CI Integration with Boolean Flag
+
+For quick CI integration, you can use a simple boolean flag to enable automatic file logging:
+
+```typescript
+// Automatically generates timestamped log files in ./logs/
+const options = {
+  logging: {
+    enabled: true,
+    level: 'info',
+    logFile: true, // Creates logs/archunit-YYYY-MM-DD_HH-MM-SS.log
+  },
+};
+
+await expect(rule).toPassAsync(options);
+```
+
+When `logFile: true`, ArchUnitTS automatically:
+
+- Creates a `logs/` directory if it doesn't exist
+- Generates timestamped log files like `archunit-2025-06-06_14-30-45.log`
+- Includes session headers with start times
+- Formats all log messages with timestamps and log levels
+
+#### CI Pipeline Integration Example
+
+This makes it incredibly easy to save logs as CI artifacts for debugging:
+
+```yaml
+# GitHub Actions example
+- name: Run Architecture Tests
+  run: npm test -- --verbose
+  env:
+    ARCHUNIT_LOG_FILE: true
+
+- name: Upload Test Logs
+  if: always()
+  uses: actions/upload-artifact@v3
+  with:
+    name: architecture-test-logs
+    path: logs/
+```
+
+```yaml
+# GitLab CI example
+test:
+  script:
+    - npm test
+  artifacts:
+    when: always
+    paths:
+      - logs/
+    expire_in: 1 week
 ```
 
 ## 🏈 Architecture Fitness Functions

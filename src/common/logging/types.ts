@@ -39,4 +39,14 @@ export interface LoggingOptions {
 	 * Whether to log file processing progress
 	 */
 	logProgress?: boolean;
+	/**
+	 * File path to write logs to (in addition to console output).
+	 * Can be a string path or true to use a default timestamped log file.
+	 */
+	logFile?: string | boolean;
+
+	/**
+	 * Whether to append to existing log file or overwrite (defaults to overwrite)
+	 */
+	appendToLogFile?: boolean;
 }
