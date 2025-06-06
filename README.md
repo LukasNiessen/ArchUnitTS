@@ -327,7 +327,7 @@ it('should not contain forbidden dependencies', async () => {
 
 ### Reports
 
-Generate beautiful HTML reports for your metrics. _Note that this features is in beta._
+Generate beautiful HTML reports for your metrics. _Note that this features is in beta._ Default output path is `/reports`.
 
 ```typescript
 // Export count metrics report

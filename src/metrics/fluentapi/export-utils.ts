@@ -42,7 +42,7 @@ export class MetricsExporter {
 		options: Partial<ExportOptions> = {}
 	): Promise<void> {
 		// Set default output path if not provided
-		const defaultPath = path.join('dist', 'metrics-report.html');
+		const defaultPath = path.join('reports', 'metrics-report.html');
 		const outputPath = options.outputPath || defaultPath;
 
 		// Gather all metrics
