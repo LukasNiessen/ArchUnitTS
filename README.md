@@ -433,6 +433,20 @@ Glob patterns provide powerful wildcard matching for paths and filenames:
 .inPath('src/domain/*/*.ts')       // TypeScript files one level under domain
 ```
 
+### Recommendation
+
+We generally recommend to use string with glob support unless you need to deal with very special cases. Writing regular expressions yourself is not necessary for most cases and comes with extra complexity.
+
+For example, let's say you want to enforce some rule upon files inside `src/components`. If you use a RegExp you might first try this:
+
+```typescript
+.inFolder(/.*\/components\/.*/)
+```
+
+But this will not work reliably. It will not match `src/components/my-component.ts`. That's because ArchUnitTS will compare the _'folder path'_ here, that is the path without the filename, so in this case: `src/components`. The RegExp does not match this because it does not have an ending `/`. So the RegExp should be something like `.*\/components(\/.*)?`. Much simpler would be `'**/components/**`.
+
+That being said, of course there are cases where glob syntax is just not strong enough and you will have to go with a RegExp.
+
 ### Check Methods: .check() vs toPassAsync()
 
 ArchUnitTS provides two main methods for executing architecture rules.
