@@ -117,12 +117,7 @@ describe('Metrics Pattern Matching Integration', () => {
 				.lcom96a()
 				.shouldBeBelow(1.0);
 
-			await expect(rule).toPassAsync({
-				logging: {
-					enabled: true,
-					level: 'debug',
-				},
-			});
+			await expect(rule).toPassAsync();
 		});
 
 		it('should maintain existing forClassesMatching() functionality', async () => {

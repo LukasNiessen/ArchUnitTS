@@ -16,16 +16,7 @@ describe('CheckOptions Integration Test', () => {
 			.should()
 			.haveNoCycles();
 
-		const options: CheckOptions = {
-			allowEmptyTests: true,
-			clearCache: true,
-			logging: {
-				enabled: true,
-				level: 'info',
-			},
-		};
-
-		await expect(rule).toPassAsync(options);
+		await expect(rule).toPassAsync();
 	});
 
 	it('should work with allowEmptyTests option', async () => {
