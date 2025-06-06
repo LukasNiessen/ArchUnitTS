@@ -2,7 +2,7 @@ import { UserError } from '../../common/error/errors';
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedEdge } from '../../common/projection/project-edges';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
-import { matchesAllPatterns } from './pattern-matching';
+import { matchesAllPatterns } from '../../common/pattern-matching';
 import { Filter } from '../../common/type';
 
 export class ViolatingFileDependency implements Violation {

@@ -18,6 +18,3 @@ export * from './src/testing';
 
 // Common utilities
 export * from './src/common';
-
-// Legacy Jest export for backward compatibility
-export { JestViolationFactory, JestResultFactory } from './src/jest';

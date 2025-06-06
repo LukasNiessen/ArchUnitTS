@@ -5,7 +5,7 @@ import { CheckLogger } from '../../common/util/logger';
 import { CheckOptions } from '../../common/fluentapi/checkable';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 import { Filter } from '../../common/type';
-import { matchesAllPatterns } from './pattern-matching';
+import { matchesAllPatterns } from '../../common/pattern-matching';
 
 export class ViolatingCycle implements Violation {
 	public cycle: ProjectedEdge[];

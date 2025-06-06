@@ -110,9 +110,9 @@ describe('Metrics Pattern Matching Integration', () => {
 	});
 
 	describe('Backwards compatibility', () => {
-		it.only('should maintain existing inFile() functionality', async () => {
+		it('should maintain existing inFile() functionality', async () => {
 			const rule = metrics(tsConfigPath)
-				.inFolder('src/metrics/**')
+				.inFolder('test/metrics/**')
 				.lcom()
 				.lcom96a()
 				.shouldBeBelow(1.0);

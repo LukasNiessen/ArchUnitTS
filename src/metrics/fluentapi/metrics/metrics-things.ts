@@ -266,12 +266,18 @@ export class CustomMetricThresholdBuilder implements Checkable {
 		logger.logProgress('Extracting class information from codebase');
 
 		const violations: Violation[] = [];
-		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		const allClasses = extractClassInfo(
+			this.metricsBuilder.tsConfigFilePath,
+			process.cwd(),
+			logger.getInternalLogger()
+		);
 		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
-		const filteredClasses = filter ? filter.apply(allClasses) : allClasses;
+		const filteredClasses = filter
+			? filter.apply(allClasses, logger.getInternalLogger(), options)
+			: allClasses;
 
 		logger.logProgress(
 			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
@@ -373,12 +379,18 @@ export class CustomMetricCondition implements Checkable {
 		logger.logProgress('Extracting class information from codebase');
 
 		const violations: Violation[] = [];
-		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		const allClasses = extractClassInfo(
+			this.metricsBuilder.tsConfigFilePath,
+			process.cwd(),
+			logger.getInternalLogger()
+		);
 		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
-		const filteredClasses = filter ? filter.apply(allClasses) : allClasses;
+		const filteredClasses = filter
+			? filter.apply(allClasses, undefined, options)
+			: allClasses;
 
 		logger.logProgress(
 			`Applied filters, ${filteredClasses.length} classes remaining for analysis`

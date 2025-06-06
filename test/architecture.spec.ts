@@ -4,8 +4,6 @@ import { projectSlices } from '../src/slices';
 import { projectFiles } from '../src/files';
 
 describe('architecture', () => {
-	// X-TODO turn back on!
-	/*
 	it('components follow their inner architecture', async () => {
 		const diagramLocation = path.resolve('test', 'components_inner.puml');
 
@@ -22,7 +20,7 @@ describe('architecture', () => {
 	});
 
 	it('common should not depend on specific components', async () => {
-		for (const c of ['files', 'jest', 'slices', 'metrics']) {
+		for (const c of ['files', 'testing', 'slices']) {
 			const rule = projectFiles()
 				.inFolder('src/common/**')
 				.shouldNot()
@@ -34,7 +32,7 @@ describe('architecture', () => {
 	});
 
 	it('files should not depend on forbidden components', async () => {
-		for (const c of ['slices', 'jest', 'metrics']) {
+		for (const c of ['slices', 'testing', 'metrics']) {
 			const rule = projectFiles()
 				.inFolder('src/files/**')
 				.shouldNot()
@@ -46,7 +44,7 @@ describe('architecture', () => {
 	});
 
 	it('metrics should not depend on forbidden components', async () => {
-		for (const c of ['files', 'jest', 'slices']) {
+		for (const c of ['files', 'testing', 'slices']) {
 			const rule = projectFiles()
 				.inFolder('src/metrics/**')
 				.shouldNot()
@@ -58,7 +56,7 @@ describe('architecture', () => {
 	});
 
 	it('slices should not depend on forbidden components', async () => {
-		for (const c of ['files', 'jest', 'metrics']) {
+		for (const c of ['files', 'testing', 'metrics']) {
 			const rule = projectFiles()
 				.inFolder('src/slices/**')
 				.shouldNot()
@@ -82,5 +80,4 @@ describe('architecture', () => {
 		//const rule = projectFiles().inFolder('test').should().matchFilename('*.spec.ts');
 		//await expect(rule).toPassAsync();
 	});
-	*/
 });

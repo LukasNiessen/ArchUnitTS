@@ -77,13 +77,15 @@ export class LCOMMetricsBuilder {
 	/**
 	 * Calculate comprehensive LCOM metrics summary
 	 */
-	public async summary(): Promise<LCOMMetricsSummary> {
+	public async summary(options?: CheckOptions): Promise<LCOMMetricsSummary> {
 		// Extract class information from the codebase
 		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
-		const classes = filter ? filter.apply(allClasses) : allClasses;
+		const classes = filter
+			? filter.apply(allClasses, undefined, options)
+			: allClasses;
 
 		// Initialize all LCOM metrics
 		const lcom96a = new LCOM96a();
@@ -272,13 +274,19 @@ export class MetricCondition implements Checkable {
 		logger.startCheck(ruleName);
 		logger.logProgress('Extracting class information from codebase');
 
-		// Extract class information from the codebase
-		const allClasses = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		// Extract class information from the codebase with debug logging
+		const allClasses = extractClassInfo(
+			this.metricsBuilder.tsConfigFilePath,
+			process.cwd(),
+			logger.getInternalLogger()
+		);
 		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
-		const classes = filter ? filter.apply(allClasses) : allClasses;
+		const classes = filter
+			? filter.apply(allClasses, logger.getInternalLogger(), options)
+			: allClasses;
 		logger.logProgress(
 			`Applied filters, ${classes.length} classes remaining for analysis`
 		);

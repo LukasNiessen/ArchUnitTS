@@ -314,8 +314,6 @@ export const extractGraphUncached = async (configFileName?: string): Promise<Edg
 				);
 
 				// Skip node_modules files if configured so
-				//console.log('resolvedFileName:', resolvedFileName);
-				//console.log('normalizedTargetFileName:', normalizedTargetFileName);
 				if (
 					EXCLUDE_NODE_MODULES &&
 					normalizedTargetFileName.startsWith('node_modules')

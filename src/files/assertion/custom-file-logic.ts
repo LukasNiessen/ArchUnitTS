@@ -3,7 +3,7 @@ import { ProjectedNode } from '../../common/projection/project-nodes';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 import { CheckOptions } from '../../..';
 import { CheckLogger } from '../../common/util/logger';
-import { matchesAllPatterns } from './pattern-matching';
+import { matchesAllPatterns } from '../../common/pattern-matching';
 import { Filter } from '../../common/type';
 
 // Type definitions for custom logic

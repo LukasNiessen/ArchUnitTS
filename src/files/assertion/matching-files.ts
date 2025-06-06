@@ -4,7 +4,7 @@ import { CheckLogger } from '../../common/util';
 import { CheckOptions } from '../../common/fluentapi';
 import { Filter } from '../../common';
 import { getPatternString } from '../../common/regex-factory';
-import { matchesAllPatterns, matchesPattern } from './pattern-matching';
+import { matchesAllPatterns, matchesPattern } from '../../common/pattern-matching';
 
 export class ViolatingNode implements Violation {
 	public checkPattern: string;

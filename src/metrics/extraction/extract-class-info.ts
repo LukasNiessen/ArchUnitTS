@@ -2,6 +2,7 @@ import * as ts from 'typescript';
 import * as path from 'path';
 import { Edge, extractGraph } from '../../common/extraction';
 import { ClassInfo } from './interface';
+import { Logger } from '../../common';
 
 /**
  * Enhanced class information including abstractness and dependency data
@@ -42,17 +43,32 @@ export interface FileAnalysisResult {
  */
 export function extractClassInfo(
 	tsConfigFilePath?: string,
-	projectPath: string = process.cwd()
+	projectPath: string = process.cwd(),
+	loggerInput?: Logger
 ): ClassInfo[] {
+	const logger = loggerInput;
+
+	logger?.debug(
+		`Starting class extraction with config: ${tsConfigFilePath || 'auto-detected'}`
+	);
+	logger?.info(`Project path: ${projectPath}`);
+
 	// Get program from tsconfig or create a default one
 	const configPath = tsConfigFilePath
 		? path.resolve(projectPath, tsConfigFilePath)
 		: path.resolve(projectPath, 'tsconfig.json');
 
+	logger?.info(`Using TypeScript config file: ${configPath}`);
+	logger?.debug(`Reading config file: ${configPath}`);
+
 	const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
 	if (configFile.error) {
-		throw new Error(`Error reading tsconfig file: ${configFile.error.messageText}`);
+		const error = `Error reading tsconfig file: ${configFile.error.messageText}`;
+		logger?.error(error);
+		throw new Error(error);
 	}
+
+	logger?.debug('Successfully read TypeScript configuration file');
 
 	const parsedConfig = ts.parseJsonConfigFileContent(
 		configFile.config,
@@ -63,17 +79,53 @@ export function extractClassInfo(
 	);
 
 	if (parsedConfig.errors.length > 0) {
-		throw new Error(
-			`Error parsing tsconfig file: ${parsedConfig.errors[0].messageText}`
-		);
+		const error = `Error parsing tsconfig file: ${parsedConfig.errors[0].messageText}`;
+		logger?.error(error);
+		throw new Error(error);
 	}
 
+	logger?.debug('Successfully parsed TypeScript configuration');
+	logger?.debug(
+		`Compiler options: ${JSON.stringify(parsedConfig.options, null, 2).slice(0, 500)}...`
+	);
+	logger?.info(`Found ${parsedConfig.fileNames.length} files in project configuration`);
+
+	logger?.debug(
+		`Root files: ${parsedConfig.fileNames.slice(0, 10).join(', ')}${parsedConfig.fileNames.length > 10 ? `... and ${parsedConfig.fileNames.length - 10} more` : ''}`
+	);
+
+	logger?.debug('Creating TypeScript program');
 	const program = ts.createProgram({
 		rootNames: parsedConfig.fileNames,
 		options: parsedConfig.options,
 	});
 
+	const sourceFiles = program.getSourceFiles();
+	logger?.info(`TypeScript program created with ${sourceFiles.length} source files`);
+
+	// Filter out files from node_modules for logging purposes
+	const projectFiles = sourceFiles.filter(
+		(sf) => !sf.isDeclarationFile && !sf.fileName.includes('node_modules')
+	);
+	const declarationFiles = sourceFiles.filter((sf) => sf.isDeclarationFile);
+	const nodeModulesFiles = sourceFiles.filter((sf) =>
+		sf.fileName.includes('node_modules')
+	);
+
+	logger?.debug(`Project source files: ${projectFiles.length}`);
+	logger?.debug(`Declaration files: ${declarationFiles.length}`);
+	logger?.debug(`Node modules files: ${nodeModulesFiles.length}`);
+
+	if (projectFiles.length === 0) {
+		logger?.warn(
+			'No project source files found - this might indicate a configuration issue'
+		);
+	}
+
 	const classes: ClassInfo[] = [];
+	let processedFiles = 0;
+
+	logger?.debug('Starting class extraction from source files');
 
 	// Process each source file
 	for (const sourceFile of program.getSourceFiles()) {
@@ -81,8 +133,32 @@ export function extractClassInfo(
 			!sourceFile.isDeclarationFile &&
 			!sourceFile.fileName.includes('node_modules')
 		) {
+			processedFiles++;
+			logger?.debug(
+				`Processing file ${processedFiles}/${projectFiles.length}: ${path.relative(projectPath, sourceFile.fileName)}`
+			);
+
+			const classesBeforeFile = classes.length;
 			processSourceFile(sourceFile, program, classes);
+			const classesAfterFile = classes.length;
+			const classesFoundInFile = classesAfterFile - classesBeforeFile;
+
+			if (classesFoundInFile > 0) {
+				logger?.debug(
+					`Found ${classesFoundInFile} class(es) in ${path.relative(projectPath, sourceFile.fileName)}`
+				);
+			}
 		}
+	}
+
+	logger?.info(`Class extraction completed:`);
+	logger?.info(`  - Total classes found: ${classes.length}`);
+	logger?.info(`  - Files processed: ${processedFiles}`);
+
+	if (classes.length === 0) {
+		logger?.warn(
+			'No classes found - this might indicate a pattern matching or file discovery issue'
+		);
 	}
 
 	return classes;
@@ -91,23 +167,38 @@ export function extractClassInfo(
 function processSourceFile(
 	sourceFile: ts.SourceFile,
 	program: ts.Program,
-	classes: ClassInfo[]
+	classes: ClassInfo[],
+	loggerInput?: Logger
 ): void {
+	const logger = loggerInput;
+
+	const relativeFileName = path.relative(process.cwd(), sourceFile.fileName);
+	logger?.debug(`Analyzing source file: ${relativeFileName}`);
+
+	let classesFoundInFile = 0;
+
 	function visit(node: ts.Node): void {
 		// Find class declarations
 		if (ts.isClassDeclaration(node) && node.name) {
+			classesFoundInFile++;
 			const className = node.name.text;
+			logger?.debug(`  Found class: ${className}`);
+
 			const classInfo: ClassInfo = {
 				name: className,
-				filePath: sourceFile.fileName,
+				filePath: relativeFileName,
 				methods: [],
 				fields: [],
 			};
+
+			let methodCount = 0;
+			let fieldCount = 0;
 
 			// Process class members
 			node.members.forEach((member) => {
 				// Find class properties/fields
 				if (ts.isPropertyDeclaration(member) && member.name) {
+					fieldCount++;
 					const fieldName = member.name.getText(sourceFile);
 					classInfo.fields.push({
 						name: fieldName,
@@ -117,16 +208,24 @@ function processSourceFile(
 
 				// Find class methods
 				if (ts.isMethodDeclaration(member) && member.name) {
+					methodCount++;
 					const methodName = member.name.getText(sourceFile);
 					const accessedFields: string[] = [];
 
 					// Analyze method body to find field accesses
 					if (member.body) {
+						logger?.debug(`    Analyzing method: ${methodName}`);
 						findFieldAccesses(
 							member.body,
 							classInfo.fields.map((f) => f.name),
 							accessedFields
 						);
+
+						if (accessedFields.length > 0) {
+							logger?.debug(
+								`      Method ${methodName} accesses fields: ${accessedFields.join(', ')}`
+							);
+						}
 					}
 
 					classInfo.methods.push({
@@ -144,6 +243,9 @@ function processSourceFile(
 				}
 			});
 
+			logger?.debug(
+				`    Class ${className} has ${methodCount} methods and ${fieldCount} fields`
+			);
 			classes.push(classInfo);
 		}
 
@@ -172,6 +274,14 @@ function processSourceFile(
 	}
 
 	visit(sourceFile);
+
+	if (classesFoundInFile > 0) {
+		logger?.debug(
+			`  Total classes found in ${relativeFileName}: ${classesFoundInFile}`
+		);
+	} else {
+		logger?.debug(`  No classes found in ${relativeFileName}`);
+	}
 }
 
 /**

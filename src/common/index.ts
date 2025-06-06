@@ -7,3 +7,4 @@ export * from './projection';
 export * from './regex-factory';
 export * from './type';
 export * from './util';
+export * from './pattern-matching';

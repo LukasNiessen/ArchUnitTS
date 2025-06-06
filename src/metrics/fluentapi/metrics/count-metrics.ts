@@ -273,7 +273,7 @@ export class CountMetricsBuilder {
 	}
 
 	private async analyzeClasses(): Promise<ClassInfo[]> {
-		return extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		return extractClassInfo(this.metricsBuilder.tsConfigFilePath, process.cwd());
 	}
 
 	private createTypeScriptProgram(): ts.Program {
@@ -386,14 +386,20 @@ export class CountThresholdBuilder implements Checkable {
 		logger.startCheck(ruleName);
 		logger.logProgress('Extracting class information from codebase');
 
-		const classes = extractClassInfo(this.metricsBuilder.tsConfigFilePath);
+		const classes = extractClassInfo(
+			this.metricsBuilder.tsConfigFilePath,
+			process.cwd(),
+			logger.getInternalLogger()
+		);
 		logger.logProgress(`Extracted ${classes.length} classes from codebase`);
 
 		const filteredClasses =
-			this.metricsBuilder.getFilter()?.apply(classes) ?? classes;
+			this.metricsBuilder
+				.getFilter()
+				?.apply(classes, logger.getInternalLogger(), options) ?? classes;
 
 		logger.logProgress(
-			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
+			`Applied filters, ${filteredClasses.length} classes remainitng for analysis`
 		);
 		filteredClasses.forEach((classToCheck) =>
 			logger.info(`Class under check: ${classToCheck.name}`)

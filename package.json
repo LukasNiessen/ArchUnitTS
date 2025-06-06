@@ -67,7 +67,7 @@
 		"patchpub": "npm run clean && tsc && npm version patch && npm publish",
 		"minorpub": "npm run clean && tsc && npm version minor && npm publish",
 		"majorpub": "npm run clean && tsc && npm version major && npm publish",
-		"build": "tsc",
+		"build": "npm run clean && tsc",
 		"docs": "typedoc --options typedoc.json && cp assets/logo-rounded.png docs/assets/logo-rounded.png",
 		"docs:watch": "typedoc --options typedoc.json --watch",
 		"docs:serve": "npm run docs && npx --yes serve docs",

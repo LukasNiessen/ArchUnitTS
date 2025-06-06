@@ -1,6 +1,8 @@
-import { ProjectedNode } from '../../common/projection';
-import { Filter } from '../../common';
-import { ClassInfo } from '../../metrics';
+import { ProjectedNode } from './projection';
+import { Filter } from '.';
+import { ClassInfo } from '../metrics';
+import { CheckLogger } from './util';
+import type { CheckOptions } from './fluentapi';
 
 /**
  * Extract filename from a file path
@@ -22,7 +24,12 @@ function pathWithoutFilename(inp: string): string {
 	return parts.join('/');
 }
 
-export function matchesPattern(file: ProjectedNode | string, filter: Filter): boolean {
+export function matchesPattern(
+	file: ProjectedNode | string,
+	filter: Filter,
+	options?: CheckOptions
+): boolean {
+	const logger = new CheckLogger(options?.logging);
 	const filePath = typeof file === 'string' ? file : file.label;
 
 	let targetString: string;
@@ -41,10 +48,22 @@ export function matchesPattern(file: ProjectedNode | string, filter: Filter): bo
 			break;
 	}
 
-	return filter.regExp.test(targetString);
+	const matches = filter.regExp.test(targetString);
+
+	logger.info(`Testing file: ${filePath}`);
+	logger.info(`  Target string (${filter.options.target}): "${targetString}"`);
+	logger.info(`  Pattern: ${filter.regExp.source}`);
+	logger.info(`  Matches: ${matches}`);
+
+	return matches;
 }
 
-export function matchesPatternClassInfo(classInfo: ClassInfo, filter: Filter): boolean {
+export function matchesPatternClassInfo(
+	classInfo: ClassInfo,
+	filter: Filter,
+	options?: CheckOptions
+): boolean {
+	const logger = new CheckLogger(options?.logging);
 	const filePath = classInfo.filePath;
 
 	let targetString: string;
@@ -66,7 +85,14 @@ export function matchesPatternClassInfo(classInfo: ClassInfo, filter: Filter): b
 			break;
 	}
 
-	return filter.regExp.test(targetString);
+	const matches = filter.regExp.test(targetString);
+
+	logger.info(`Testing class: ${classInfo.name} from ${filePath}`);
+	logger.info(`  Target string (${filter.options.target}): "${targetString}"`);
+	logger.info(`  Pattern: ${filter.regExp.source}`);
+	logger.info(`  Matches: ${matches}`);
+
+	return matches;
 }
 
 /**

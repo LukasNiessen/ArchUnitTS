@@ -154,11 +154,17 @@ export class CheckLogger {
 		}
 		this.logger.warn(message, ...args);
 	}
-
 	error(message: string, ...args: unknown[]): void {
 		if (!this.isEnabled()) {
 			return;
 		}
 		this.logger.error(message, ...args);
+	}
+
+	/**
+	 * Get the internal logger instance for passing to sub-components
+	 */
+	getInternalLogger(): Logger {
+		return this.logger;
 	}
 }

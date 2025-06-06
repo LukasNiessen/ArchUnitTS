@@ -1,5 +1,5 @@
 import { RegexFactory } from '../../src/common';
-import { matchesPattern } from '../../src/files/assertion/pattern-matching';
+import { matchesPattern } from '../../src/common/pattern-matching';
 import { ClassFilter, ClassInfo } from '../../src/metrics';
 
 describe('Filtering Consistency Between Modules', () => {

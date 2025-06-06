@@ -1,17 +1,34 @@
-import { Filter } from '../../common';
-import { matchesPatternClassInfo } from '../../files';
+import { Filter, Logger, matchesPatternClassInfo } from '../../common';
 import { ClassInfo, Metric } from '../extraction';
 import { MetricComparison } from './types';
+import type { CheckOptions } from '../../common/fluentapi';
 
 /**
  * Filter classes by class name using regex patterns
  */
 export class ClassFilter {
 	constructor(private readonly filter: Filter) {}
-	apply(classes: ClassInfo[]): ClassInfo[] {
-		return classes.filter((classInfo) => {
-			return matchesPatternClassInfo(classInfo, this.filter);
+	apply(classes: ClassInfo[], logger?: Logger, options?: CheckOptions): ClassInfo[] {
+		const beforeCount = classes.length;
+
+		if (logger) {
+			logger.info(`Filter pattern: ${this.filter.regExp.source}`);
+			logger.info(`Filter target: ${this.filter.options.target}`);
+			logger.info(`Applying filter to ${classes.length} classes`);
+		}
+
+		const filtered = classes.filter((classInfo) => {
+			const matches = matchesPatternClassInfo(classInfo, this.filter, options);
+			return matches;
 		});
+
+		if (logger && beforeCount !== filtered.length) {
+			logger.info(
+				`  Filter applied: ${beforeCount} -> ${filtered.length} classes (pattern: ${this.filter.regExp.source})`
+			);
+		}
+
+		return filtered;
 	}
 
 	getFilter(): Filter {
@@ -25,9 +42,18 @@ export class ClassFilter {
 export class CompositeFilter {
 	constructor(private readonly filters: ClassFilter[]) {}
 
-	apply(classes: ClassInfo[]): ClassInfo[] {
-		return this.filters.reduce((filteredClasses, filter) => {
-			return filter.apply(filteredClasses);
+	apply(classes: ClassInfo[], logger?: Logger, options?: CheckOptions): ClassInfo[] {
+		if (logger) {
+			logger.debug(
+				`Applying ${this.filters.length} filter(s) to ${classes.length} classes`
+			);
+		}
+
+		return this.filters.reduce((filteredClasses, filter, index) => {
+			if (logger) {
+				logger.debug(`  Applying filter ${index + 1}/${this.filters.length}`);
+			}
+			return filter.apply(filteredClasses, logger, options);
 		}, classes);
 	}
 }
