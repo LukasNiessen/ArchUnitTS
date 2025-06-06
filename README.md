@@ -327,7 +327,7 @@ it('should not contain forbidden dependencies', async () => {
 
 ### Reports
 
-Generate beautiful HTML reports for your metrics. _Note that this features is in beta._ Default output path is `/reports`.
+Generate beautiful HTML reports for your metrics. The default output path is `/reports`. _Note that this features is in beta._
 
 ```typescript
 // Export count metrics report
@@ -857,9 +857,7 @@ This makes it incredibly easy to save logs as CI artifacts for debugging:
 ```yaml
 # GitHub Actions example
 - name: Run Architecture Tests
-  run: npm test -- --verbose
-  env:
-    ARCHUNIT_LOG_FILE: true
+  run: npm test
 
 - name: Upload Test Logs
   if: always()
