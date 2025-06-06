@@ -269,14 +269,14 @@ export class CustomMetricThresholdBuilder implements Checkable {
 		const allClasses = extractClassInfo(
 			this.metricsBuilder.tsConfigFilePath,
 			process.cwd(),
-			logger.getInternalLogger()
+			logger
 		);
 		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
 		const filteredClasses = filter
-			? filter.apply(allClasses, logger.getInternalLogger(), options)
+			? filter.apply(allClasses, logger, options)
 			: allClasses;
 
 		logger.logProgress(
@@ -382,7 +382,7 @@ export class CustomMetricCondition implements Checkable {
 		const allClasses = extractClassInfo(
 			this.metricsBuilder.tsConfigFilePath,
 			process.cwd(),
-			logger.getInternalLogger()
+			logger
 		);
 		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
 

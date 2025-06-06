@@ -389,14 +389,12 @@ export class CountThresholdBuilder implements Checkable {
 		const classes = extractClassInfo(
 			this.metricsBuilder.tsConfigFilePath,
 			process.cwd(),
-			logger.getInternalLogger()
+			logger
 		);
 		logger.logProgress(`Extracted ${classes.length} classes from codebase`);
 
 		const filteredClasses =
-			this.metricsBuilder
-				.getFilter()
-				?.apply(classes, logger.getInternalLogger(), options) ?? classes;
+			this.metricsBuilder.getFilter()?.apply(classes, logger, options) ?? classes;
 
 		logger.logProgress(
 			`Applied filters, ${filteredClasses.length} classes remainitng for analysis`

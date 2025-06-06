@@ -309,11 +309,4 @@ export class CheckLogger {
 		}
 		this.logger.error(message, ...args);
 	}
-
-	/**
-	 * Get the internal logger instance for passing to sub-components
-	 */
-	getInternalLogger(): Logger {
-		return this.logger;
-	}
 }

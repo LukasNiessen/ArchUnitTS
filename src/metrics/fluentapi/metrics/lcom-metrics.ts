@@ -278,15 +278,13 @@ export class MetricCondition implements Checkable {
 		const allClasses = extractClassInfo(
 			this.metricsBuilder.tsConfigFilePath,
 			process.cwd(),
-			logger.getInternalLogger()
+			logger
 		);
 		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
-		const classes = filter
-			? filter.apply(allClasses, logger.getInternalLogger(), options)
-			: allClasses;
+		const classes = filter ? filter.apply(allClasses, logger, options) : allClasses;
 		logger.logProgress(
 			`Applied filters, ${classes.length} classes remaining for analysis`
 		);
