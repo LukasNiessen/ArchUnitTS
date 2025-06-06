@@ -32,7 +32,9 @@ describe('Metrics Filtering Integration', () => {
 
 	describe('File filtering', () => {
 		it('should allow filtering by specific file', () => {
-			const metricsBuilder = metrics().inFile('src/metrics/calculation/lcom.ts');
+			const metricsBuilder = metrics()
+				.inPath('src/metrics/calculation')
+				.withName('lcom.ts');
 
 			const filter = metricsBuilder.getFilter();
 			expect(filter).not.toBeNull();
@@ -69,7 +71,7 @@ describe('Metrics Filtering Integration', () => {
 			const metricsBuilder = metrics()
 				.inFolder(/src\/.*/)
 				.forClassesMatching(/.*Metric.*/)
-				.inFile('specific-file.ts');
+				.withName('specific-file.ts');
 
 			const filter = metricsBuilder.getFilter();
 			expect(filter).not.toBeNull();
@@ -120,7 +122,7 @@ describe('Metrics Filtering Integration', () => {
 		it('should filter classes based on builder configuration', async () => {
 			// Get summary for a filtered set of classes
 			const filteredSummary = await metrics(mockProjectPath)
-				.inFile('concrete-service.ts')
+				.withName('concrete-service.ts')
 				.lcom()
 				.summary();
 

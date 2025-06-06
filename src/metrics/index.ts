@@ -1,6 +1,6 @@
 // Explicit exports to avoid naming conflicts
 export type { MetricComparison } from './common';
-export type { ClassFilter, ClassInfo, FieldInfo, MethodInfo, Metric } from './common';
+export type { ClassInfo, FieldInfo, MethodInfo, Metric } from './common';
 
 // Assertion module
 export * from './assertion';

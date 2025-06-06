@@ -1,14 +1,5 @@
-import {
-	ClassInfo,
-	FolderPathFilter,
-	SingleFileFilter,
-	ClassNameFilter,
-	CompositeFilter,
-	byFolderPath,
-	bySingleFile,
-	byClassName,
-	combineFilters,
-} from '../../src/metrics';
+import { ClassFilter, ClassInfo, CompositeFilter } from '../../src/metrics';
+import { RegexFactory } from '../../src/common';
 
 describe('Class Filtering', () => {
 	const sampleClasses: ClassInfo[] = [
@@ -44,9 +35,9 @@ describe('Class Filtering', () => {
 		},
 	];
 
-	describe('FolderPathFilter', () => {
+	describe('ClassFilter with path filtering', () => {
 		it('should filter classes by folder path pattern', () => {
-			const filter = new FolderPathFilter(/\/services\//);
+			const filter = new ClassFilter(RegexFactory.pathMatcher(/\/services\//));
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(1);
@@ -54,7 +45,7 @@ describe('Class Filtering', () => {
 		});
 
 		it('should handle multiple matches', () => {
-			const filter = new FolderPathFilter(/\/src\//);
+			const filter = new ClassFilter(RegexFactory.pathMatcher(/\/src\//));
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(4);
@@ -66,16 +57,18 @@ describe('Class Filtering', () => {
 		});
 
 		it('should return empty array when no matches', () => {
-			const filter = new FolderPathFilter(/\/nonexistent\//);
+			const filter = new ClassFilter(RegexFactory.pathMatcher(/\/nonexistent\//));
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(0);
 		});
 	});
 
-	describe('SingleFileFilter', () => {
+	describe('ClassFilter with exact file filtering', () => {
 		it('should filter classes by exact file path', () => {
-			const filter = new SingleFileFilter('/project/src/services/user-service.ts');
+			const filter = new ClassFilter(
+				RegexFactory.exactFileMatcher('/project/src/services/user-service.ts')
+			);
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(1);
@@ -83,16 +76,18 @@ describe('Class Filtering', () => {
 		});
 
 		it('should return empty array when file does not match', () => {
-			const filter = new SingleFileFilter('/project/src/nonexistent.ts');
+			const filter = new ClassFilter(
+				RegexFactory.exactFileMatcher('/project/src/nonexistent.ts')
+			);
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(0);
 		});
 	});
 
-	describe('ClassNameFilter', () => {
+	describe('ClassFilter with class name filtering', () => {
 		it('should filter classes by name pattern', () => {
-			const filter = new ClassNameFilter(/.*Service$/);
+			const filter = new ClassFilter(RegexFactory.classNameMatcher(/.*Service$/));
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(1);
@@ -100,7 +95,9 @@ describe('Class Filtering', () => {
 		});
 
 		it('should handle multiple matches', () => {
-			const filter = new ClassNameFilter(/.*Repository$|.*Controller$/);
+			const filter = new ClassFilter(
+				RegexFactory.classNameMatcher(/.*Repository$|.*Controller$/)
+			);
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(2);
@@ -110,7 +107,9 @@ describe('Class Filtering', () => {
 		});
 
 		it('should return empty array when no name matches', () => {
-			const filter = new ClassNameFilter(/.*Nonexistent$/);
+			const filter = new ClassFilter(
+				RegexFactory.classNameMatcher(/.*Nonexistent$/)
+			);
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(0);
@@ -119,8 +118,10 @@ describe('Class Filtering', () => {
 
 	describe('CompositeFilter', () => {
 		it('should combine multiple filters with AND logic', () => {
-			const folderFilter = new FolderPathFilter(/\/src\//);
-			const nameFilter = new ClassNameFilter(/.*Service$/);
+			const folderFilter = new ClassFilter(RegexFactory.pathMatcher(/\/src\//));
+			const nameFilter = new ClassFilter(
+				RegexFactory.classNameMatcher(/.*Service$/)
+			);
 			const compositeFilter = new CompositeFilter([folderFilter, nameFilter]);
 
 			const result = compositeFilter.apply(sampleClasses);
@@ -130,8 +131,10 @@ describe('Class Filtering', () => {
 		});
 
 		it('should return empty array when filters exclude all classes', () => {
-			const folderFilter = new FolderPathFilter(/\/test\//);
-			const nameFilter = new ClassNameFilter(/.*Service$/);
+			const folderFilter = new ClassFilter(RegexFactory.pathMatcher(/\/test\//));
+			const nameFilter = new ClassFilter(
+				RegexFactory.classNameMatcher(/.*Service$/)
+			);
 			const compositeFilter = new CompositeFilter([folderFilter, nameFilter]);
 
 			const result = compositeFilter.apply(sampleClasses);
@@ -140,50 +143,43 @@ describe('Class Filtering', () => {
 		});
 	});
 
-	describe('Helper functions', () => {
-		it('byFolderPath should create FolderPathFilter with string pattern', () => {
-			const filter = byFolderPath('services');
+	describe('ClassFilter with different target types', () => {
+		it('should filter by folder path using string pattern', () => {
+			const filter = new ClassFilter(RegexFactory.folderMatcher('**/services/**'));
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(1);
 			expect(result[0].name).toBe('UserService');
 		});
 
-		it('byFolderPath should create FolderPathFilter with regex pattern', () => {
-			const filter = byFolderPath(/\/repositories\//);
+		it('should filter by folder path using regex pattern', () => {
+			const filter = new ClassFilter(
+				RegexFactory.folderMatcher(/.*\/repositories(\/)?.*/)
+			);
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(1);
 			expect(result[0].name).toBe('ProductRepository');
 		});
 
-		it('bySingleFile should create SingleFileFilter', () => {
-			const filter = bySingleFile('/project/src/controllers/order-controller.ts');
-			const result = filter.apply(sampleClasses);
-
-			expect(result).toHaveLength(1);
-			expect(result[0].name).toBe('OrderController');
-		});
-
-		it('byClassName should create ClassNameFilter with string pattern', () => {
-			const filter = byClassName('TestHelper');
+		it('should filter by filename pattern', () => {
+			const filter = new ClassFilter(
+				RegexFactory.fileNameMatcher('test-helper.ts')
+			);
 			const result = filter.apply(sampleClasses);
 
 			expect(result).toHaveLength(1);
 			expect(result[0].name).toBe('TestHelper');
 		});
 
-		it('byClassName should create ClassNameFilter with regex pattern', () => {
-			const filter = byClassName(/.*Connection$/);
-			const result = filter.apply(sampleClasses);
-
-			expect(result).toHaveLength(1);
-			expect(result[0].name).toBe('DatabaseConnection');
-		});
-		it('combineFilters should create CompositeFilter', () => {
-			const folderFilter = byFolderPath(/\/infrastructure\//);
-			const nameFilter = byClassName(/.*Connection$/);
-			const combinedFilter = combineFilters([folderFilter, nameFilter]);
+		it('should combine multiple ClassFilters using CompositeFilter', () => {
+			const folderFilter = new ClassFilter(
+				RegexFactory.folderMatcher('**/infrastructure/**')
+			);
+			const nameFilter = new ClassFilter(
+				RegexFactory.classNameMatcher(/.*Connection$/)
+			);
+			const combinedFilter = new CompositeFilter([folderFilter, nameFilter]);
 
 			const result = combinedFilter.apply(sampleClasses);
 

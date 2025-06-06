@@ -10,7 +10,7 @@ export interface PatternMatchingOptions {
 	 * - 'path': Match against the full relative path (e.g., 'src/services/Service.ts')
 	 * @default 'filename'
 	 */
-	target?: 'filename' | 'path' | 'path-no-filename';
+	target?: 'filename' | 'path' | 'path-no-filename' | 'classname';
 
 	/**
 	 * Whether to require the pattern to match the entire string or allow partial matches

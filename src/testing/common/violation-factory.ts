@@ -10,6 +10,8 @@ import { MetricViolation } from '../../metrics/assertion';
 import { FileCountViolation } from '../../metrics/fluentapi/metrics/count-metrics';
 import { TestViolation } from './result-factory';
 import { ColorUtils } from './color-utils';
+import { getPatternString } from '../../common/regex-factory';
+import { Filter } from '../../common';
 
 class UnknownTestViolation implements TestViolation {
 	details: Object = Object();
@@ -104,10 +106,17 @@ export class ViolationFactory {
 	}
 
 	private static fromEmptyTestViolation(emptyTest: EmptyTestViolation): TestViolation {
-		const patternString =
-			typeof emptyTest.filters === 'string'
-				? emptyTest.filters
-				: emptyTest.filters.map((filter) => filter.regExp).join(', ');
+		let patternString = '';
+		const filters = emptyTest.filters;
+		if (filters.length > 0) {
+			if (typeof filters[0] === 'string') {
+				patternString = filters.join(',');
+			} else {
+				patternString = (filters as Filter[])
+					.map((filter) => getPatternString(filter.regExp))
+					.join(', ');
+			}
+		}
 
 		const message = `${ColorUtils.formatViolationType('Empty test violation')}:
    ${ColorUtils.formatRule('No files found matching the specified pattern(s)')}

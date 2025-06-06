@@ -1,69 +1,28 @@
-import { matchesPattern } from '../../..';
-import { Pattern, Filter } from '../../common';
-import { ClassFilter, ClassInfo, Metric } from '../extraction';
+import { Filter } from '../../common';
+import { matchesPatternClassInfo } from '../../files';
+import { ClassInfo, Metric } from '../extraction';
 import { MetricComparison } from './types';
-import * as path from 'path';
-
-/**
- * Filter classes by folder path using regex patterns
- */
-export class FolderPathFilter implements ClassFilter {
-	constructor(private readonly pathPattern: RegExp) {}
-
-	apply(classes: ClassInfo[]): ClassInfo[] {
-		return classes.filter((classInfo) => {
-			// Normalize the file path to use forward slashes for consistency
-			const normalizedPath = classInfo.filePath.replace(/\\/g, '/');
-			return this.pathPattern.test(normalizedPath);
-		});
-	}
-}
-
-/**
- * Filter classes by exact file path
- */
-export class SingleFileFilter implements ClassFilter {
-	constructor(private readonly exactFilePath: string) {}
-
-	apply(classes: ClassInfo[]): ClassInfo[] {
-		return classes.filter((classInfo) => {
-			// Normalize both paths for comparison
-			const normalizedClassPath = path.resolve(classInfo.filePath);
-			const normalizedTargetPath = path.resolve(this.exactFilePath);
-			return normalizedClassPath === normalizedTargetPath;
-		});
-	}
-}
 
 /**
  * Filter classes by class name using regex patterns
  */
-export class ClassNameFilter implements ClassFilter {
-	constructor(private readonly namePattern: RegExp) {}
+export class ClassFilter {
+	constructor(private readonly filter: Filter) {}
 	apply(classes: ClassInfo[]): ClassInfo[] {
 		return classes.filter((classInfo) => {
-			return this.namePattern.test(classInfo.name);
+			return matchesPatternClassInfo(classInfo, this.filter);
 		});
 	}
-}
 
-/**
- * Filter classes using the same pattern matching logic as the files module
- */
-export class FilterBasedClassFilter implements ClassFilter {
-	constructor(private readonly filter: Filter) {}
-
-	apply(classes: ClassInfo[]): ClassInfo[] {
-		return classes.filter((classInfo) => {
-			return matchesPattern(classInfo.filePath, this.filter);
-		});
+	getFilter(): Filter {
+		return this.filter;
 	}
 }
 
 /**
  * Combine multiple filters with AND logic
  */
-export class CompositeFilter implements ClassFilter {
+export class CompositeFilter {
 	constructor(private readonly filters: ClassFilter[]) {}
 
 	apply(classes: ClassInfo[]): ClassInfo[] {
@@ -72,53 +31,6 @@ export class CompositeFilter implements ClassFilter {
 		}, classes);
 	}
 }
-
-/**
- * Helper function to create a folder path filter
- * @param pathPattern String or regex pattern matching folder paths
- * @returns ClassFilter instance
- */
-export const byFolderPath = (pathPattern: Pattern): ClassFilter => {
-	const regex = typeof pathPattern === 'string' ? new RegExp(pathPattern) : pathPattern;
-	return new FolderPathFilter(regex);
-};
-
-/**
- * Helper function to create a single file filter
- * @param filePath Exact file path to match
- * @returns ClassFilter instance
- */
-export const bySingleFile = (filePath: string): ClassFilter => {
-	return new SingleFileFilter(filePath);
-};
-
-/**
- * Helper function to create a class name filter
- * @param namePattern String or regex pattern matching class names
- * @returns ClassFilter instance
- */
-export const byClassName = (namePattern: Pattern): ClassFilter => {
-	const regex = typeof namePattern === 'string' ? new RegExp(namePattern) : namePattern;
-	return new ClassNameFilter(regex);
-};
-
-/**
- * Helper function to create a filter using the common Filter type
- * @param filter Filter object with pattern matching options
- * @returns ClassFilter instance
- */
-export const byFilter = (filter: Filter): ClassFilter => {
-	return new FilterBasedClassFilter(filter);
-};
-
-/**
- * Helper function to combine multiple filters with AND logic
- * @param filters Array of filters to combine
- * @returns Combined ClassFilter instance
- */
-export const combineFilters = (filters: ClassFilter[]): ClassFilter => {
-	return new CompositeFilter(filters);
-};
 
 /**
  * Projects class information to calculate specific metrics

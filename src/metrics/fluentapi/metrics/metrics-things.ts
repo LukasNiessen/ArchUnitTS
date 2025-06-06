@@ -1,5 +1,4 @@
-import { bySingleFile, byClassName, combineFilters, byFilter } from '../../projection';
-import { ClassFilter, ClassInfo, Metric, extractClassInfo } from '../../extraction';
+import { ClassInfo, Metric, extractClassInfo } from '../../extraction';
 import { DistanceMetricsBuilder } from './distance-metrics';
 import { LCOMMetricsBuilder } from './lcom-metrics';
 import { CountMetricsBuilder } from './count-metrics';
@@ -7,7 +6,8 @@ import { MetricComparison } from '../types';
 import { Checkable, CheckOptions } from '../../../common/fluentapi';
 import { Violation, EmptyTestViolation } from '../../../common/assertion';
 import { CheckLogger } from '../../../common/util';
-import { Pattern, RegexFactory } from '../../../common';
+import { Filter, Pattern, RegexFactory } from '../../../common';
+import { ClassFilter, CompositeFilter } from '../../projection';
 
 /**
  * Type for user-defined custom metric calculation functions
@@ -75,7 +75,7 @@ export class MetricsBuilder {
 	 * @param name String or regex pattern matching filenames only
 	 */
 	public withName(name: Pattern): MetricsBuilder {
-		this.filters.push(byFilter(RegexFactory.fileNameMatcher(name)));
+		this.filters.push(new ClassFilter(RegexFactory.fileNameMatcher(name)));
 		return this;
 	}
 
@@ -84,7 +84,7 @@ export class MetricsBuilder {
 	 * @param folder String or regex pattern matching folder paths
 	 */
 	public inFolder(folderPattern: Pattern): MetricsBuilder {
-		this.filters.push(byFilter(RegexFactory.folderMatcher(folderPattern)));
+		this.filters.push(new ClassFilter(RegexFactory.folderMatcher(folderPattern)));
 		return this;
 	}
 
@@ -93,33 +93,28 @@ export class MetricsBuilder {
 	 * @param path String or regex pattern matching full file paths
 	 */
 	public inPath(path: Pattern): MetricsBuilder {
-		this.filters.push(byFilter(RegexFactory.pathMatcher(path)));
+		this.filters.push(new ClassFilter(RegexFactory.pathMatcher(path)));
 		return this;
 	}
 
 	/**
-	 * Filter classes to a specific file
-	 * @param filePath Path to the specific file
-	 */
-	public inFile(filePath: string): MetricsBuilder {
-		this.filters.push(bySingleFile(filePath));
-		return this;
-	}
-
-	/**
-	 * Filter classes by name using regex pattern
+	 * Filter classes by name using regex pattern or by string with glob support
 	 * @param namePattern String or regex pattern matching class names
 	 */
 	public forClassesMatching(namePattern: Pattern): MetricsBuilder {
-		this.filters.push(byClassName(namePattern));
+		this.filters.push(new ClassFilter(RegexFactory.classNameMatcher(namePattern)));
 		return this;
 	}
 
-	getFilter(): ClassFilter | null {
+	getFilter(): CompositeFilter | null {
 		if (this.filters.length === 0) {
 			return null;
 		}
-		return combineFilters(this.filters);
+		return new CompositeFilter(this.filters);
+	}
+
+	getFiltersAsFilterArray(): Filter[] {
+		return this.filters.map((classFilter) => classFilter.getFilter());
 	}
 
 	/**
@@ -284,7 +279,10 @@ export class CustomMetricThresholdBuilder implements Checkable {
 
 		// Check for empty test condition
 		if (filteredClasses.length === 0 && !options?.allowEmptyTests) {
-			const emptyViolation = new EmptyTestViolation([], 'extracted classes'); // X-TODO: fix 1st arg (empty array)
+			const emptyViolation = new EmptyTestViolation(
+				this.metricsBuilder.getFiltersAsFilterArray(),
+				'extracted classes'
+			);
 			logger.logViolation(emptyViolation.toString());
 			logger.endCheck(ruleName, 1);
 			return [emptyViolation];
@@ -388,7 +386,10 @@ export class CustomMetricCondition implements Checkable {
 
 		// Check for empty test condition
 		if (filteredClasses.length === 0 && !options?.allowEmptyTests) {
-			const emptyViolation = new EmptyTestViolation([], 'extracted classes'); // X-TODO: fix 1st arg (empty array)
+			const emptyViolation = new EmptyTestViolation(
+				this.metricsBuilder.getFiltersAsFilterArray(),
+				'extracted classes'
+			);
 			logger.logViolation(emptyViolation.toString());
 			logger.endCheck(ruleName, 1);
 			return [emptyViolation];

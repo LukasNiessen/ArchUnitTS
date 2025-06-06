@@ -67,6 +67,14 @@ export class FilesShouldCondition {
 	public inPath(path: Pattern): FilesShouldCondition {
 		return new FilesShouldCondition(this, [RegexFactory.pathMatcher(path)]);
 	}
+
+	/**
+	 * Filter to a specific file by exact path match
+	 * @param filePath Exact file path to match
+	 */
+	public inFile(filePath: string): FilesShouldCondition {
+		return new FilesShouldCondition(this, [RegexFactory.exactFileMatcher(filePath)]);
+	}
 }
 
 export class NegatedMatchPatternFileConditionBuilder {

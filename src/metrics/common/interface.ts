@@ -24,14 +24,14 @@ export interface Metric {
 	description: string;
 }
 
-/**
- * Interface for filtering classes based on various criteria
- */
-export interface ClassFilter {
-	/**
-	 * Apply the filter to a list of classes
-	 * @param classes The classes to filter
-	 * @returns Filtered classes that match the criteria
-	 */
-	apply(classes: ClassInfo[]): ClassInfo[];
-}
+// /**
+//  * Interface for filtering classes based on various criteria
+//  */
+// export interface ClassFilter {
+// 	/**
+// 	 * Apply the filter to a list of classes
+// 	 * @param classes The classes to filter
+// 	 * @returns Filtered classes that match the criteria
+// 	 */
+// 	apply(classes: ClassInfo[]): ClassInfo[];
+// }

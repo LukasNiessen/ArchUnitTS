@@ -1,5 +1,6 @@
 import { ProjectedNode } from '../../common/projection';
 import { Filter } from '../../common';
+import { ClassInfo } from '../../metrics';
 
 /**
  * Extract filename from a file path
@@ -34,6 +35,31 @@ export function matchesPattern(file: ProjectedNode | string, filter: Filter): bo
 			break;
 		case 'path-no-filename':
 			targetString = pathWithoutFilename(filePath);
+			break;
+		default:
+			targetString = normalizePath(filePath);
+			break;
+	}
+
+	return filter.regExp.test(targetString);
+}
+
+export function matchesPatternClassInfo(classInfo: ClassInfo, filter: Filter): boolean {
+	const filePath = classInfo.filePath;
+
+	let targetString: string;
+	switch (filter.options.target) {
+		case 'filename':
+			targetString = extractFilename(filePath);
+			break;
+		case 'path':
+			targetString = normalizePath(filePath);
+			break;
+		case 'path-no-filename':
+			targetString = pathWithoutFilename(filePath);
+			break;
+		case 'classname':
+			targetString = classInfo.name;
 			break;
 		default:
 			targetString = normalizePath(filePath);

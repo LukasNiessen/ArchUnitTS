@@ -76,15 +76,7 @@ await metrics()
 Existing methods continue to work:
 
 ```typescript
-// Specific file
-await metrics()
-  .inFile('src/services/user.service.ts')
-  .count()
-  .methodCount()
-  .shouldBeBelow(10)
-  .check();
-
-// Class name matching (legacy method)
+// Class name matching
 await metrics()
   .forClassesMatching(/.*Service/)
   .lcom()

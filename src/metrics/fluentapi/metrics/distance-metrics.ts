@@ -285,17 +285,11 @@ export class DistanceCondition implements Checkable {
 		const analysisResults = await extractEnhancedClassInfo(this.tsConfigFilePath);
 		logger.logProgress(`Analyzed ${analysisResults.length} files from project`);
 
-		// Check for empty test condition
-		if (analysisResults.length === 0 && !options?.allowEmptyTests) {
-			const emptyViolation = new EmptyTestViolation([], 'enhanced class info'); // X-TODO: fix 1st arg (empty array)
-			logger.logViolation(emptyViolation.toString());
-			logger.endCheck(ruleName, 1);
-			return [emptyViolation];
-		}
-
 		// Filter results if needed
 		let filteredResults = analysisResults;
+		const filterArr = [];
 		if (this.targetFile) {
+			filterArr.push(this.targetFile);
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFile!)
 			);
@@ -303,12 +297,24 @@ export class DistanceCondition implements Checkable {
 				`Filtered to target file: ${this.targetFile}, ${filteredResults.length} results remaining`
 			);
 		} else if (this.targetFolder) {
+			filterArr.push(this.targetFolder);
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFolder!)
 			);
 			logger.logProgress(
 				`Filtered to target folder: ${this.targetFolder}, ${filteredResults.length} results remaining`
 			);
+		}
+
+		// Check for empty test condition
+		if (analysisResults.length === 0 && !options?.allowEmptyTests) {
+			const emptyViolation = new EmptyTestViolation(
+				filterArr,
+				'enhanced class info'
+			);
+			logger.logViolation(emptyViolation.toString());
+			logger.endCheck(ruleName, 1);
+			return [emptyViolation];
 		}
 
 		// Calculate metrics for each file and check threshold
@@ -383,17 +389,11 @@ export class ZoneCondition implements Checkable {
 		const analysisResults = await extractEnhancedClassInfo(this.tsConfigFilePath);
 		logger.logProgress(`Analyzed ${analysisResults.length} files from project`);
 
-		// Check for empty test condition
-		if (analysisResults.length === 0 && !options?.allowEmptyTests) {
-			const emptyViolation = new EmptyTestViolation([], 'enhanced class info'); // X-TODO: fix 1st arg (empty array)
-			logger.logViolation(emptyViolation.toString());
-			logger.endCheck(ruleName, 1);
-			return [emptyViolation];
-		}
-
 		// Filter results if needed
 		let filteredResults = analysisResults;
+		const filterArr = [];
 		if (this.targetFile) {
+			filterArr.push(this.targetFile);
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFile!)
 			);
@@ -401,12 +401,24 @@ export class ZoneCondition implements Checkable {
 				`Filtered to target file: ${this.targetFile}, ${filteredResults.length} results remaining`
 			);
 		} else if (this.targetFolder) {
+			filterArr.push(this.targetFolder);
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFolder!)
 			);
 			logger.logProgress(
 				`Filtered to target folder: ${this.targetFolder}, ${filteredResults.length} results remaining`
 			);
+		}
+
+		// Check for empty test condition
+		if (analysisResults.length === 0 && !options?.allowEmptyTests) {
+			const emptyViolation = new EmptyTestViolation(
+				filterArr,
+				'enhanced class info'
+			);
+			logger.logViolation(emptyViolation.toString());
+			logger.endCheck(ruleName, 1);
+			return [emptyViolation];
 		}
 
 		logger.logProgress(

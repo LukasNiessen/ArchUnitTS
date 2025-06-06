@@ -36,7 +36,7 @@ describe('LCOM metrics project summary', () => {
 		it('should filter classes based on builder configuration', async () => {
 			// Get summary for a filtered set of classes
 			const filteredSummary = await metrics(mockProjectPath)
-				.inFile('concrete-service.ts')
+				.withName('concrete-service.ts')
 				.lcom()
 				.summary();
 

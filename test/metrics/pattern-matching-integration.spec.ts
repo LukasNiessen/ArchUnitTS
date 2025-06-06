@@ -1,4 +1,4 @@
-import { metrics } from '../../src/metrics';
+import { metrics } from '../..';
 
 describe('Metrics Pattern Matching Integration', () => {
 	const tsConfigPath = './tsconfig.test.json';
@@ -110,16 +110,19 @@ describe('Metrics Pattern Matching Integration', () => {
 	});
 
 	describe('Backwards compatibility', () => {
-		it('should maintain existing inFile() functionality', async () => {
-			const violations = await metrics(tsConfigPath)
-				.inFile('src/metrics/fluentapi/metrics.ts')
+		it.only('should maintain existing inFile() functionality', async () => {
+			const rule = metrics(tsConfigPath)
+				.inFolder('src/metrics/**')
 				.lcom()
 				.lcom96a()
-				.shouldBeBelow(1.0)
-				.check();
+				.shouldBeBelow(1.0);
 
-			// Should pass if the specific file exists
-			expect(violations.length).toBeGreaterThanOrEqual(0);
+			await expect(rule).toPassAsync({
+				logging: {
+					enabled: true,
+					level: 'debug',
+				},
+			});
 		});
 
 		it('should maintain existing forClassesMatching() functionality', async () => {

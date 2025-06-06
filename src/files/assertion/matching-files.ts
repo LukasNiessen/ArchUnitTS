@@ -3,6 +3,7 @@ import { ProjectedNode } from '../../common/projection';
 import { CheckLogger } from '../../common/util';
 import { CheckOptions } from '../../common/fluentapi';
 import { Filter } from '../../common';
+import { getPatternString } from '../../common/regex-factory';
 import { matchesAllPatterns, matchesPattern } from './pattern-matching';
 
 export class ViolatingNode implements Violation {
@@ -86,11 +87,3 @@ const checkPositiveViolation = (
 	const patternString = getPatternString(pattern);
 	return !matches ? new ViolatingNode(patternString, file, false) : null;
 };
-
-function getPatternString(pattern: RegExp): string {
-	// For display purposes, return the original regex source without double escaping
-	const source = pattern.source;
-	// Remove excessive escaping for common cases
-	const result = source.replace(/\\\\(.)/g, '\\$1');
-	return result;
-}
