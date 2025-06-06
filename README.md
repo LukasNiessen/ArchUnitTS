@@ -90,7 +90,7 @@ These tests will run automatically in your testing setup, for example in your CI
 Additionally, you can generate reports and save them as artifacts. Here's a simple example using GitLab CI. _Note that reports are in beta._
 
 ```typescript
-it('should generate HTML reports', () => {
+it('should generate HTML reports', async () => {
   const countMetrics = metrics().count();
   const lcomMetrics = metrics().lcom();
 
