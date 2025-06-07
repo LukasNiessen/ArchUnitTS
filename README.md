@@ -372,7 +372,7 @@ We offer three targeting options for pattern matching across all modules:
 We support string patterns and regular expressions. String patterns support glob, see below.
 
 ```typescript
-// String patterns with glob support (case insensitive)
+// String patterns with glob support (case sensitive)
 .withName('*.service.ts')     // All files ending with .service.ts
 .inFolder('**/services')      // All files in any services folder
 .inPath('src/api/**/*.ts')    // All TypeScript files under src/api
@@ -384,13 +384,13 @@ We support string patterns and regular expressions. String patterns support glob
 
 ### Case Sensitivity
 
-- **Strings**: Case **insensitive** by default
+- **Strings/glob patterns**: Case **sensitive** by default
 - **Regular expressions**: Case **sensitive** by default
 
-If you need case-sensitive matching, use regular expressions. If you need case-insensitive regex matching, use the `i` flag:
+If you need case-insensitive matching, use regular expressions with the `i` flag:
 
 ```typescript
-// Case sensitive regex
+// Case sensitive regex (default)
 .withName(/^.*service\.ts$/)  // Matches service.ts
 ```
 
