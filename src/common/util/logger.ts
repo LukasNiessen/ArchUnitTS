@@ -164,22 +164,22 @@ class CheckLogger implements Logger {
 	}
 	startCheck(ruleName: string, options?: LoggingOptions): void {
 		const message = `Starting architecture rule check: ${ruleName}`;
-		this.info(options || { enabled: true }, message);
+		this.info(options, message);
 	}
 	endCheck(ruleName: string, violationCount: number, options?: LoggingOptions): void {
 		const message = `Completed architecture rule check: ${ruleName} (${violationCount} violations)`;
 		if (violationCount > 0) {
-			this.warn(options || { enabled: true }, message);
+			this.warn(options, message);
 		} else {
-			this.info(options || { enabled: true }, message);
+			this.info(options, message);
 		}
 	}
 	logViolation(violation: string, options?: LoggingOptions): void {
 		const message = `Violation found: ${violation}`;
-		this.warn(options || { enabled: true }, message);
+		this.warn(options, message);
 	}
 	logProgress(message: string, options?: LoggingOptions): void {
-		this.debug(options || { enabled: true }, message);
+		this.debug(options, message);
 	}
 	logMetric(
 		metricName: string,
@@ -191,7 +191,7 @@ class CheckLogger implements Logger {
 		if (threshold !== undefined) {
 			message += ` (threshold: ${threshold})`;
 		}
-		this.debug(options || { enabled: true }, message);
+		this.debug(options, message);
 	}
 	logFileProcessing(
 		fileName: string,
@@ -199,7 +199,7 @@ class CheckLogger implements Logger {
 		options?: LoggingOptions
 	): void {
 		const message = `Processed file: ${fileName} (matched ${matchedRules} rules)`;
-		this.debug(options || { enabled: true }, message);
+		this.debug(options, message);
 	}
 }
 
