@@ -126,7 +126,7 @@ export class PositiveSliceCondition implements Checkable {
 
 type GraphProvider = () => Promise<Graph>;
 
-export const slicesOfNxProject = (rootFolder?: string): SliceConditionBuilder => {
+export const nxProjectSlices = (rootFolder?: string): SliceConditionBuilder => {
 	const graphProvider = () => Promise.resolve(extractNxGraph(rootFolder));
 	return new SliceConditionBuilder(graphProvider);
 };

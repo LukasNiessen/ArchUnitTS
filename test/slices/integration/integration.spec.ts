@@ -4,7 +4,7 @@ import { parse } from 'plantuml-parser';
 import { extractGraph, extractNxGraph, Graph, projectEdges } from '../../../src/common';
 import {
 	gatherPositiveViolations,
-	slicesOfNxProject,
+	nxProjectSlices,
 	projectSlices,
 	sliceByFileSuffix,
 	sliceByPattern,
@@ -201,7 +201,7 @@ describe('Integration test', () => {
   component [is-odd]
 @enduml
         `;
-		const violations = await slicesOfNxProject(__dirname)
+		const violations = await nxProjectSlices(__dirname)
 			.should()
 			.ignoringExternalDependencies()
 			.adhereToDiagram(diagram)
@@ -235,7 +235,7 @@ describe('Integration test', () => {
   component [is-even]
 @enduml
         `;
-		const violations = await slicesOfNxProject(__dirname)
+		const violations = await nxProjectSlices(__dirname)
 			.should()
 			.ignoringUnknownNodes()
 			.ignoringExternalDependencies()

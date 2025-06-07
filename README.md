@@ -71,7 +71,7 @@ it('business layer should not depend on database layer', async () => {
 Lastly we ensure that some code metric rules are met.
 
 ```typescript
-it('should not contain too large files', () => {
+it('should not contain too large files', async () => {
   const rule = metrics().count().linesOfCode().shouldBeBelow(1000);
   await expect(rule).toPassAsync();
 });
@@ -367,6 +367,10 @@ We offer three targeting options for pattern matching across all modules:
 - **`inPath(pattern)`** - Pattern is checked against against the full relative path (eg. `src/services/Service.ts`)
 - **`inFolder(pattern)`** - Pattern is checked against the path without filename (eg. `src/services` from `src/services/Service.ts`)
 
+For the metrics module there is an additional one:
+
+- **`forClassesMatching(pattern)`** - Pattern is checked against class names. The filepath or filename does not matter here
+
 ### Pattern Types
 
 We support string patterns and regular expressions. String patterns support glob, see below.
@@ -380,6 +384,10 @@ We support string patterns and regular expressions. String patterns support glob
 // Regular expressions (case sensitive - use when you need exact case matching)
 .withName(/^.*Service\.ts$/)  // Same as *.service.ts but case-sensitive
 .inFolder(/services$/)        // Folders ending with 'services' (case-sensitive)
+
+// For metrics module: Class name matching with regex
+.forClassesMatching(/.*Service$/)  // Classes ending with 'Service'
+.forClassesMatching(/^User.*/)     // Classes starting with 'User'
 ```
 
 ### Case Sensitivity
@@ -716,6 +724,293 @@ metrics()
     (classInfo) => classInfo.methods.length / Math.max(classInfo.fields.length, 1)
   )
   .shouldBeBelow(3.0);
+```
+
+## 🔧 Nx Monorepo Support
+
+ArchUnitTS provides support for Nx monorepos by reading the Nx project graph and making it accessible through the slices API. This allows you to validate architecture rules based on your actual Nx project structure and dependencies.
+
+### Basic Nx Project Slices
+
+The `nxProjectSlices()` function reads your Nx workspace configuration and creates slices based on your Nx projects:
+
+```typescript
+import { nxProjectSlices } from 'archunit';
+import * as path from 'path';
+
+it('should adhere to Nx project architecture', async () => {
+  const rule = nxProjectSlices().should().haveNoCycles();
+  await expect(rule).toPassAsync();
+});
+```
+
+### Nx Project Boundaries
+
+Enforce boundaries between Nx applications and libraries using the project graph:
+
+```typescript
+it('should respect Nx project boundaries', async () => {
+  // Apps should not depend on other apps
+  const rule = nxProjectSlices()
+    .matching('apps/admin')
+    .shouldNot()
+    .dependOnSlices()
+    .matching('apps/client');
+  await expect(rule).toPassAsync();
+});
+
+it('should enforce library type boundaries', async () => {
+  // Feature libs should not depend on other feature libs
+  const rule = nxProjectSlices()
+    .matching('feature-*')
+    .shouldNot()
+    .dependOnSlices()
+    .matching('feature-*');
+  await expect(rule).toPassAsync();
+});
+```
+
+### UML Diagram Validation with Nx
+
+Validate your Nx architecture against PlantUML diagrams:
+
+```typescript
+it('should adhere to Nx architecture diagram', async () => {
+  const diagramLocation = path.resolve('docs', 'components.puml');
+
+  const rule = nxProjectSlices()
+    .ignoringExternalDependencies()
+    .should()
+    .adhereToDiagramInFile(diagramLocation);
+
+  await expect(rule).toPassAsync();
+});
+
+it('should follow inline diagram', async () => {
+  const diagram = `
+@startuml
+component [shared-ui] as UI
+component [feature-auth] as Auth
+component [feature-dashboard] as Dashboard
+component [shared-data-access] as Data
+
+Auth --> UI
+Dashboard --> UI
+Auth --> Data
+Dashboard --> Data
+@enduml`;
+
+  const rule = nxProjectSlices().should().adhereToDiagram(diagram);
+
+  await expect(rule).toPassAsync();
+});
+```
+
+### Nx Project Type Validation
+
+Enforce Nx project categorization and naming conventions:
+
+```typescript
+it('should follow Nx project naming patterns', async () => {
+  // Feature projects should follow naming convention
+  const rule = nxProjectSlices()
+    .matching(/^feature-/)
+    .should()
+    .containSlices()
+    .matching(/^feature-[a-z-]+$/);
+
+  await expect(rule).toPassAsync();
+});
+
+it('should enforce shared library dependencies', async () => {
+  // Shared libs should not depend on feature libs
+  const rule = nxProjectSlices()
+    .matching('shared-*')
+    .shouldNot()
+    .dependOnSlices()
+    .matching('feature-*');
+
+  await expect(rule).toPassAsync();
+});
+```
+
+## 📐 UML Diagram Support
+
+ArchUnitTS can validate your architecture against PlantUML diagrams, ensuring your code matches your architectural designs.
+
+### Component Diagrams
+
+Validate component relationships using PlantUML component diagrams:
+
+```typescript
+it('should adhere to component architecture', async () => {
+  const diagram = `
+@startuml
+component [UserInterface] as UI
+component [BusinessLogic] as BL
+component [DataAccess] as DA
+component [Database] as DB
+
+UI --> BL
+BL --> DA
+DA --> DB
+@enduml`;
+
+  const rule = projectSlices()
+    .definedBy('src/(**)/') // Group by folder structure
+    .should()
+    .adhereToDiagram(diagram);
+
+  await expect(rule).toPassAsync();
+});
+```
+
+### Package Diagrams
+
+Enforce package dependencies with UML package diagrams:
+
+```typescript
+it('should follow layered architecture diagram', async () => {
+  const diagram = `
+@startuml
+package "Presentation Layer" {
+  [Controllers]
+  [ViewModels]
+}
+
+package "Business Layer" {
+  [Services]
+  [Domain Models]
+}
+
+package "Data Layer" {
+  [Repositories]
+  [Entities]
+}
+
+[Controllers] --> [Services]
+[Services] --> [Repositories]
+[ViewModels] --> [Domain Models]
+@enduml`;
+
+  const rule = projectSlices().definedBy('src/**/(**)').should().adhereToDiagram(diagram);
+
+  await expect(rule).toPassAsync();
+});
+```
+
+### Class Diagrams
+
+Validate class relationships and inheritance hierarchies:
+
+```typescript
+it('should match domain model diagram', async () => {
+  const diagram = `
+@startuml
+class User {
+  +id: string
+  +email: string
+  +name: string
+}
+
+class Order {
+  +id: string
+  +userId: string
+  +total: number
+}
+
+class OrderItem {
+  +orderId: string
+  +productId: string
+  +quantity: number
+}
+
+User ||--o{ Order : places
+Order ||--o{ OrderItem : contains
+@enduml`;
+
+  const rule = projectSlices()
+    .definedBy('src/domain/(**)')
+    .should()
+    .adhereToDiagram(diagram);
+
+  await expect(rule).toPassAsync();
+});
+```
+
+### Microservices Architecture
+
+Validate microservices boundaries with UML diagrams:
+
+```typescript
+it('should respect microservices boundaries', async () => {
+  const diagram = `
+@startuml
+component [UserService] as US
+component [OrderService] as OS
+component [PaymentService] as PS
+component [NotificationService] as NS
+
+US --> OS : getUserOrders()
+OS --> PS : processPayment()
+OS --> NS : sendNotification()
+
+note right of US : No direct dependencies\nbetween services except\nthrough defined APIs
+@enduml`;
+
+  const rule = projectSlices()
+    .definedBy('services/(**)/') // Group by service folders
+    .should()
+    .adhereToDiagram(diagram);
+
+  await expect(rule).toPassAsync();
+});
+```
+
+### Custom Architecture Diagrams
+
+Define and validate your own architectural patterns:
+
+```typescript
+it('should follow hexagonal architecture', async () => {
+  const diagram = `
+@startuml
+hexagon "Application Core" as Core {
+  component [Domain]
+  component [Use Cases]
+}
+
+component [Web API] as Web
+component [Database] as DB
+component [External Service] as Ext
+
+Web --> Core : HTTP
+Core --> DB : Repository
+Core --> Ext : Gateway
+
+note top of Core : Business logic isolated\nfrom external concerns
+@enduml`;
+
+  const rule = projectSlices().definedBy('src/(**)/').should().adhereToDiagram(diagram);
+
+  await expect(rule).toPassAsync();
+});
+```
+
+### Diagram Validation Options
+
+Customize how diagrams are validated:
+
+```typescript
+it('should validate with strict mode', async () => {
+  const rule = projectSlices().definedBy('src/(**)/').should().adhereToDiagram(diagram, {
+    strict: true, // Fail if extra dependencies exist
+    ignoreUnknown: false, // Fail if unknown components found
+    caseSensitive: true, // Case-sensitive component matching
+  });
+
+  await expect(rule).toPassAsync();
+});
 ```
 
 ## 📊 Library Comparison
