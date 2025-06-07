@@ -734,7 +734,7 @@ The above info regarding filtering (`inFolder()` etc) does not apply to the slic
 
 ArchUnitTS provides support for Nx monorepos by reading the Nx project graph and making it accessible through the slices API. This allows you to validate architecture rules based on your actual Nx project structure and dependencies.
 
-### Basic Nx Project Slices
+### Nx Project Slices
 
 The `nxProjectSlices()` function reads your Nx workspace configuration and creates slices based on your Nx projects:
 
@@ -996,22 +996,6 @@ note top of Core : Business logic isolated\nfrom external concerns
 @enduml`;
 
   const rule = projectSlices().definedBy('src/(**)/').should().adhereToDiagram(diagram);
-
-  await expect(rule).toPassAsync();
-});
-```
-
-### Diagram Validation Options
-
-Customize how diagrams are validated:
-
-```typescript
-it('should validate with strict mode', async () => {
-  const rule = projectSlices().definedBy('src/(**)/').should().adhereToDiagram(diagram, {
-    strict: true, // Fail if extra dependencies exist
-    ignoreUnknown: false, // Fail if unknown components found
-    caseSensitive: true, // Case-sensitive component matching
-  });
 
   await expect(rule).toPassAsync();
 });
