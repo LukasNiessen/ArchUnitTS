@@ -973,7 +973,7 @@ This project is under the **MIT** license.
 ---
 
 ## P.S.
-
 ### Special Note on Cycle-Free Checks
 
 Empty checks are particularly nuanced for cycle-free assertions. Consider this scenario: folder A contains one file that only depends on folder B. When testing `.inFolder("A").should().haveNoCycles()`, we want to check for cycles _within_ folder A only. However, if we report an empty test error, users might be confused since folder A does contain a file. Therefore, cycle-free checks use a more permissive approach and check the unfiltered file set for emptiness, rather than the filtered set that's actually analyzed for cycles.
+"TODO" 
