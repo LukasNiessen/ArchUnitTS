@@ -216,6 +216,13 @@ export class DependOnFileCondition implements Checkable {
 			logger.info(`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`)
 		);
 
+		logger.info(
+			'Filters, objectPatterns:',
+			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
+				.filesShouldCondition.filters
+		);
+		logger.info('Filters, subjectPatterns:', this.dependencyFilters);
+
 		const violations = gatherDependOnFileViolations(
 			projectedEdges,
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
@@ -268,6 +275,11 @@ export class CycleFreeFileCondition implements Checkable {
 			logger.info(`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`)
 		);
 
+		logger.info(
+			'Filters:',
+			this.matchPatternFileConditionBuilder.filesShouldCondition.filters
+		);
+
 		const violations = gatherCycleViolations(
 			projectedEdges,
 			this.matchPatternFileConditionBuilder.filesShouldCondition.filters,
@@ -314,6 +326,12 @@ export class MatchPatternFileCondition implements Checkable {
 
 		logger.logProgress(`Processing ${projectedNodes.length} files`);
 		projectedNodes.forEach((node) => logger.info(`Found file: ${node.label}`));
+
+		logger.info('Filter:', this.filter);
+		logger.info(
+			'Precondition filters:',
+			this.matchPatternFileConditionBuilder.filesShouldCondition.filters
+		);
 
 		const violations = gatherRegexMatchingViolations(
 			projectedNodes,
@@ -398,6 +416,9 @@ export class CustomFileCheckableCondition implements Checkable {
 
 		logger.logProgress(`Applying custom condition to ${projectedNodes.length} files`);
 		projectedNodes.forEach((node) => logger.info(`Found file: ${node.label}`));
+
+		logger.info('Filters:', this.filters || []);
+		logger.info('Condition:', this.condition);
 
 		const violations = gatherCustomFileViolations(
 			projectedNodes,
