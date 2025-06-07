@@ -728,7 +728,7 @@ metrics()
 
 ## Slices API
 
-The above info does not apply to the slices API but only to the files and metrics APIs. the slices API has different a way of filtering. See more in the examples or below.
+The above info regarding filtering (`inFolder()` etc) does not apply to the slices API but only to the files and metrics APIs. the slices API has different a way of doing filtering. See more in the examples or below.
 
 ## 🔧 Nx Monorepo Support
 
