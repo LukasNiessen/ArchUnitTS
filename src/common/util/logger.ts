@@ -19,7 +19,6 @@ class CheckLogger implements Logger {
 			.replace(/\.\d{3}Z$/, '');
 		this.logFilePath = path.join(process.cwd(), 'logs', `archunit-${timestamp}.log`);
 	}
-
 	/**
 	 * Determines whether to log to console based on options
 	 */
@@ -32,6 +31,19 @@ class CheckLogger implements Logger {
 	 */
 	private shouldLogToFile(options?: LoggingOptions): boolean {
 		return options?.enabled === true && options?.logFile === true;
+	}
+
+	/**
+	 * Determines if the given log level should be logged based on the configured minimum level
+	 */
+	private shouldLogLevel(messageLevel: string, options?: LoggingOptions): boolean {
+		const levels = ['debug', 'info', 'warn', 'error'];
+		const minLevel = options?.level || 'info';
+		const minLevelIndex = levels.indexOf(minLevel);
+		const messageLevelIndex = levels.indexOf(messageLevel.toLowerCase());
+
+		// If message level is at or above the minimum level, log it
+		return messageLevelIndex >= minLevelIndex;
 	} /**
 	 * Prepares file for writing if needed
 	 */
@@ -79,12 +91,15 @@ class CheckLogger implements Logger {
 			args.length > 0 ? ` ${args.map((arg) => String(arg)).join(' ')}` : '';
 		return `[${level}] ${message}${formattedArgs}`;
 	}
-
 	debug(
 		options: LoggingOptions | undefined,
 		message: string,
 		...args: unknown[]
 	): void {
+		if (!this.shouldLogLevel('debug', options)) {
+			return;
+		}
+
 		const fullMessage = this.formatMessage('DEBUG', message, args);
 
 		if (this.shouldLogToConsole(options)) {
@@ -94,6 +109,10 @@ class CheckLogger implements Logger {
 	}
 
 	info(options: LoggingOptions | undefined, message: string, ...args: unknown[]): void {
+		if (!this.shouldLogLevel('info', options)) {
+			return;
+		}
+
 		const fullMessage = this.formatMessage('INFO', message, args);
 
 		if (this.shouldLogToConsole(options)) {
@@ -103,6 +122,10 @@ class CheckLogger implements Logger {
 	}
 
 	warn(options: LoggingOptions | undefined, message: string, ...args: unknown[]): void {
+		if (!this.shouldLogLevel('warn', options)) {
+			return;
+		}
+
 		const fullMessage = this.formatMessage('WARN', message, args);
 
 		if (this.shouldLogToConsole(options)) {
@@ -116,6 +139,10 @@ class CheckLogger implements Logger {
 		message: string,
 		...args: unknown[]
 	): void {
+		if (!this.shouldLogLevel('error', options)) {
+			return;
+		}
+
 		const fullMessage = this.formatMessage('ERROR', message, args);
 
 		if (this.shouldLogToConsole(options)) {

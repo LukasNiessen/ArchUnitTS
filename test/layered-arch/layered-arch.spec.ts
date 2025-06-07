@@ -17,7 +17,6 @@ describe('Layered architecture', () => {
 		expect(violations).toHaveLength(1);
 	});
 
-	/*
 	it.only('should not have dependencies from ui to db', async () => {
 		const rule = projectFiles(projectPath)
 			.inFolder('src/ui')
@@ -36,5 +35,4 @@ describe('Layered architecture', () => {
 			},
 		});
 	});
-	*/
 });

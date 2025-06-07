@@ -164,7 +164,7 @@ const extractGraphUncached = async (
 ): Promise<Edge[]> => {
 	logger?.debug(options?.logging, 'Starting uncached graph extraction');
 
-	const configFile = configFileName ?? guessLocationOfTsconfig();
+	const configFile = configFileName ?? guessLocationOfTsconfig(options);
 	if (!configFile) {
 		const error = 'Could not find configuration path';
 		logger?.error(options?.logging, error);

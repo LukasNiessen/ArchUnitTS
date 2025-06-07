@@ -36,17 +36,17 @@ export const gatherCustomFileViolations = (
 ): (CustomFileViolation | EmptyTestViolation)[] => {
 	const allowEmptyTests = options?.allowEmptyTests || false;
 	sharedLogger?.debug(
-		`Starting custom file logic validation with ${filters.length} patterns`,
-		options?.logging
+		options?.logging,
+		`Starting custom file logic validation with ${filters.length} patterns`
 	);
-	sharedLogger?.debug(`Patterns: ${JSON.stringify(filters)}`, options?.logging);
-	sharedLogger?.debug(`Allow empty tests: ${allowEmptyTests}`, options?.logging);
+	sharedLogger?.debug(options?.logging, `Patterns: ${JSON.stringify(filters)}`);
+	sharedLogger?.debug(options?.logging, `Allow empty tests: ${allowEmptyTests}`);
 
 	const violations: (CustomFileViolation | EmptyTestViolation)[] = [];
 
-	sharedLogger?.debug(`Filtering nodes to mach regexPatterns`, options?.logging);
+	sharedLogger?.debug(options?.logging, `Filtering nodes to mach regexPatterns`);
 	filters.forEach((pattern) =>
-		sharedLogger?.debug(`regexPattern: ${pattern}`, options?.logging)
+		sharedLogger?.debug(options?.logging, `regexPattern: ${pattern}`)
 	);
 
 	const projectedNodes = nodes.filter((node) =>
@@ -54,22 +54,22 @@ export const gatherCustomFileViolations = (
 	);
 
 	sharedLogger?.debug(
-		`Found ${projectedNodes.length} matching files from ${nodes.length} total nodes`,
-		options?.logging
+		options?.logging,
+		`Found ${projectedNodes.length} matching files from ${nodes.length} total nodes`
 	);
 
 	// Check for empty test if no files match preconditions
 	if (projectedNodes.length === 0 && !allowEmptyTests) {
 		sharedLogger?.warn(
-			'No files matched patterns and empty tests are not allowed - creating EmptyTestViolation',
-			options?.logging
+			options?.logging,
+			'No files matched patterns and empty tests are not allowed - creating EmptyTestViolation'
 		);
 		return [new EmptyTestViolation(filters)];
 	}
 
 	for (const node of projectedNodes) {
 		const path = node.label;
-		sharedLogger?.debug(`Processing file: ${path}`, options?.logging);
+		sharedLogger?.debug(options?.logging, `Processing file: ${path}`);
 
 		const lastSlash = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
 		const directory = lastSlash >= 0 ? path.substring(0, lastSlash) : '';
@@ -79,8 +79,8 @@ export const gatherCustomFileViolations = (
 		const extension = lastDot >= 0 ? fileName.substring(lastDot + 1) : '';
 
 		sharedLogger?.debug(
-			`File details: name='${name}', extension='${extension}', directory='${directory}'`,
-			options?.logging
+			options?.logging,
+			`File details: name='${name}', extension='${extension}', directory='${directory}'`
 		);
 
 		// Read file content and calculate lines of code
@@ -91,16 +91,16 @@ export const gatherCustomFileViolations = (
 			content = fs.readFileSync(path, 'utf8');
 			linesOfCode = content.split('\n').length;
 			sharedLogger?.debug(
-				`Successfully read file content: ${linesOfCode} lines of code`,
-				options?.logging
+				options?.logging,
+				`Successfully read file content: ${linesOfCode} lines of code`
 			);
 		} catch (error) {
 			// If file can't be read, use empty content
 			content = '';
 			linesOfCode = 0;
 			sharedLogger?.warn(
-				`Failed to read file '${path}': ${error instanceof Error ? error.message : String(error)}`,
-				options?.logging
+				options?.logging,
+				`Failed to read file '${path}': ${error instanceof Error ? error.message : String(error)}`
 			);
 		}
 
@@ -114,19 +114,19 @@ export const gatherCustomFileViolations = (
 		};
 
 		sharedLogger?.debug(
-			`Evaluating custom condition for file: ${path}`,
-			options?.logging
+			options?.logging,
+			`Evaluating custom condition for file: ${path}`
 		);
 		const isValid = condition(fileInfo);
 		sharedLogger?.debug(
-			`Custom condition result for '${path}': ${isValid}`,
-			options?.logging
+			options?.logging,
+			`Custom condition result for '${path}': ${isValid}`
 		);
 
 		if (!isValid) {
 			sharedLogger?.warn(
-				`Custom file condition failed for '${path}' - creating violation`,
-				options?.logging
+				options?.logging,
+				`Custom file condition failed for '${path}' - creating violation`
 			);
 			violations.push(
 				new CustomFileViolation(
@@ -137,15 +137,15 @@ export const gatherCustomFileViolations = (
 			);
 		} else {
 			sharedLogger?.debug(
-				`File '${path}' passed custom condition`,
-				options?.logging
+				options?.logging,
+				`File '${path}' passed custom condition`
 			);
 		}
 	}
 
 	sharedLogger?.debug(
-		`Custom file logic validation completed. Found ${violations.length} violations`,
-		options?.logging
+		options?.logging,
+		`Custom file logic validation completed. Found ${violations.length} violations`
 	);
 	return violations;
 };
