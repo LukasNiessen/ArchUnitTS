@@ -73,7 +73,7 @@
 		"docs:serve": "npm run docs && npx --yes serve docs",
 		"format": "prettier --ignore-path .gitignore --write '**/*.ts*'",
 		"format:check": "prettier --ignore-path .gitignore --check '**/*.ts*'",
-		"test": "jest --no-cache",
+		"test": "jest logging.spec.ts --no-cache --coverage=false && jest --testPathIgnorePatterns=logging\\.spec\\.ts --no-cache",
 		"test:watch": "jest --watch --no-cache",
 		"test:clear": "jest --clearCache",
 		"test:prod": "npm run lint && npm run test -- --coverage --no-cache"

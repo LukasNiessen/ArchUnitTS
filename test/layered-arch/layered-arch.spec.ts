@@ -17,22 +17,14 @@ describe('Layered architecture', () => {
 		expect(violations).toHaveLength(1);
 	});
 
-	it.only('should not have dependencies from ui to db', async () => {
+	it('should not have dependencies from ui to db', async () => {
 		const rule = projectFiles(projectPath)
 			.inFolder('src/ui')
-			.withName('*.ts')
-			.should()
-			.haveNoCycles();
-		// .shouldNot()
-		// .dependOnFiles()
-		// .inFolder('src/db');
-
-		await expect(rule).toPassAsync({
-			logging: {
-				enabled: true,
-				level: 'debug',
-				logFile: true,
-			},
-		});
+			.withName('ui.ts')
+			.shouldNot()
+			.dependOnFiles()
+			.inFolder('src/db');
+		const violations = await rule.check();
+		expect(violations).toHaveLength(1);
 	});
 });

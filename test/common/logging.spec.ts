@@ -1,11 +1,12 @@
 import { sharedLogger } from '../../src/common/util/logger';
 import * as fs from 'fs';
 import * as path from 'path';
+import { LoggingOptions } from '../../src/common';
 
 describe('Logging functionality', () => {
 	const testLogDir = path.join(__dirname, '..', '..', 'test-logs');
 
-	beforeAll(() => {
+	beforeEach(() => {
 		// Clean up test logs directory
 		if (fs.existsSync(testLogDir)) {
 			fs.rmSync(testLogDir, { recursive: true, force: true });
@@ -28,7 +29,9 @@ describe('Logging functionality', () => {
 			const options = {
 				enabled: true,
 				logFile: true,
-			}; // Log some messages
+				level: 'debug',
+			} as LoggingOptions;
+
 			logger.info(options, 'Test message 1');
 			logger.warn(options, 'Test warning');
 			logger.error(options, 'Test error');
@@ -41,7 +44,7 @@ describe('Logging functionality', () => {
 				.filter((f) => f.startsWith('archunit-') && f.endsWith('.log'));
 			expect(logFiles.length).toBeGreaterThanOrEqual(1);
 
-			const logFile = path.join(logsDir, logFiles[0]);
+			const logFile = path.join(logsDir, logFiles[logFiles.length - 1]);
 			const logContent = fs.readFileSync(logFile, 'utf-8');
 
 			expect(logContent).toContain('ArchUnitTS Logging Session Started');
@@ -98,11 +101,9 @@ describe('Logging functionality', () => {
 			const logger = sharedLogger;
 			const options = {
 				enabled: true,
+				level: 'debug',
 				logFile: true,
-				logTiming: true,
-				logViolations: true,
-				logProgress: true,
-			};
+			} as LoggingOptions;
 
 			logger.startCheck('test-rule', options);
 			logger.logProgress('Processing test files', options);
@@ -117,7 +118,10 @@ describe('Logging functionality', () => {
 				.filter((f) => f.startsWith('archunit-') && f.endsWith('.log'));
 			expect(logFiles.length).not.toBe(0);
 
-			const logContent = fs.readFileSync(path.join(logsDir, logFiles[0]), 'utf-8');
+			const logContent = fs.readFileSync(
+				path.join(logsDir, logFiles[logFiles.length - 1]),
+				'utf-8'
+			);
 			expect(logContent).toContain('Starting architecture rule check: test-rule');
 			expect(logContent).toContain('Processing test files');
 			expect(logContent).toContain('Violation found: Test violation found');

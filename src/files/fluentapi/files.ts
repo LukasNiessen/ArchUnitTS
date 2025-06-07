@@ -57,15 +57,24 @@ export class FilesShouldCondition {
 	}
 
 	public withName(name: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.fileNameMatcher(name)]);
+		return new FilesShouldCondition(this.fileCondition, [
+			...this.filters,
+			RegexFactory.fileNameMatcher(name),
+		]);
 	}
 
 	public inFolder(folder: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.folderMatcher(folder)]);
+		return new FilesShouldCondition(this.fileCondition, [
+			...this.filters,
+			RegexFactory.folderMatcher(folder),
+		]);
 	}
 
 	public inPath(path: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.pathMatcher(path)]);
+		return new FilesShouldCondition(this.fileCondition, [
+			...this.filters,
+			RegexFactory.pathMatcher(path),
+		]);
 	}
 
 	/**
