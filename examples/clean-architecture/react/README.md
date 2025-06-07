@@ -585,7 +585,9 @@ describe('React Clean Architecture Metrics', () => {
         (classInfo) => {
           const useEffectPattern = /useEffect\([^,]+,\s*\[([^\]]*)\]/g;
           const matches = [...classInfo.content.matchAll(useEffectPattern)];
-          if (matches.length === 0) return 0;
+          if (matches.length === 0) {
+            return 0;
+          }
 
           const totalDeps = matches.reduce((sum, match) => {
             const deps = match[1].split(',').filter((dep) => dep.trim());

@@ -2,7 +2,7 @@ import * as ts from 'typescript';
 import * as path from 'path';
 import { Edge, extractGraph } from '../../common/extraction';
 import { ClassInfo } from './interface';
-import { Logger } from '../../common';
+import { CheckOptions, Logger, sharedLogger } from '../../common';
 
 /**
  * Enhanced class information including abstractness and dependency data
@@ -44,31 +44,32 @@ export interface FileAnalysisResult {
 export function extractClassInfo(
 	tsConfigFilePath?: string,
 	projectPath: string = process.cwd(),
-	loggerInput?: Logger
+	options?: CheckOptions
 ): ClassInfo[] {
-	const logger = loggerInput;
+	const logger = sharedLogger;
 
 	logger?.debug(
+		options?.logging,
 		`Starting class extraction with config: ${tsConfigFilePath || 'auto-detected'}`
 	);
-	logger?.info(`Project path: ${projectPath}`);
+	logger?.info(options?.logging, `Project path: ${projectPath}`);
 
 	// Get program from tsconfig or create a default one
 	const configPath = tsConfigFilePath
 		? path.resolve(projectPath, tsConfigFilePath)
 		: path.resolve(projectPath, 'tsconfig.json');
 
-	logger?.info(`Using TypeScript config file: ${configPath}`);
-	logger?.debug(`Reading config file: ${configPath}`);
+	logger?.info(options?.logging, `Using TypeScript config file: ${configPath}`);
+	logger?.debug(options?.logging, `Reading config file: ${configPath}`);
 
 	const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
 	if (configFile.error) {
 		const error = `Error reading tsconfig file: ${configFile.error.messageText}`;
-		logger?.error(error);
+		logger?.error(options?.logging, error);
 		throw new Error(error);
 	}
 
-	logger?.debug('Successfully read TypeScript configuration file');
+	logger?.debug(options?.logging, 'Successfully read TypeScript configuration file');
 
 	const parsedConfig = ts.parseJsonConfigFileContent(
 		configFile.config,
@@ -80,28 +81,36 @@ export function extractClassInfo(
 
 	if (parsedConfig.errors.length > 0) {
 		const error = `Error parsing tsconfig file: ${parsedConfig.errors[0].messageText}`;
-		logger?.error(error);
+		logger?.error(options?.logging, error);
 		throw new Error(error);
 	}
 
-	logger?.debug('Successfully parsed TypeScript configuration');
+	logger?.debug(options?.logging, 'Successfully parsed TypeScript configuration');
 	logger?.debug(
+		options?.logging,
 		`Compiler options: ${JSON.stringify(parsedConfig.options, null, 2).slice(0, 500)}...`
 	);
-	logger?.info(`Found ${parsedConfig.fileNames.length} files in project configuration`);
+	logger?.info(
+		options?.logging,
+		`Found ${parsedConfig.fileNames.length} files in project configuration`
+	);
 
 	logger?.debug(
+		options?.logging,
 		`Root files: ${parsedConfig.fileNames.slice(0, 10).join(', ')}${parsedConfig.fileNames.length > 10 ? `... and ${parsedConfig.fileNames.length - 10} more` : ''}`
 	);
 
-	logger?.debug('Creating TypeScript program');
+	logger?.debug(options?.logging, 'Creating TypeScript program');
 	const program = ts.createProgram({
 		rootNames: parsedConfig.fileNames,
 		options: parsedConfig.options,
 	});
 
 	const sourceFiles = program.getSourceFiles();
-	logger?.info(`TypeScript program created with ${sourceFiles.length} source files`);
+	logger?.info(
+		options?.logging,
+		`TypeScript program created with ${sourceFiles.length} source files`
+	);
 
 	// Filter out files from node_modules for logging purposes
 	const projectFiles = sourceFiles.filter(
@@ -112,12 +121,13 @@ export function extractClassInfo(
 		sf.fileName.includes('node_modules')
 	);
 
-	logger?.debug(`Project source files: ${projectFiles.length}`);
-	logger?.debug(`Declaration files: ${declarationFiles.length}`);
-	logger?.debug(`Node modules files: ${nodeModulesFiles.length}`);
+	logger?.debug(options?.logging, `Project source files: ${projectFiles.length}`);
+	logger?.debug(options?.logging, `Declaration files: ${declarationFiles.length}`);
+	logger?.debug(options?.logging, `Node modules files: ${nodeModulesFiles.length}`);
 
 	if (projectFiles.length === 0) {
 		logger?.warn(
+			options?.logging,
 			'No project source files found - this might indicate a configuration issue'
 		);
 	}
@@ -125,7 +135,7 @@ export function extractClassInfo(
 	const classes: ClassInfo[] = [];
 	let processedFiles = 0;
 
-	logger?.debug('Starting class extraction from source files');
+	logger?.debug(options?.logging, 'Starting class extraction from source files');
 
 	// Process each source file
 	for (const sourceFile of program.getSourceFiles()) {
@@ -135,6 +145,7 @@ export function extractClassInfo(
 		) {
 			processedFiles++;
 			logger?.debug(
+				options?.logging,
 				`Processing file ${processedFiles}/${projectFiles.length}: ${path.relative(projectPath, sourceFile.fileName)}`
 			);
 
@@ -145,18 +156,20 @@ export function extractClassInfo(
 
 			if (classesFoundInFile > 0) {
 				logger?.debug(
+					options?.logging,
 					`Found ${classesFoundInFile} class(es) in ${path.relative(projectPath, sourceFile.fileName)}`
 				);
 			}
 		}
 	}
 
-	logger?.info(`Class extraction completed:`);
-	logger?.info(`  - Total classes found: ${classes.length}`);
-	logger?.info(`  - Files processed: ${processedFiles}`);
+	logger?.info(options?.logging, `Class extraction completed:`);
+	logger?.info(options?.logging, `  - Total classes found: ${classes.length}`);
+	logger?.info(options?.logging, `  - Files processed: ${processedFiles}`);
 
 	if (classes.length === 0) {
 		logger?.warn(
+			options?.logging,
 			'No classes found - this might indicate a pattern matching or file discovery issue'
 		);
 	}
@@ -168,12 +181,12 @@ function processSourceFile(
 	sourceFile: ts.SourceFile,
 	program: ts.Program,
 	classes: ClassInfo[],
-	loggerInput?: Logger
+	options?: CheckOptions
 ): void {
-	const logger = loggerInput;
+	const logger = sharedLogger;
 
 	const relativeFileName = path.relative(process.cwd(), sourceFile.fileName);
-	logger?.debug(`Analyzing source file: ${relativeFileName}`);
+	logger?.debug(options?.logging, `Analyzing source file: ${relativeFileName}`);
 
 	let classesFoundInFile = 0;
 
@@ -182,7 +195,7 @@ function processSourceFile(
 		if (ts.isClassDeclaration(node) && node.name) {
 			classesFoundInFile++;
 			const className = node.name.text;
-			logger?.debug(`  Found class: ${className}`);
+			logger?.debug(options?.logging, `  Found class: ${className}`);
 
 			const classInfo: ClassInfo = {
 				name: className,
@@ -214,7 +227,10 @@ function processSourceFile(
 
 					// Analyze method body to find field accesses
 					if (member.body) {
-						logger?.debug(`    Analyzing method: ${methodName}`);
+						logger?.debug(
+							options?.logging,
+							`    Analyzing method: ${methodName}`
+						);
 						findFieldAccesses(
 							member.body,
 							classInfo.fields.map((f) => f.name),
@@ -223,6 +239,7 @@ function processSourceFile(
 
 						if (accessedFields.length > 0) {
 							logger?.debug(
+								options?.logging,
 								`      Method ${methodName} accesses fields: ${accessedFields.join(', ')}`
 							);
 						}
@@ -244,6 +261,7 @@ function processSourceFile(
 			});
 
 			logger?.debug(
+				options?.logging,
 				`    Class ${className} has ${methodCount} methods and ${fieldCount} fields`
 			);
 			classes.push(classInfo);
@@ -277,10 +295,11 @@ function processSourceFile(
 
 	if (classesFoundInFile > 0) {
 		logger?.debug(
+			options?.logging,
 			`  Total classes found in ${relativeFileName}: ${classesFoundInFile}`
 		);
 	} else {
-		logger?.debug(`  No classes found in ${relativeFileName}`);
+		logger?.debug(options?.logging, `  No classes found in ${relativeFileName}`);
 	}
 }
 
@@ -289,7 +308,8 @@ function processSourceFile(
  */
 export async function extractEnhancedClassInfo(
 	tsConfigFilePath?: string,
-	projectPath: string = process.cwd()
+	projectPath: string = process.cwd(),
+	options?: CheckOptions
 ): Promise<FileAnalysisResult[]> {
 	// Get program from tsconfig or create a default one
 	const configPath = tsConfigFilePath
@@ -321,7 +341,7 @@ export async function extractEnhancedClassInfo(
 	});
 
 	// Extract dependency graph
-	const dependencyGraph = await extractGraph(tsConfigFilePath || configPath);
+	const dependencyGraph = await extractGraph(tsConfigFilePath || configPath, options);
 
 	const fileResults: FileAnalysisResult[] = [];
 

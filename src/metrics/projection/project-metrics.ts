@@ -12,9 +12,9 @@ export class ClassFilter {
 		const beforeCount = classes.length;
 
 		if (logger) {
-			logger.info(`Filter pattern: ${this.filter.regExp.source}`);
-			logger.info(`Filter target: ${this.filter.options.target}`);
-			logger.info(`Applying filter to ${classes.length} classes`);
+			logger.info(options?.logging, `Filter pattern: ${this.filter.regExp.source}`);
+			logger.info(options?.logging, `Filter target: ${this.filter.options.target}`);
+			logger.info(options?.logging, `Applying filter to ${classes.length} classes`);
 		}
 
 		const filtered = classes.filter((classInfo) => {
@@ -24,6 +24,7 @@ export class ClassFilter {
 
 		if (logger && beforeCount !== filtered.length) {
 			logger.info(
+				options?.logging,
 				`  Filter applied: ${beforeCount} -> ${filtered.length} classes (pattern: ${this.filter.regExp.source})`
 			);
 		}
@@ -45,13 +46,17 @@ export class CompositeFilter {
 	apply(classes: ClassInfo[], logger?: Logger, options?: CheckOptions): ClassInfo[] {
 		if (logger) {
 			logger.debug(
+				options?.logging,
 				`Applying ${this.filters.length} filter(s) to ${classes.length} classes`
 			);
 		}
 
 		return this.filters.reduce((filteredClasses, filter, index) => {
 			if (logger) {
-				logger.debug(`  Applying filter ${index + 1}/${this.filters.length}`);
+				logger.debug(
+					options?.logging,
+					`  Applying filter ${index + 1}/${this.filters.length}`
+				);
 			}
 			return filter.apply(filteredClasses, logger, options);
 		}, classes);

@@ -807,9 +807,11 @@ When debug logging is enabled, you'll see detailed information about the analysi
 [2025-06-02T12:08:26.772Z] [WARN] Completed architecture rule check: Dependency check: patterns [(^|.*/)src/database/.*] (1 violations)
 ```
 
-### File Logging for CI/CD Integration
+### File Logging for CI/CD Integration (Beta)
 
 ArchUnitTS supports writing logs to files, making it super easy to integrate into CI pipelines and save logs as artifacts for debugging purposes. This is particularly useful for analyzing test failures in production environments.
+
+**This feature is in beta**. Note that if your testing framework runs tests in parallel, like Jest does for example, the log file may look confusing for large test suites.
 
 #### Basic File Logging
 
@@ -819,16 +821,14 @@ const options = {
   logging: {
     enabled: true,
     level: 'debug',
-    logFile: './logs/architecture-tests.log', // Custom file path
+    logFile: true,
   },
 };
 
 await expect(rule).toPassAsync(options);
 ```
 
-#### Easy CI Integration with Boolean Flag
-
-For quick CI integration, you can use a simple boolean flag to enable automatic file logging:
+#### Easy CI Integration
 
 ```typescript
 // Automatically generates timestamped log files in ./logs/
@@ -973,7 +973,8 @@ This project is under the **MIT** license.
 ---
 
 ## P.S.
+
 ### Special Note on Cycle-Free Checks
 
 Empty checks are particularly nuanced for cycle-free assertions. Consider this scenario: folder A contains one file that only depends on folder B. When testing `.inFolder("A").should().haveNoCycles()`, we want to check for cycles _within_ folder A only. However, if we report an empty test error, users might be confused since folder A does contain a file. Therefore, cycle-free checks use a more permissive approach and check the unfiltered file set for emptiness, rather than the filtered set that's actually analyzed for cycles.
-"TODO" 
+"TODO"

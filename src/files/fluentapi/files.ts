@@ -1,6 +1,6 @@
 import { extractGraph } from '../../common/extraction';
 import { Checkable, CheckOptions } from '../../common/fluentapi';
-import { CheckLogger } from '../../common/util';
+import { sharedLogger } from '../../common/util/logger';
 import {
 	projectEdges,
 	perEdge,
@@ -195,33 +195,44 @@ export class DependOnFileCondition implements Checkable {
 	}
 
 	public async check(options?: CheckOptions): Promise<Violation[]> {
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `Dependency check: ${this.dependencyFilters.length} filters`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Extracting project graph for dependency analysis...');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Extracting project graph for dependency analysis...',
+			options?.logging
+		);
 
 		const configFileName =
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
 				.filesShouldCondition.fileCondition.tsConfigFilePath;
 
-		const graph = await extractGraph(configFileName, options?.clearCache, logger);
+		const graph = await extractGraph(configFileName, options);
 
 		const projectedEdges = projectEdges(graph, perEdge());
-		logger.logProgress(
-			`Analyzing dependencies across ${projectedEdges.length} edges`
+		sharedLogger.logProgress(
+			`Analyzing dependencies across ${projectedEdges.length} edges`,
+			options?.logging
 		);
 
 		projectedEdges.forEach((edge) =>
-			logger.info(`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`)
+			sharedLogger.info(
+				options?.logging,
+				`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`
+			)
 		);
 
-		logger.info(
+		sharedLogger.info(
+			options?.logging,
 			'Filters, objectPatterns:',
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder
 				.filesShouldCondition.filters
 		);
-		logger.info('Filters, subjectPatterns:', this.dependencyFilters);
+		sharedLogger.info(
+			options?.logging,
+			'Filters, subjectPatterns:',
+			this.dependencyFilters
+		);
 
 		const violations = gatherDependOnFileViolations(
 			projectedEdges,
@@ -234,10 +245,13 @@ export class DependOnFileCondition implements Checkable {
 
 		// Log violations if logging is enabled
 		violations.forEach((violation) => {
-			logger.logViolation(`Dependency violation: ${JSON.stringify(violation)}`);
+			sharedLogger.logViolation(
+				`Dependency violation: ${JSON.stringify(violation)}`,
+				options?.logging
+			);
 		});
 
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
 }
@@ -255,27 +269,34 @@ export class CycleFreeFileCondition implements Checkable {
 	 * @returns Promise<Violation[]> Array of violations representing detected cycles
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = 'Cycle detection check';
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Extracting project graph for cycle detection...');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Extracting project graph for cycle detection...',
+			options?.logging
+		);
 
 		const configFileName =
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
 				.tsConfigFilePath;
-		const graph = await extractGraph(configFileName, options?.clearCache);
+		const graph = await extractGraph(configFileName, options);
 
 		const projectedEdges = projectEdges(graph, perInternalEdge());
 
-		logger.logProgress(
-			`Analyzing ${projectedEdges.length} internal dependencies for cycles`
+		sharedLogger.logProgress(
+			`Analyzing ${projectedEdges.length} internal dependencies for cycles`,
+			options?.logging
 		);
 		projectedEdges.forEach((edge) =>
-			logger.info(`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`)
+			sharedLogger.info(
+				options?.logging,
+				`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`
+			)
 		);
 
-		logger.info(
+		sharedLogger.info(
+			options?.logging,
 			'Filters:',
 			this.matchPatternFileConditionBuilder.filesShouldCondition.filters
 		);
@@ -287,9 +308,12 @@ export class CycleFreeFileCondition implements Checkable {
 		);
 
 		violations.forEach((violation) => {
-			logger.logViolation(`Cycle detected: ${JSON.stringify(violation)}`);
+			sharedLogger.logViolation(
+				`Cycle detected: ${JSON.stringify(violation)}`,
+				options?.logging
+			);
 		});
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 
 		return violations;
 	}
@@ -311,24 +335,29 @@ export class MatchPatternFileCondition implements Checkable {
 	 * @returns Promise<Violation[]> Array of violations found during the check
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `Pattern matching: ${this.filter.regExp}`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Extracting project graph...');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress('Extracting project graph...', options?.logging);
 
 		const configFileName =
 			this.matchPatternFileConditionBuilder.filesShouldCondition.fileCondition
 				.tsConfigFilePath;
-		const graph = await extractGraph(configFileName, options?.clearCache);
+		const graph = await extractGraph(configFileName, options);
 
 		const projectedNodes = projectToNodes(graph);
 
-		logger.logProgress(`Processing ${projectedNodes.length} files`);
-		projectedNodes.forEach((node) => logger.info(`Found file: ${node.label}`));
+		sharedLogger.logProgress(
+			`Processing ${projectedNodes.length} files`,
+			options?.logging
+		);
+		projectedNodes.forEach((node) =>
+			sharedLogger.info(options?.logging, `Found file: ${node.label}`)
+		);
 
-		logger.info('Filter:', this.filter);
-		logger.info(
+		sharedLogger.info(options?.logging, 'Filter:', this.filter);
+		sharedLogger.info(
+			options?.logging,
 			'Precondition filters:',
 			this.matchPatternFileConditionBuilder.filesShouldCondition.filters
 		);
@@ -342,9 +371,12 @@ export class MatchPatternFileCondition implements Checkable {
 		);
 
 		violations.forEach((violation) => {
-			logger.logViolation(`Pattern violation: ${JSON.stringify(violation)}`);
+			sharedLogger.logViolation(
+				`Pattern violation: ${JSON.stringify(violation)}`,
+				options?.logging
+			);
 		});
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 
 		return violations;
 	}
@@ -405,20 +437,27 @@ export class CustomFileCheckableCondition implements Checkable {
 			return [];
 		}
 
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `Custom file condition: ${this.message || 'Custom rule'}`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Extracting project graph for custom file analysis...');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Extracting project graph for custom file analysis...',
+			options?.logging
+		);
 
-		const graph = await extractGraph(this.tsConfigFilePath, options?.clearCache);
+		const graph = await extractGraph(this.tsConfigFilePath, options);
 		const projectedNodes = projectToNodes(graph);
 
-		logger.logProgress(`Applying custom condition to ${projectedNodes.length} files`);
-		projectedNodes.forEach((node) => logger.info(`Found file: ${node.label}`));
+		sharedLogger.logProgress(
+			`Applying custom condition to ${projectedNodes.length} files`,
+			options?.logging
+		);
+		projectedNodes.forEach((node) =>
+			sharedLogger.info(options?.logging, `Found file: ${node.label}`)
+		);
 
-		logger.info('Filters:', this.filters || []);
-		logger.info('Condition:', this.condition);
+		sharedLogger.info(options?.logging, 'Filters:', this.filters || []);
+		sharedLogger.info(options?.logging, 'Condition:', this.condition);
 
 		const violations = gatherCustomFileViolations(
 			projectedNodes,
@@ -430,12 +469,13 @@ export class CustomFileCheckableCondition implements Checkable {
 
 		// Log violations if logging is enabled
 		violations.forEach((violation) => {
-			logger.logViolation(
-				`Custom condition violation: ${JSON.stringify(violation)}`
+			sharedLogger.logViolation(
+				`Custom condition violation: ${JSON.stringify(violation)}`,
+				options?.logging
 			);
 		});
 
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
 }

@@ -7,7 +7,7 @@ import { gatherPositiveViolations, gatherViolations, Rule } from '../assertion';
 import { Violation } from '../../common/assertion';
 import { identity, sliceByPattern } from '../projection';
 import { MapFunction, projectEdges } from '../../common/projection';
-import { CheckLogger } from '../../common/util';
+import { sharedLogger } from '../../common/util';
 
 export const projectSlices = (filename?: string): SliceConditionBuilder => {
 	const graphProvider = () => extractGraph(filename);
@@ -85,8 +85,6 @@ export class PositiveSliceCondition implements Checkable {
 	) {}
 
 	public async check(options?: CheckOptions): Promise<Violation[]> {
-		const logger = new CheckLogger(options?.logging);
-
 		const graph =
 			await this.positiveConditionBuilder.sliceConditionBuilder.graphProvider();
 		const filtered = this.positiveConditionBuilder.ignoreExternals
@@ -111,7 +109,10 @@ export class PositiveSliceCondition implements Checkable {
 		);
 
 		mapped.forEach((edge) =>
-			logger.info(`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`)
+			sharedLogger.info(
+				options?.logging,
+				`Found edge: From ${edge.sourceLabel} to ${edge.targetLabel}`
+			)
 		);
 
 		return gatherPositiveViolations(

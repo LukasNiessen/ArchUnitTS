@@ -1,7 +1,7 @@
 import { ProjectedNode } from './projection';
 import { Filter } from '.';
 import { ClassInfo } from '../metrics';
-import { CheckLogger } from './util';
+import { sharedLogger } from './util';
 import type { CheckOptions } from './fluentapi';
 
 /**
@@ -29,7 +29,6 @@ export function matchesPattern(
 	filter: Filter,
 	options?: CheckOptions
 ): boolean {
-	const logger = new CheckLogger(options?.logging);
 	const filePath = typeof file === 'string' ? file : file.label;
 
 	let targetString: string;
@@ -50,10 +49,13 @@ export function matchesPattern(
 
 	const matches = filter.regExp.test(targetString);
 
-	logger.info(`Testing file: ${filePath}`);
-	logger.info(`  Target string (${filter.options.target}): "${targetString}"`);
-	logger.info(`  Pattern: ${filter.regExp.source}`);
-	logger.info(`  Matches: ${matches}`);
+	sharedLogger.info(options?.logging, `Testing file: ${filePath}`);
+	sharedLogger.info(
+		options?.logging,
+		`  Target string (${filter.options.target}): "${targetString}"`
+	);
+	sharedLogger.info(options?.logging, `  Pattern: ${filter.regExp.source}`);
+	sharedLogger.info(options?.logging, `  Matches: ${matches}`);
 
 	return matches;
 }
@@ -63,7 +65,6 @@ export function matchesPatternClassInfo(
 	filter: Filter,
 	options?: CheckOptions
 ): boolean {
-	const logger = new CheckLogger(options?.logging);
 	const filePath = classInfo.filePath;
 
 	let targetString: string;
@@ -87,10 +88,16 @@ export function matchesPatternClassInfo(
 
 	const matches = filter.regExp.test(targetString);
 
-	logger.info(`Testing class: ${classInfo.name} from ${filePath}`);
-	logger.info(`  Target string (${filter.options.target}): "${targetString}"`);
-	logger.info(`  Pattern: ${filter.regExp.source}`);
-	logger.info(`  Matches: ${matches}`);
+	sharedLogger.info(
+		options?.logging,
+		`Testing class: ${classInfo.name} from ${filePath}`
+	);
+	sharedLogger.info(
+		options?.logging,
+		`  Target string (${filter.options.target}): "${targetString}"`
+	);
+	sharedLogger.info(options?.logging, `  Pattern: ${filter.regExp.source}`);
+	sharedLogger.info(options?.logging, `  Matches: ${matches}`);
 
 	return matches;
 }

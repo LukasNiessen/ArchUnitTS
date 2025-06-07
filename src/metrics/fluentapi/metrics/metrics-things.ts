@@ -5,7 +5,7 @@ import { CountMetricsBuilder } from './count-metrics';
 import { MetricComparison } from '../types';
 import { Checkable, CheckOptions } from '../../../common/fluentapi';
 import { Violation, EmptyTestViolation } from '../../../common/assertion';
-import { CheckLogger } from '../../../common/util';
+import { sharedLogger } from '../../../common/util';
 import { Filter, Pattern, RegexFactory } from '../../../common';
 import { ClassFilter, CompositeFilter } from '../../projection';
 
@@ -259,28 +259,33 @@ export class CustomMetricThresholdBuilder implements Checkable {
 	) {}
 
 	async check(options?: CheckOptions): Promise<Violation[]> {
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `${this.metricName} custom metric threshold check (${this.comparison} ${this.threshold})`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Extracting class information from codebase');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Extracting class information from codebase',
+			options?.logging
+		);
 
 		const violations: Violation[] = [];
 		const allClasses = extractClassInfo(
 			this.metricsBuilder.tsConfigFilePath,
-			process.cwd(),
-			logger
+			process.cwd()
 		);
-		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
+		sharedLogger.logProgress(
+			`Extracted ${allClasses.length} classes from codebase`,
+			options?.logging
+		);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
 		const filteredClasses = filter
-			? filter.apply(allClasses, logger, options)
+			? filter.apply(allClasses, sharedLogger, options)
 			: allClasses;
 
-		logger.logProgress(
-			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
+		sharedLogger.logProgress(
+			`Applied filters, ${filteredClasses.length} classes remaining for analysis`,
+			options?.logging
 		);
 
 		// Check for empty test condition
@@ -289,18 +294,22 @@ export class CustomMetricThresholdBuilder implements Checkable {
 				this.metricsBuilder.getFiltersAsFilterArray(),
 				'extracted classes'
 			);
-			logger.logViolation(emptyViolation.toString());
-			logger.endCheck(ruleName, 1);
+			sharedLogger.logViolation(emptyViolation.toString(), options?.logging);
+			sharedLogger.endCheck(ruleName, 1, options?.logging);
 			return [emptyViolation];
 		}
 
-		logger.logProgress('Calculating custom metrics and checking thresholds');
+		sharedLogger.logProgress(
+			'Calculating custom metrics and checking thresholds',
+			options?.logging
+		);
 		for (const classInfo of filteredClasses) {
 			const metricValue = this.calculation(classInfo);
-			logger.logMetric(
+			sharedLogger.logMetric(
 				`${this.metricName} (${classInfo.name})`,
 				metricValue,
-				this.threshold
+				this.threshold,
+				options?.logging
 			);
 
 			let passes = false;
@@ -333,11 +342,11 @@ export class CustomMetricThresholdBuilder implements Checkable {
 					`${comparisonText} ${this.threshold}`
 				);
 				violations.push(violation);
-				logger.logViolation(violation.toString());
+				sharedLogger.logViolation(violation.toString(), options?.logging);
 			}
 		}
 
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
 
@@ -372,19 +381,23 @@ export class CustomMetricCondition implements Checkable {
 	) {}
 
 	async check(options?: CheckOptions): Promise<Violation[]> {
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `${this.metricName} custom metric assertion check`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Extracting class information from codebase');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Extracting class information from codebase',
+			options?.logging
+		);
 
 		const violations: Violation[] = [];
 		const allClasses = extractClassInfo(
 			this.metricsBuilder.tsConfigFilePath,
-			process.cwd(),
-			logger
+			process.cwd()
 		);
-		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
+		sharedLogger.logProgress(
+			`Extracted ${allClasses.length} classes from codebase`,
+			options?.logging
+		);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
@@ -392,8 +405,9 @@ export class CustomMetricCondition implements Checkable {
 			? filter.apply(allClasses, undefined, options)
 			: allClasses;
 
-		logger.logProgress(
-			`Applied filters, ${filteredClasses.length} classes remaining for analysis`
+		sharedLogger.logProgress(
+			`Applied filters, ${filteredClasses.length} classes remaining for analysis`,
+			options?.logging
 		);
 
 		// Check for empty test condition
@@ -402,15 +416,23 @@ export class CustomMetricCondition implements Checkable {
 				this.metricsBuilder.getFiltersAsFilterArray(),
 				'extracted classes'
 			);
-			logger.logViolation(emptyViolation.toString());
-			logger.endCheck(ruleName, 1);
+			sharedLogger.logViolation(emptyViolation.toString(), options?.logging);
+			sharedLogger.endCheck(ruleName, 1, options?.logging);
 			return [emptyViolation];
 		}
 
-		logger.logProgress('Calculating custom metrics and applying assertion logic');
+		sharedLogger.logProgress(
+			'Calculating custom metrics and applying assertion logic',
+			options?.logging
+		);
 		for (const classInfo of filteredClasses) {
 			const metricValue = this.calculation(classInfo);
-			logger.logMetric(`${this.metricName} (${classInfo.name})`, metricValue);
+			sharedLogger.logMetric(
+				`${this.metricName} (${classInfo.name})`,
+				metricValue,
+				undefined,
+				options?.logging
+			);
 
 			const passes = this.assertion(metricValue, classInfo);
 
@@ -423,11 +445,11 @@ export class CustomMetricCondition implements Checkable {
 					'failed custom assertion'
 				);
 				violations.push(violation);
-				logger.logViolation(violation.toString());
+				sharedLogger.logViolation(violation.toString(), options?.logging);
 			}
 		}
 
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
 }

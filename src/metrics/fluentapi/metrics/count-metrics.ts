@@ -2,7 +2,7 @@ import * as ts from 'typescript';
 import * as path from 'path';
 import { Violation, EmptyTestViolation } from '../../../common/assertion';
 import { Checkable, CheckOptions } from '../../../common/fluentapi';
-import { CheckLogger } from '../../../common/util';
+import { sharedLogger } from '../../../common/util';
 import { gatherMetricViolations } from '../../assertion';
 import {
 	MethodCountMetric,
@@ -380,30 +380,40 @@ export class CountThresholdBuilder implements Checkable {
 			throw new Error('Threshold and comparison must be set before checking');
 		}
 
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `${this.metric.name} count metric check (${this.comparison} ${this.threshold})`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Extracting class information from codebase');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Extracting class information from codebase',
+			options?.logging
+		);
 
 		const classes = extractClassInfo(
 			this.metricsBuilder.tsConfigFilePath,
 			process.cwd(),
-			logger
+			options
 		);
-		logger.logProgress(`Extracted ${classes.length} classes from codebase`);
+		sharedLogger.logProgress(
+			`Extracted ${classes.length} classes from codebase`,
+			options?.logging
+		);
 
 		const filteredClasses =
-			this.metricsBuilder.getFilter()?.apply(classes, logger, options) ?? classes;
+			this.metricsBuilder.getFilter()?.apply(classes, sharedLogger, options) ??
+			classes;
 
-		logger.logProgress(
-			`Applied filters, ${filteredClasses.length} classes remainitng for analysis`
+		sharedLogger.logProgress(
+			`Applied filters, ${filteredClasses.length} classes remainitng for analysis`,
+			options?.logging
 		);
 		filteredClasses.forEach((classToCheck) =>
-			logger.info(`Class under check: ${classToCheck.name}`)
+			sharedLogger.info(options?.logging, `Class under check: ${classToCheck.name}`)
 		);
 
-		logger.logProgress('Calculating count metrics and projecting to metric results');
+		sharedLogger.logProgress(
+			'Calculating count metrics and projecting to metric results',
+			options?.logging
+		);
 		const results = projectToMetricResults(
 			filteredClasses,
 			this.metric,
@@ -411,7 +421,10 @@ export class CountThresholdBuilder implements Checkable {
 			this.comparison
 		);
 
-		logger.logProgress('Gathering metric violations from results');
+		sharedLogger.logProgress(
+			'Gathering metric violations from results',
+			options?.logging
+		);
 		const violations = gatherMetricViolations(
 			results,
 			options?.allowEmptyTests,
@@ -420,10 +433,10 @@ export class CountThresholdBuilder implements Checkable {
 
 		// Log violations if enabled
 		violations.forEach((violation) => {
-			logger.logViolation(violation.toString());
+			sharedLogger.logViolation(violation.toString(), options?.logging);
 		});
 
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
 }
@@ -475,11 +488,13 @@ export class FileCountThresholdBuilder implements Checkable {
 			throw new Error('Threshold and comparison must be set before checking');
 		}
 
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `${this.metric.name} file count metric check (${this.comparison} ${this.threshold})`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Creating TypeScript program for file analysis');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Creating TypeScript program for file analysis',
+			options?.logging
+		);
 
 		const violations: Violation[] = [];
 		const program = this.createTypeScriptProgram();
@@ -489,7 +504,10 @@ export class FileCountThresholdBuilder implements Checkable {
 				(sf) => !sf.isDeclarationFile && !sf.fileName.includes('node_modules')
 			);
 
-		logger.logProgress(`Analyzing ${sourceFiles.length} source files`);
+		sharedLogger.logProgress(
+			`Analyzing ${sourceFiles.length} source files`,
+			options?.logging
+		);
 
 		// Check for empty test condition
 		if (sourceFiles.length === 0 && !options?.allowEmptyTests) {
@@ -497,8 +515,8 @@ export class FileCountThresholdBuilder implements Checkable {
 				this.metricsBuilder.getFiltersAsFilterArray(),
 				'source files'
 			);
-			logger.logViolation(emptyViolation.toString());
-			logger.endCheck(ruleName, 1);
+			sharedLogger.logViolation(emptyViolation.toString(), options?.logging);
+			sharedLogger.endCheck(ruleName, 1, options?.logging);
 			return [emptyViolation];
 		}
 
@@ -511,9 +529,17 @@ export class FileCountThresholdBuilder implements Checkable {
 				// For now, we'll include all files and let class-level filters be ignored
 			}
 
-			logger.logProgress(`Processing file: ${sourceFile.fileName}`);
+			sharedLogger.logProgress(
+				`Processing file: ${sourceFile.fileName}`,
+				options?.logging
+			);
 			const value = this.metric.calculateFromFile(sourceFile);
-			logger.logMetric(this.metric.name, value, this.threshold);
+			sharedLogger.logMetric(
+				this.metric.name,
+				value,
+				this.threshold,
+				options?.logging
+			);
 
 			const passes = this.evaluateThreshold(value);
 			if (!passes) {
@@ -525,15 +551,17 @@ export class FileCountThresholdBuilder implements Checkable {
 					this.comparison
 				);
 				violations.push(violation);
-				logger.logViolation(violation.toString());
+				sharedLogger.logViolation(violation.toString(), options?.logging);
 			}
 		}
 
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
 	private evaluateThreshold(value: number): boolean {
-		if (!this.threshold || !this.comparison) return true;
+		if (!this.threshold || !this.comparison) {
+			return true;
+		}
 
 		switch (this.comparison) {
 			case 'below':

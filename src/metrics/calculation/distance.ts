@@ -1,5 +1,6 @@
 import { FileAnalysisResult, extractEnhancedClassInfo } from '../extraction';
 import { countDeclarations } from '../../common/util';
+import { CheckOptions } from '../../common';
 
 /**
  * Distance to Main Sequence metrics interface
@@ -272,7 +273,8 @@ export function calculateFileDistanceMetrics(
  */
 export async function calculateDistanceMetricsForProject(
 	tsConfigPath?: string,
-	projectPath?: string
+	projectPath?: string,
+	options?: CheckOptions
 ): Promise<{
 	fileResults: Array<{
 		filePath: string;
@@ -293,7 +295,11 @@ export async function calculateDistanceMetricsForProject(
 		filesOnMainSequence: number; // files with distance < 0.1
 	};
 }> {
-	const analysisResults = await extractEnhancedClassInfo(tsConfigPath, projectPath);
+	const analysisResults = await extractEnhancedClassInfo(
+		tsConfigPath,
+		projectPath,
+		options
+	);
 	const fileCount = analysisResults.length;
 
 	// Use the helper function to calculate metrics for each file

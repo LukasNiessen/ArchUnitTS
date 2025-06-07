@@ -1,312 +1,183 @@
-import { Logger, LoggingOptions, LogLevel } from '../logging';
-import * as fs from 'fs';
-import * as path from 'path';
+import { LoggingOptions, Logger } from '../logging/types';
+import { writeFileSync, appendFileSync, existsSync, mkdirSync } from 'node:fs';
+import * as path from 'node:path';
 
 /**
- * Generates a default log file path with timestamp
+ * CheckLogger is designed to output logging information during the execution of architectural checks.
+ * It creates a single log file per instance and supports both console and file logging.
  */
-function generateDefaultLogPath(): string {
-	const timestamp = new Date()
-		.toISOString()
-		.replace(/[:.]/g, '-') // Replace colons and dots with hyphens
-		.replace('T', '_') // Replace T with underscore
-		.slice(0, -5); // Remove milliseconds and Z
-
-	return path.join('logs', `archunit-${timestamp}.log`);
-}
-
-/**
- * Logger that writes to both console and file
- */
-export class FileLogger implements Logger {
-	private readonly consoleLogger: DefaultLogger;
-	private readonly filePath: string;
-	private readonly append: boolean;
-	private logFileInitialized = false;
-
-	constructor(filePath: string, level: LogLevel = 'info', append = false) {
-		this.consoleLogger = new DefaultLogger(level);
-		this.filePath = filePath;
-		this.append = append;
-
-		// Initialize log file
-		this.initializeLogFile();
+class CheckLogger implements Logger {
+	private readonly logFilePath: string;
+	private isFileInitialized = false;
+	constructor() {
+		// Auto-assign log file path with timestamp in logs directory
+		const now = new Date();
+		const timestamp = now
+			.toISOString()
+			.replace(/T/, '_')
+			.replace(/:/g, '-')
+			.replace(/\.\d{3}Z$/, '');
+		this.logFilePath = path.join(process.cwd(), 'logs', `archunit-${timestamp}.log`);
 	}
-	private initializeLogFile(): void {
-		try {
+
+	/**
+	 * Determines whether to log to console based on options
+	 */
+	private shouldLogToConsole(options?: LoggingOptions): boolean {
+		return options?.enabled || false;
+	}
+
+	/**
+	 * Determines whether to log to file based on options
+	 */
+	private shouldLogToFile(options?: LoggingOptions): boolean {
+		return options?.enabled === true && options?.logFile === true;
+	} /**
+	 * Prepares file for writing if needed
+	 */
+	private prepareFileWriting(options?: LoggingOptions): void {
+		if (!this.shouldLogToFile(options)) {
+			return;
+		}
+
+		if (!this.isFileInitialized) {
+			const append = options?.appendToLogFile ?? true;
+			const dir = path.dirname(this.logFilePath);
+
 			// Ensure directory exists
-			const dir = path.dirname(this.filePath);
-			if (!fs.existsSync(dir)) {
-				fs.mkdirSync(dir, { recursive: true });
+			if (!existsSync(dir)) {
+				mkdirSync(dir, { recursive: true });
 			}
 
-			// Create or clear log file
-			if (!this.append || !fs.existsSync(this.filePath)) {
-				fs.writeFileSync(this.filePath, '');
+			if (!append || !existsSync(this.logFilePath)) {
+				// Create new file or overwrite existing
+				const sessionHeader = `ArchUnitTS Logging Session Started\n${new Date().toISOString()}\n${'='.repeat(50)}\n`;
+				writeFileSync(this.logFilePath, sessionHeader);
 			}
-
-			this.logFileInitialized = true;
-			this.writeToFile(
-				`\n=== ArchUnitTS Logging Session Started at ${new Date().toISOString()} ===\n`
-			);
-		} catch (error) {
-			console.warn(`Failed to initialize log file ${this.filePath}:`, error);
-			this.logFileInitialized = false;
+			this.isFileInitialized = true;
 		}
 	}
 
-	private writeToFile(message: string): void {
-		if (!this.logFileInitialized) return;
-
-		try {
-			fs.appendFileSync(this.filePath, message + '\n');
-		} catch (error) {
-			console.warn(`Failed to write to log file ${this.filePath}:`, error);
+	/**
+	 * Writes message to file if file logging is enabled
+	 */
+	private writeToFile(message: string, options?: LoggingOptions): void {
+		if (!this.shouldLogToFile(options)) {
+			return;
 		}
-	}
-
-	private formatLogMessage(level: LogLevel, message: string): string {
+		this.prepareFileWriting(options);
 		const timestamp = new Date().toISOString();
-		return `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+		const logEntry = `[${timestamp}] ${message}\n`;
+		appendFileSync(this.logFilePath, logEntry);
 	}
 
-	debug(message: string, ...args: unknown[]): void {
-		this.consoleLogger.debug(message, ...args);
-		const formattedMessage = this.formatLogMessage('debug', message);
-		if (args.length > 0) {
-			this.writeToFile(
-				`${formattedMessage} ${args
-					.map((arg) =>
-						typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-					)
-					.join(' ')}`
-			);
-		} else {
-			this.writeToFile(formattedMessage);
+	/**
+	 * Formats log message with level and arguments
+	 */
+	private formatMessage(level: string, message: string, args: unknown[]): string {
+		const formattedArgs =
+			args.length > 0 ? ` ${args.map((arg) => String(arg)).join(' ')}` : '';
+		return `[${level}] ${message}${formattedArgs}`;
+	}
+
+	debug(
+		options: LoggingOptions | undefined,
+		message: string,
+		...args: unknown[]
+	): void {
+		const fullMessage = this.formatMessage('DEBUG', message, args);
+
+		if (this.shouldLogToConsole(options)) {
+			console.debug(fullMessage);
 		}
+		this.writeToFile(fullMessage, options);
 	}
 
-	info(message: string, ...args: unknown[]): void {
-		this.consoleLogger.info(message, ...args);
-		const formattedMessage = this.formatLogMessage('info', message);
-		if (args.length > 0) {
-			this.writeToFile(
-				`${formattedMessage} ${args
-					.map((arg) =>
-						typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-					)
-					.join(' ')}`
-			);
-		} else {
-			this.writeToFile(formattedMessage);
+	info(options: LoggingOptions | undefined, message: string, ...args: unknown[]): void {
+		const fullMessage = this.formatMessage('INFO', message, args);
+
+		if (this.shouldLogToConsole(options)) {
+			console.info(fullMessage);
 		}
+		this.writeToFile(fullMessage, options);
 	}
 
-	warn(message: string, ...args: unknown[]): void {
-		this.consoleLogger.warn(message, ...args);
-		const formattedMessage = this.formatLogMessage('warn', message);
-		if (args.length > 0) {
-			this.writeToFile(
-				`${formattedMessage} ${args
-					.map((arg) =>
-						typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-					)
-					.join(' ')}`
-			);
-		} else {
-			this.writeToFile(formattedMessage);
+	warn(options: LoggingOptions | undefined, message: string, ...args: unknown[]): void {
+		const fullMessage = this.formatMessage('WARN', message, args);
+
+		if (this.shouldLogToConsole(options)) {
+			console.warn(fullMessage);
 		}
+		this.writeToFile(fullMessage, options);
 	}
 
-	error(message: string, ...args: unknown[]): void {
-		this.consoleLogger.error(message, ...args);
-		const formattedMessage = this.formatLogMessage('error', message);
-		if (args.length > 0) {
-			this.writeToFile(
-				`${formattedMessage} ${args
-					.map((arg) =>
-						typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-					)
-					.join(' ')}`
-			);
-		} else {
-			this.writeToFile(formattedMessage);
+	error(
+		options: LoggingOptions | undefined,
+		message: string,
+		...args: unknown[]
+	): void {
+		const fullMessage = this.formatMessage('ERROR', message, args);
+
+		if (this.shouldLogToConsole(options)) {
+			console.error(fullMessage);
 		}
-	}
-}
-
-export class DefaultLogger implements Logger {
-	private readonly level: LogLevel;
-	private readonly logLevels: Record<LogLevel, number> = {
-		debug: 0,
-		info: 1,
-		warn: 2,
-		error: 3,
-	};
-
-	constructor(level: LogLevel = 'info') {
-		this.level = level;
+		this.writeToFile(fullMessage, options);
 	}
 
-	private shouldLog(level: LogLevel): boolean {
-		return this.logLevels[level] >= this.logLevels[this.level];
+	/**
+	 * Gets the path to the log file for this logger instance
+	 */
+	getLogFilePath(): string {
+		return this.logFilePath;
 	}
 
-	private formatMessage(level: LogLevel, message: string): string {
-		const timestamp = new Date().toISOString();
-		return `[${timestamp}] [${level.toUpperCase()}] ${message}`;
-	}
-
-	debug(message: string, ...args: unknown[]): void {
-		if (this.shouldLog('debug')) {
-			console.debug(this.formatMessage('debug', message), ...args);
-		}
-	}
-
-	info(message: string, ...args: unknown[]): void {
-		if (this.shouldLog('info')) {
-			console.info(this.formatMessage('info', message), ...args);
-		}
-	}
-
-	warn(message: string, ...args: unknown[]): void {
-		if (this.shouldLog('warn')) {
-			console.warn(this.formatMessage('warn', message), ...args);
-		}
-	}
-
-	error(message: string, ...args: unknown[]): void {
-		if (this.shouldLog('error')) {
-			console.error(this.formatMessage('error', message), ...args);
-		}
-	}
-}
-
-export class CheckLogger {
-	private readonly logger: Logger;
-	private readonly options: LoggingOptions;
-	private startTime?: number;
-
-	constructor(options: LoggingOptions = {}) {
-		this.options = {
-			enabled: false,
-			level: 'info',
-			logger: new DefaultLogger(options.level),
-			logTiming: false,
-			logViolations: false,
-			logProgress: false,
-			...options,
-		};
-		// Use FileLogger if logFile option is provided
-		if (this.options.logFile) {
-			const logFilePath =
-				typeof this.options.logFile === 'string'
-					? this.options.logFile
-					: generateDefaultLogPath();
-
-			this.logger = new FileLogger(
-				logFilePath,
-				this.options.level || 'info',
-				this.options.appendToLogFile
-			);
-		} else {
-			this.logger = this.options.logger!;
-		}
-	}
-
+	// Additional specialized methods for architectural checks
 	isEnabled(): boolean {
-		return this.options.enabled === true;
+		return true; // Always enabled, controlled by options passed to individual calls
 	}
-
-	startCheck(ruleName: string): void {
-		if (!this.isEnabled()) {
-			return;
-		}
-
-		if (this.options.logTiming) {
-			this.startTime = Date.now();
-		}
-
-		this.logger.info(`Starting architecture rule check: ${ruleName}`);
+	startCheck(ruleName: string, options?: LoggingOptions): void {
+		const message = `Starting architecture rule check: ${ruleName}`;
+		this.info(options || { enabled: true }, message);
 	}
-
-	endCheck(ruleName: string, violationCount: number): void {
-		if (!this.isEnabled()) {
-			return;
-		}
-
-		let message = `Completed architecture rule check: ${ruleName} (${violationCount} violations)`;
-
-		if (this.options.logTiming && this.startTime) {
-			const duration = Date.now() - this.startTime;
-			message += ` in ${duration}ms`;
-		}
-
+	endCheck(ruleName: string, violationCount: number, options?: LoggingOptions): void {
+		const message = `Completed architecture rule check: ${ruleName} (${violationCount} violations)`;
 		if (violationCount > 0) {
-			this.logger.warn(message);
+			this.warn(options || { enabled: true }, message);
 		} else {
-			this.logger.info(message);
+			this.info(options || { enabled: true }, message);
 		}
 	}
-
-	logViolation(violation: string): void {
-		if (!this.isEnabled() || !this.options.logViolations) {
-			return;
-		}
-		this.logger.warn(`Violation found: ${violation}`);
+	logViolation(violation: string, options?: LoggingOptions): void {
+		const message = `Violation found: ${violation}`;
+		this.warn(options || { enabled: true }, message);
 	}
-
-	logProgress(message: string): void {
-		if (!this.isEnabled() || !this.options.logProgress) {
-			return;
-		}
-		this.logger.debug(message);
+	logProgress(message: string, options?: LoggingOptions): void {
+		this.debug(options || { enabled: true }, message);
 	}
-
-	logMetric(metricName: string, value: number, threshold?: number): void {
-		if (!this.isEnabled()) {
-			return;
-		}
-
+	logMetric(
+		metricName: string,
+		value: number,
+		threshold?: number,
+		options?: LoggingOptions
+	): void {
 		let message = `Metric ${metricName}: ${value}`;
 		if (threshold !== undefined) {
 			message += ` (threshold: ${threshold})`;
 		}
-
-		this.logger.debug(message);
+		this.debug(options || { enabled: true }, message);
 	}
-
-	logFileProcessing(fileName: string, matchedRules: number): void {
-		if (!this.isEnabled() || !this.options.logProgress) {
-			return;
-		}
-		this.logger.debug(`Processed file: ${fileName} (matched ${matchedRules} rules)`);
-	}
-
-	debug(message: string, ...args: unknown[]): void {
-		if (!this.isEnabled()) {
-			return;
-		}
-		this.logger.debug(message, ...args);
-	}
-
-	info(message: string, ...args: unknown[]): void {
-		if (!this.isEnabled()) {
-			return;
-		}
-		this.logger.info(message, ...args);
-	}
-
-	warn(message: string, ...args: unknown[]): void {
-		if (!this.isEnabled()) {
-			return;
-		}
-		this.logger.warn(message, ...args);
-	}
-	error(message: string, ...args: unknown[]): void {
-		if (!this.isEnabled()) {
-			return;
-		}
-		this.logger.error(message, ...args);
+	logFileProcessing(
+		fileName: string,
+		matchedRules: number,
+		options?: LoggingOptions
+	): void {
+		const message = `Processed file: ${fileName} (matched ${matchedRules} rules)`;
+		this.debug(options || { enabled: true }, message);
 	}
 }
+
+// Shared logger instance used across all architecture checks
+export const sharedLogger = new CheckLogger();
+
+// Export the class for potential direct usage
+export { CheckLogger };

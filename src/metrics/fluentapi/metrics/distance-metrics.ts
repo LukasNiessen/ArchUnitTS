@@ -1,6 +1,6 @@
 import { Checkable, CheckOptions } from '../../../common/fluentapi';
 import { Violation, EmptyTestViolation } from '../../../common/assertion';
-import { CheckLogger } from '../../../common/util';
+import { sharedLogger } from '../../../common/util';
 import {
 	Abstractness,
 	Instability,
@@ -275,15 +275,24 @@ export class DistanceCondition implements Checkable {
 	 * Check if files violate the distance metric condition
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `${this.metric.name} distance metric check (${this.comparison} ${this.threshold})`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Analyzing project for enhanced class information');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Analyzing project for enhanced class information',
+			options?.logging
+		);
 
 		// Analyze the project
-		const analysisResults = await extractEnhancedClassInfo(this.tsConfigFilePath);
-		logger.logProgress(`Analyzed ${analysisResults.length} files from project`);
+		const analysisResults = await extractEnhancedClassInfo(
+			this.tsConfigFilePath,
+			process.cwd(),
+			options
+		);
+		sharedLogger.logProgress(
+			`Analyzed ${analysisResults.length} files from project`,
+			options?.logging
+		);
 
 		// Filter results if needed
 		let filteredResults = analysisResults;
@@ -293,16 +302,18 @@ export class DistanceCondition implements Checkable {
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFile!)
 			);
-			logger.logProgress(
-				`Filtered to target file: ${this.targetFile}, ${filteredResults.length} results remaining`
+			sharedLogger.logProgress(
+				`Filtered to target file: ${this.targetFile}, ${filteredResults.length} results remaining`,
+				options?.logging
 			);
 		} else if (this.targetFolder) {
 			filterArr.push(this.targetFolder);
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFolder!)
 			);
-			logger.logProgress(
-				`Filtered to target folder: ${this.targetFolder}, ${filteredResults.length} results remaining`
+			sharedLogger.logProgress(
+				`Filtered to target folder: ${this.targetFolder}, ${filteredResults.length} results remaining`,
+				options?.logging
 			);
 		}
 
@@ -312,18 +323,26 @@ export class DistanceCondition implements Checkable {
 				filterArr,
 				'enhanced class info'
 			);
-			logger.logViolation(emptyViolation.toString());
-			logger.endCheck(ruleName, 1);
+			sharedLogger.logViolation(emptyViolation.toString(), options?.logging);
+			sharedLogger.endCheck(ruleName, 1, options?.logging);
 			return [emptyViolation];
 		}
 
 		// Calculate metrics for each file and check threshold
-		logger.logProgress('Calculating distance metrics and checking thresholds');
+		sharedLogger.logProgress(
+			'Calculating distance metrics and checking thresholds',
+			options?.logging
+		);
 		const violations: Violation[] = [];
 
 		for (const result of filteredResults) {
 			const metricValue = this.metric.calculateForFile(result);
-			logger.logMetric(this.metric.name, metricValue, this.threshold);
+			sharedLogger.logMetric(
+				this.metric.name,
+				metricValue,
+				this.threshold,
+				options?.logging
+			);
 
 			let isViolation = false;
 
@@ -355,11 +374,11 @@ export class DistanceCondition implements Checkable {
 					comparison: this.comparison,
 				};
 				violations.push(violation);
-				logger.logViolation(violation.message);
+				sharedLogger.logViolation(violation.message, options?.logging);
 			}
 		}
 
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
 }
@@ -379,15 +398,24 @@ export class ZoneCondition implements Checkable {
 	 * Check if files are in the specified architectural zone
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `${this.zoneType.replace(/-/g, ' ')} zone check`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Analyzing project for enhanced class information');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Analyzing project for enhanced class information',
+			options?.logging
+		);
 
 		// Analyze the project
-		const analysisResults = await extractEnhancedClassInfo(this.tsConfigFilePath);
-		logger.logProgress(`Analyzed ${analysisResults.length} files from project`);
+		const analysisResults = await extractEnhancedClassInfo(
+			this.tsConfigFilePath,
+			process.cwd(),
+			options
+		);
+		sharedLogger.logProgress(
+			`Analyzed ${analysisResults.length} files from project`,
+			options?.logging
+		);
 
 		// Filter results if needed
 		let filteredResults = analysisResults;
@@ -397,16 +425,18 @@ export class ZoneCondition implements Checkable {
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFile!)
 			);
-			logger.logProgress(
-				`Filtered to target file: ${this.targetFile}, ${filteredResults.length} results remaining`
+			sharedLogger.logProgress(
+				`Filtered to target file: ${this.targetFile}, ${filteredResults.length} results remaining`,
+				options?.logging
 			);
 		} else if (this.targetFolder) {
 			filterArr.push(this.targetFolder);
 			filteredResults = analysisResults.filter((result) =>
 				result.filePath.includes(this.targetFolder!)
 			);
-			logger.logProgress(
-				`Filtered to target folder: ${this.targetFolder}, ${filteredResults.length} results remaining`
+			sharedLogger.logProgress(
+				`Filtered to target folder: ${this.targetFolder}, ${filteredResults.length} results remaining`,
+				options?.logging
 			);
 		}
 
@@ -416,13 +446,14 @@ export class ZoneCondition implements Checkable {
 				filterArr,
 				'enhanced class info'
 			);
-			logger.logViolation(emptyViolation.toString());
-			logger.endCheck(ruleName, 1);
+			sharedLogger.logViolation(emptyViolation.toString(), options?.logging);
+			sharedLogger.endCheck(ruleName, 1, options?.logging);
 			return [emptyViolation];
 		}
 
-		logger.logProgress(
-			'Calculating abstractness and instability metrics for zone analysis'
+		sharedLogger.logProgress(
+			'Calculating abstractness and instability metrics for zone analysis',
+			options?.logging
 		);
 		const abstractness = new Abstractness();
 		const instability = new Instability();
@@ -431,8 +462,18 @@ export class ZoneCondition implements Checkable {
 		for (const result of filteredResults) {
 			const abstractnessValue = abstractness.calculateForFile(result);
 			const instabilityValue = instability.calculateForFile(result);
-			logger.logMetric(`abstractness (${result.filePath})`, abstractnessValue);
-			logger.logMetric(`instability (${result.filePath})`, instabilityValue);
+			sharedLogger.logMetric(
+				`abstractness (${result.filePath})`,
+				abstractnessValue,
+				undefined,
+				options?.logging
+			);
+			sharedLogger.logMetric(
+				`instability (${result.filePath})`,
+				instabilityValue,
+				undefined,
+				options?.logging
+			);
 
 			let isViolation = false;
 
@@ -453,11 +494,11 @@ export class ZoneCondition implements Checkable {
 					instability: instabilityValue,
 				};
 				violations.push(violation);
-				logger.logViolation(violation.message);
+				sharedLogger.logViolation(violation.message, options?.logging);
 			}
 		}
 
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
 }

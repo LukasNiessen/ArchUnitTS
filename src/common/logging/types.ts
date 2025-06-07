@@ -3,10 +3,10 @@
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export interface Logger {
-	debug(message: string, ...args: unknown[]): void;
-	info(message: string, ...args: unknown[]): void;
-	warn(message: string, ...args: unknown[]): void;
-	error(message: string, ...args: unknown[]): void;
+	debug(options: LoggingOptions | undefined, message: string, ...args: unknown[]): void;
+	info(options: LoggingOptions | undefined, message: string, ...args: unknown[]): void;
+	warn(options: LoggingOptions | undefined, message: string, ...args: unknown[]): void;
+	error(options: LoggingOptions | undefined, message: string, ...args: unknown[]): void;
 }
 
 export interface LoggingOptions {
@@ -40,13 +40,12 @@ export interface LoggingOptions {
 	 */
 	logProgress?: boolean;
 	/**
-	 * File path to write logs to (in addition to console output).
-	 * Can be a string path or true to use a default timestamped log file.
+	 * If true, logs are written to a file (auto created)
 	 */
-	logFile?: string | boolean;
+	logFile?: boolean;
 
 	/**
-	 * Whether to append to existing log file or overwrite (defaults to overwrite)
+	 * Whether to append to an existing log file (true) or overwrite it (false)
 	 */
 	appendToLogFile?: boolean;
 }

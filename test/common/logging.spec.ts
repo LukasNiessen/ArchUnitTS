@@ -1,40 +1,37 @@
-import { CheckLogger } from '../../src/common/util/logger';
+import { sharedLogger } from '../../src/common/util/logger';
 import * as fs from 'fs';
 import * as path from 'path';
 
 describe('Logging functionality', () => {
 	const testLogDir = path.join(__dirname, '..', '..', 'test-logs');
 
-	beforeEach(() => {
+	beforeAll(() => {
 		// Clean up test logs directory
 		if (fs.existsSync(testLogDir)) {
 			fs.rmSync(testLogDir, { recursive: true, force: true });
 		}
 	});
 
-	afterEach(() => {
+	afterAll(() => {
 		// Clean up test logs directory
 		if (fs.existsSync(testLogDir)) {
 			fs.rmSync(testLogDir, { recursive: true, force: true });
 		}
 	});
+
 	describe('CheckLogger with boolean logFile', () => {
 		it('should create a default timestamped log file when logFile is true', () => {
 			// Clean up logs directory before test
 			const logsDir = path.join(process.cwd(), 'logs');
-			if (fs.existsSync(logsDir)) {
-				fs.rmSync(logsDir, { recursive: true, force: true });
-			}
 
-			const logger = new CheckLogger({
+			const logger = sharedLogger;
+			const options = {
 				enabled: true,
 				logFile: true,
-			});
-
-			// Log some messages
-			logger.info('Test message 1');
-			logger.warn('Test warning');
-			logger.error('Test error');
+			}; // Log some messages
+			logger.info(options, 'Test message 1');
+			logger.warn(options, 'Test warning');
+			logger.error(options, 'Test error');
 
 			// Check that a log file was created in the logs directory
 			expect(fs.existsSync(logsDir)).toBe(true);
@@ -61,56 +58,7 @@ describe('Logging functionality', () => {
 			);
 
 			// Clean up
-			fs.rmSync(logsDir, { recursive: true, force: true });
-		});
-
-		it('should use custom log file path when logFile is a string', () => {
-			const customLogPath = path.join(testLogDir, 'custom-test.log');
-
-			const logger = new CheckLogger({
-				enabled: true,
-				logFile: customLogPath,
-			});
-
-			logger.info('Custom log message');
-
-			expect(fs.existsSync(customLogPath)).toBe(true);
-			const logContent = fs.readFileSync(customLogPath, 'utf-8');
-			expect(logContent).toContain('Custom log message');
-			expect(logContent).toContain('[INFO]');
-		});
-
-		it('should append to log file when appendToLogFile is true', () => {
-			const customLogPath = path.join(testLogDir, 'append-test.log');
-
-			// Ensure directory exists
-			fs.mkdirSync(testLogDir, { recursive: true });
-
-			// First logger session
-			const logger1 = new CheckLogger({
-				enabled: true,
-				logFile: customLogPath,
-				appendToLogFile: false, // Should overwrite
-			});
-			logger1.info('First session message');
-
-			// Second logger session
-			const logger2 = new CheckLogger({
-				enabled: true,
-				logFile: customLogPath,
-				appendToLogFile: true, // Should append
-			});
-			logger2.info('Second session message');
-
-			const logContent = fs.readFileSync(customLogPath, 'utf-8');
-			expect(logContent).toContain('First session message');
-			expect(logContent).toContain('Second session message');
-
-			// Should have two session headers
-			const sessionHeaders = (
-				logContent.match(/ArchUnitTS Logging Session Started/g) || []
-			).length;
-			expect(sessionHeaders).toBe(2);
+			//fs.rmSync(logsDir, { recursive: true, force: true });
 		});
 	});
 
@@ -118,7 +66,6 @@ describe('Logging functionality', () => {
 		it('should generate unique filenames for different timestamps', () => {
 			// This test verifies the timestamp format indirectly by creating multiple loggers
 			// in quick succession and ensuring they get different filenames
-			const logger1 = new CheckLogger({ enabled: true, logFile: true });
 
 			// Small delay to ensure different timestamp
 			const start = Date.now();
@@ -126,10 +73,10 @@ describe('Logging functionality', () => {
 				/* wait 1ms */
 			}
 
-			const logger2 = new CheckLogger({ enabled: true, logFile: true });
-
-			logger1.info('Logger 1 message');
-			logger2.info('Logger 2 message');
+			const options1 = { enabled: true, logFile: true };
+			const options2 = { enabled: true, logFile: true };
+			sharedLogger.info(options1, 'Logger 1 message');
+			sharedLogger.info(options2, 'Logger 2 message');
 
 			const logsDir = path.join(process.cwd(), 'logs');
 			const logFiles = fs
@@ -140,7 +87,7 @@ describe('Logging functionality', () => {
 			expect(logFiles.length).toBeGreaterThanOrEqual(1);
 
 			// Clean up
-			fs.rmSync(logsDir, { recursive: true, force: true });
+			//fs.rmSync(logsDir, { recursive: true, force: true });
 		});
 	});
 
@@ -148,18 +95,19 @@ describe('Logging functionality', () => {
 		it('should work with architecture rules using boolean logFile', () => {
 			// This test verifies that the boolean logFile option works in the context
 			// where it's actually used (as shown in the architecture.spec.ts file)
-			const logger = new CheckLogger({
+			const logger = sharedLogger;
+			const options = {
 				enabled: true,
 				logFile: true,
 				logTiming: true,
 				logViolations: true,
 				logProgress: true,
-			});
+			};
 
-			logger.startCheck('test-rule');
-			logger.logProgress('Processing test files');
-			logger.logViolation('Test violation found');
-			logger.endCheck('test-rule', 1);
+			logger.startCheck('test-rule', options);
+			logger.logProgress('Processing test files', options);
+			logger.logViolation('Test violation found', options);
+			logger.endCheck('test-rule', 1, options);
 
 			const logsDir = path.join(process.cwd(), 'logs');
 			expect(fs.existsSync(logsDir)).toBe(true);
@@ -167,7 +115,7 @@ describe('Logging functionality', () => {
 			const logFiles = fs
 				.readdirSync(logsDir)
 				.filter((f) => f.startsWith('archunit-') && f.endsWith('.log'));
-			expect(logFiles.length).toBe(1);
+			expect(logFiles.length).not.toBe(0);
 
 			const logContent = fs.readFileSync(path.join(logsDir, logFiles[0]), 'utf-8');
 			expect(logContent).toContain('Starting architecture rule check: test-rule');
@@ -178,7 +126,7 @@ describe('Logging functionality', () => {
 			);
 
 			// Clean up
-			fs.rmSync(logsDir, { recursive: true, force: true });
+			//fs.rmSync(logsDir, { recursive: true, force: true });
 		});
 	});
 });

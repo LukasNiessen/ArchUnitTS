@@ -1,7 +1,7 @@
 import { ProjectedEdge } from '../../common/projection/project-edges';
 import { projectCycles } from '../../common/projection/project-cycles';
 import { Violation } from '../../common/assertion/violation';
-import { CheckLogger } from '../../common/util/logger';
+import { sharedLogger } from '../../common/util/logger';
 import { CheckOptions } from '../../common/fluentapi/checkable';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
 import { Filter } from '../../common/type';
@@ -20,8 +20,6 @@ export const gatherCycleViolations = (
 	preconditionFilters: Filter[],
 	options?: CheckOptions
 ): (ViolatingCycle | EmptyTestViolation)[] => {
-	const logger = new CheckLogger(options?.logging);
-
 	// Check for empty test if no edges match preconditions
 	/**
 	 * Important note. Empty checks are a very difficult topic for cycle free checks.
@@ -45,7 +43,10 @@ export const gatherCycleViolations = (
 			matchesAllPatterns(edge.targetLabel, preconditionFilters)
 	);
 	filteredEdges.forEach((edge) =>
-		logger.info(`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`)
+		sharedLogger.info(
+			options?.logging,
+			`Edge under check: From ${edge.sourceLabel} to ${edge.targetLabel}`
+		)
 	);
 
 	const projectedCycles = projectCycles(filteredEdges);

@@ -1,6 +1,6 @@
 import { Violation, EmptyTestViolation } from '../../common/assertion';
 import { ProjectedNode } from '../../common/projection';
-import { CheckLogger } from '../../common/util';
+import { sharedLogger } from '../../common/util';
 import { CheckOptions } from '../../common/fluentapi';
 import { Filter } from '../../common';
 import { getPatternString } from '../../common/regex-factory';
@@ -39,8 +39,6 @@ export const gatherRegexMatchingViolations = (
 	isNegated: boolean,
 	options?: CheckOptions
 ): (ViolatingNode | EmptyTestViolation)[] => {
-	const logger = new CheckLogger(options?.logging);
-
 	const violations: ViolatingNode[] = [];
 
 	// Use matching for precondition patterns to maintain compatibility
@@ -54,7 +52,9 @@ export const gatherRegexMatchingViolations = (
 		return [new EmptyTestViolation(preconditionFilters)];
 	}
 
-	filteredFiles.forEach((node) => logger.info(`File under check: ${node.label}`));
+	filteredFiles.forEach((node) =>
+		sharedLogger.info(options?.logging, `File under check: ${node.label}`)
+	);
 
 	filteredFiles.forEach((file) => {
 		const matches = matchesPattern(file.label, filter);

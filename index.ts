@@ -7,11 +7,7 @@ export * from './src/files';
 export * from './src/metrics';
 
 // Graph extraction and debugging
-export {
-	extractGraph,
-	clearGraphCache,
-	setGraphExtractionLogger,
-} from './src/common/extraction';
+export { extractGraph, clearGraphCache } from './src/common/extraction';
 
 // Testing framework integrations
 export * from './src/testing';

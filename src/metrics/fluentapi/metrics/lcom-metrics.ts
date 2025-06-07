@@ -1,6 +1,6 @@
 import { Violation } from '../../../common/assertion';
 import { Checkable, CheckOptions } from '../../../common/fluentapi';
-import { CheckLogger } from '../../../common/util';
+import { sharedLogger } from '../../../common/util';
 import { gatherMetricViolations } from '../../assertion';
 import {
 	LCOM96a,
@@ -268,29 +268,39 @@ export class MetricCondition implements Checkable {
 	 * Check if classes violate the metric condition
 	 */
 	public async check(options?: CheckOptions): Promise<Violation[]> {
-		const logger = new CheckLogger(options?.logging);
 		const ruleName = `${this.metric.name} metric check (${this.comparison} ${this.threshold})`;
 
-		logger.startCheck(ruleName);
-		logger.logProgress('Extracting class information from codebase');
+		sharedLogger.startCheck(ruleName, options?.logging);
+		sharedLogger.logProgress(
+			'Extracting class information from codebase',
+			options?.logging
+		);
 
 		// Extract class information from the codebase with debug logging
 		const allClasses = extractClassInfo(
 			this.metricsBuilder.tsConfigFilePath,
-			process.cwd(),
-			logger
+			process.cwd()
 		);
-		logger.logProgress(`Extracted ${allClasses.length} classes from codebase`);
+		sharedLogger.logProgress(
+			`Extracted ${allClasses.length} classes from codebase`,
+			options?.logging
+		);
 
 		// Apply filters if any
 		const filter = this.metricsBuilder.getFilter();
-		const classes = filter ? filter.apply(allClasses, logger, options) : allClasses;
-		logger.logProgress(
-			`Applied filters, ${classes.length} classes remaining for analysis`
+		const classes = filter
+			? filter.apply(allClasses, sharedLogger, options)
+			: allClasses;
+		sharedLogger.logProgress(
+			`Applied filters, ${classes.length} classes remaining for analysis`,
+			options?.logging
 		);
 
 		// Project classes to metric results through the projection layer
-		logger.logProgress('Calculating metrics and projecting to metric results');
+		sharedLogger.logProgress(
+			'Calculating metrics and projecting to metric results',
+			options?.logging
+		);
 		const metricResults = projectToMetricResults(
 			classes,
 			this.metric,
@@ -299,7 +309,10 @@ export class MetricCondition implements Checkable {
 		);
 
 		// Return violations using the assertion layer
-		logger.logProgress('Gathering metric violations from results');
+		sharedLogger.logProgress(
+			'Gathering metric violations from results',
+			options?.logging
+		);
 		const violations = gatherMetricViolations(
 			metricResults,
 			options?.allowEmptyTests,
@@ -308,10 +321,10 @@ export class MetricCondition implements Checkable {
 
 		// Log violations if enabled
 		violations.forEach((violation) => {
-			logger.logViolation(violation.toString());
+			sharedLogger.logViolation(violation.toString(), options?.logging);
 		});
 
-		logger.endCheck(ruleName, violations.length);
+		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
 }
