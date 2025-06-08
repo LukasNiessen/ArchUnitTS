@@ -125,25 +125,19 @@ Many common uses cases are covered in our examples folder. Note that they are no
 
 **Layered Architecture:**
 
-- [Express BackEnd](examples/layered-architecture/express/README.md) - Complete guide for implementing layered architecture in Express.js applications
-
 - [Fastify BackEnd using a UML Diagram](examples/layered-architecture/fastify-uml/README.md) - Fastify layered architecture with UML diagram validation
 
-- [Angular FrontEnd](examples/layered-architecture/angular/README.md) - Angular frontend layered architecture patterns and rules
+**MicroServices:**
 
-**Domain Partitioning:**
+- [Express MicroServices using Nx](examples/micro-services/express/README.md) - Microservices architecture using Express and with Nx monorepo management
 
-- [Express MicroServices using Nx](examples/micro-services/express/README.md) - Microservices architecture patterns with Nx monorepo management
-
-- [Modular Monolith, Deno BackEnd](examples/domain-partitioning/deno/README.md) - Domain-driven modular monolith architecture with Deno
+**Micro Frontends:**
 
 - [React MicroFrontEnds using Nx](examples/micro-frontends/react/README.md) - Micro-frontends architecture with React and Module Federation
 
 **Clean Architecture:**
 
 - [NestJS BackEnd](examples/clean-architecture/nestjs/README.md) - Clean Architecture implementation with NestJS framework
-
-- [React FrontEnd](examples/clean-architecture/react/README.md) - Clean Architecture principles applied to React applications
 
 **Hexagonal Architecture:**
 
@@ -152,6 +146,10 @@ Many common uses cases are covered in our examples folder. Note that they are no
 **MVC:**
 
 - [Spring BackEnd](examples/mvc/spring/README.md) - Model-View-Controller architecture with Spring Boot and TypeScript frontend
+
+**Angular Example:**
+
+- [Angular FrontEnd](examples/angular-example/README.md) - A typical Angular frontend architecture
 
 ## 🐲 Example Repositories
 

@@ -1,82 +1,99 @@
-# Spring Boot MVC Architecture with ArchUnitTS
+# MVC Architecture - Spring Backend
 
-This example demonstrates how to enforce Model-View-Controller (MVC) architectural principles in a Spring Boot application using ArchUnitTS. While ArchUnitTS is primarily for TypeScript/JavaScript, this example shows how to test Spring Boot projects that might have TypeScript frontends or API documentation.
+This example demonstrates how to enforce Model-View-Controller (MVC) architectural patterns using ArchUnitTS.
+
+_Note: This is a brief and incomplete introduction to MVC Architecture. The focus here is on showing how to test architectural rules with ArchUnitTS._
 
 ## Architecture Overview
 
+MVC separates application logic into three interconnected components:
+
 ```
 src/
-├── main/
-│   ├── java/
-│   │   └── com/
-│   │       └── example/
-│   │           ├── controller/          # Controllers (View Layer)
-│   │           │   ├── UserController.java
-│   │           │   ├── ProductController.java
-│   │           │   └── OrderController.java
-│   │           ├── service/             # Business Logic Layer
-│   │           │   ├── UserService.java
-│   │           │   ├── ProductService.java
-│   │           │   └── OrderService.java
-│   │           ├── repository/          # Data Access Layer
-│   │           │   ├── UserRepository.java
-│   │           │   ├── ProductRepository.java
-│   │           │   └── OrderRepository.java
-│   │           ├── model/               # Model Layer (Entities)
-│   │           │   ├── entity/
-│   │           │   │   ├── User.java
-│   │           │   │   ├── Product.java
-│   │           │   │   └── Order.java
-│   │           │   └── dto/
-│   │           │       ├── UserDto.java
-│   │           │       ├── ProductDto.java
-│   │           │       └── OrderDto.java
-│   │           ├── config/              # Configuration
-│   │           │   ├── DatabaseConfig.java
-│   │           │   ├── SecurityConfig.java
-│   │           │   └── WebConfig.java
-│   │           └── exception/           # Exception Handling
-│   │               ├── GlobalExceptionHandler.java
-│   │               └── custom/
-│   │                   ├── UserNotFoundException.java
-│   │                   └── ValidationException.java
-│   └── resources/
-│       ├── application.yml
-│       ├── static/                      # Static Web Resources
-│       └── templates/                   # View Templates (if using server-side rendering)
-├── frontend/                           # TypeScript Frontend (React/Angular/Vue)
-│   ├── src/
-│   │   ├── components/                 # View Components
-│   │   │   ├── user/
-│   │   │   │   ├── UserList.tsx
-│   │   │   │   ├── UserForm.tsx
-│   │   │   │   └── UserDetail.tsx
-│   │   │   ├── product/
-│   │   │   └── order/
-│   │   ├── services/                   # API Service Layer
-│   │   │   ├── UserService.ts
-│   │   │   ├── ProductService.ts
-│   │   │   └── ApiClient.ts
-│   │   ├── models/                     # TypeScript Models/DTOs
-│   │   │   ├── User.ts
-│   │   │   ├── Product.ts
-│   │   │   └── Order.ts
-│   │   ├── controllers/                # Frontend Controllers/State Management
-│   │   │   ├── UserController.ts
-│   │   │   ├── ProductController.ts
-│   │   │   └── OrderController.ts
-│   │   └── types/                      # TypeScript Type Definitions
-│   │       ├── api.types.ts
-│   │       └── common.types.ts
-│   ├── api-docs/                       # API Documentation (TypeScript)
-│   │   ├── openapi.ts
-│   │   ├── user-api.spec.ts
-│   │   └── product-api.spec.ts
-│   └── tests/
-│       └── architecture/
-└── tests/
-    └── architecture/
+├── models/      # Data and business logic
+├── views/       # User interface components
+├── controllers/ # Input handling and coordination
 ```
+
+## Essential Architecture Tests
+
+```typescript
+import { projectFiles, projectSlices } from 'archunit';
+
+describe('MVC Architecture Tests', () => {
+  it('controllers should not depend on views', async () => {
+    const rule = projectFiles()
+      .inFolder('src/controllers/**')
+      .shouldNot()
+      .dependOnFiles()
+      .inFolder('src/views/**');
+
+    await expect(rule).toPassAsync();
+  });
+
+  it('views should not depend on models directly', async () => {
+    const rule = projectFiles()
+      .inFolder('src/views/**')
+      .shouldNot()
+      .dependOnFiles()
+      .inFolder('src/models/**');
+
+    await expect(rule).toPassAsync();
+  });
+
+  it('should adhere to MVC structure', async () => {
+    const diagram = `
+@startuml
+component [controllers]
+component [models]
+component [views]
+
+[controllers] --> [models]
+[controllers] --> [views]
+@enduml`;
+
+    const rule = projectSlices().definedBy('src/(**)').should().adhereToDiagram(diagram);
+
+    await expect(rule).toPassAsync();
+  });
+
+  it('should have no circular dependencies', async () => {
+    const rule = projectFiles().inFolder('src/**').should().haveNoCycles();
+
+    await expect(rule).toPassAsync();
+  });
+});
+```
+
+│ │ │ │ ├── UserForm.tsx
+│ │ │ │ └── UserDetail.tsx
+│ │ │ ├── product/
+│ │ │ └── order/
+│ │ ├── services/ # API Service Layer
+│ │ │ ├── UserService.ts
+│ │ │ ├── ProductService.ts
+│ │ │ └── ApiClient.ts
+│ │ ├── models/ # TypeScript Models/DTOs
+│ │ │ ├── User.ts
+│ │ │ ├── Product.ts
+│ │ │ └── Order.ts
+│ │ ├── controllers/ # Frontend Controllers/State Management
+│ │ │ ├── UserController.ts
+│ │ │ ├── ProductController.ts
+│ │ │ └── OrderController.ts
+│ │ └── types/ # TypeScript Type Definitions
+│ │ ├── api.types.ts
+│ │ └── common.types.ts
+│ ├── api-docs/ # API Documentation (TypeScript)
+│ │ ├── openapi.ts
+│ │ ├── user-api.spec.ts
+│ │ └── product-api.spec.ts
+│ └── tests/
+│ └── architecture/
+└── tests/
+└── architecture/
+
+````
 
 ## Key Architectural Rules
 
@@ -142,7 +159,7 @@ describe('Frontend MVC Architecture Rules', () => {
     await expect(rule).toPassAsync();
   });
 });
-```
+````
 
 ### 2. Model Layer Rules
 

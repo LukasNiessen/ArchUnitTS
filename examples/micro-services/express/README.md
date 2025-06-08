@@ -1,32 +1,31 @@
-# Micro-Services Architecture - Express with Nx
+# Microservices Architecture - Express with Nx
 
-This example demonstrates how to enforce micro-services architecture patterns in an Express.js monorepo using Nx and ArchUnitTS.
+This example demonstrates how to enforce microservices architecture patterns in an Express.js monorepo using Nx and ArchUnitTS.
+
+_Note: This is a brief and incomplete introduction to Microservices Architecture. The focus here is on showing how to test architectural rules with ArchUnitTS._
 
 ## Architecture Overview
 
-Nx workspaces provide excellent support for micro-services architecture with clear boundaries between services:
+Microservices architecture decomposes applications into small, independent services:
 
 ```
 apps/
-├── user-service/        # User management service
-├── product-service/     # Product catalog service
-├── order-service/       # Order processing service
-└── gateway-service/     # API Gateway
+├── user-service/       # User management service
+├── product-service/    # Product catalog service
+├── order-service/      # Order processing service
+└── api-gateway/        # API Gateway
 libs/
-├── shared-models/       # Common data models
-├── shared-utils/        # Utility functions
-└── event-bus/          # Event-driven communication
+├── shared/             # Shared libraries
+└── events/             # Event communication
 ```
 
-## Service Boundary Rules
-
-### 1. Service Independence
+## Essential Architecture Tests
 
 ```typescript
-import { projectFiles } from 'archunit';
+import { projectFiles, nxProjectSlices } from 'archunit';
 
-describe('Micro-Services Boundaries', () => {
-  it('services should not directly depend on other services', async () => {
+describe('Microservices Architecture Tests', () => {
+  it('services should not depend on each other', async () => {
     const rule = projectFiles()
       .inFolder('apps/user-service/**')
       .shouldNot()
@@ -36,27 +35,44 @@ describe('Micro-Services Boundaries', () => {
     await expect(rule).toPassAsync();
   });
 
-  it('product service should be independent', async () => {
-    const rule = projectFiles()
-      .inFolder('apps/product-service/**')
+  it('should respect Nx project boundaries', async () => {
+    const rule = nxProjectSlices()
+      .matching('user-service')
       .shouldNot()
-      .dependOnFiles()
-      .inFolder('apps/{user-service,order-service}/**');
+      .dependOnSlices()
+      .matching('product-service');
 
     await expect(rule).toPassAsync();
   });
 
-  it('order service should be independent', async () => {
+  it('shared libraries can be used by services', async () => {
     const rule = projectFiles()
-      .inFolder('apps/order-service/**')
-      .shouldNot()
+      .inFolder('apps/**')
+      .should()
       .dependOnFiles()
-      .inFolder('apps/{user-service,product-service}/**');
+      .inFolder('libs/shared/**');
+
+    await expect(rule).toPassAsync();
+  });
+
+  it('should have no circular dependencies', async () => {
+    const rule = nxProjectSlices().should().haveNoCycles();
 
     await expect(rule).toPassAsync();
   });
 });
 ```
+
+      .shouldNot()
+      .dependOnFiles()
+      .inFolder('apps/{user-service,product-service}/**');
+
+    await expect(rule).toPassAsync();
+
+});
+});
+
+````
 
 ### 2. Shared Library Usage
 
@@ -90,7 +106,7 @@ describe('Shared Libraries', () => {
     await expect(rule).toPassAsync();
   });
 });
-```
+````
 
 ### 3. API Gateway Rules
 

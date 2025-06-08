@@ -1,119 +1,138 @@
-# Express Hexagonal Architecture with ArchUnitTS
+# Hexagonal Architecture - Express Backend
 
-This example demonstrates how to enforce Hexagonal Architecture (Ports and Adapters) principles in an Express.js application using ArchUnitTS. Hexagonal Architecture isolates the core business logic from external concerns through well-defined ports and adapters.
+This example demonstrates how to enforce Hexagonal Architecture (Ports and Adapters) patterns in an Express.js backend application using ArchUnitTS.
+
+_Note: This is a brief and incomplete introduction to Hexagonal Architecture. The focus here is on showing how to test architectural rules with ArchUnitTS._
 
 ## Architecture Overview
 
+Hexagonal Architecture isolates the core business logic from external concerns using ports (interfaces) and adapters (implementations):
+
 ```
 src/
-├── domain/                     # Core Business Logic (Hexagon Center)
-│   ├── entities/
-│   │   ├── User.ts
-│   │   ├── Product.ts
-│   │   └── Order.ts
-│   ├── value-objects/
-│   │   ├── Email.ts
-│   │   ├── Money.ts
-│   │   └── Address.ts
-│   ├── services/               # Domain Services
-│   │   ├── UserDomainService.ts
-│   │   ├── ProductDomainService.ts
-│   │   └── OrderDomainService.ts
-│   └── events/
-│       ├── UserCreated.ts
-│       ├── OrderPlaced.ts
-│       └── ProductUpdated.ts
-├── application/                # Application Core
-│   ├── use-cases/              # Application Services
-│   │   ├── user/
-│   │   │   ├── CreateUserUseCase.ts
-│   │   │   ├── GetUserUseCase.ts
-│   │   │   └── UpdateUserUseCase.ts
-│   │   ├── product/
-│   │   └── order/
-│   └── ports/                  # Interfaces (Primary & Secondary Ports)
-│       ├── primary/            # Driver Ports (API interfaces)
-│       │   ├── UserService.ts
-│       │   ├── ProductService.ts
-│       │   └── OrderService.ts
-│       └── secondary/          # Driven Ports (Repository/External service interfaces)
-│           ├── repositories/
-│           │   ├── UserRepository.ts
-│           │   ├── ProductRepository.ts
-│           │   └── OrderRepository.ts
-│           ├── services/
-│           │   ├── EmailService.ts
-│           │   ├── PaymentService.ts
-│           │   └── NotificationService.ts
-│           └── messaging/
-│               ├── EventPublisher.ts
-│               └── EventConsumer.ts
-├── infrastructure/             # Adapters (Secondary/Driven Adapters)
-│   ├── persistence/            # Database Adapters
-│   │   ├── mongodb/
-│   │   │   ├── MongoUserRepository.ts
-│   │   │   ├── MongoProductRepository.ts
-│   │   │   └── connection.ts
-│   │   └── postgres/
-│   │       ├── PostgresUserRepository.ts
-│   │       └── connection.ts
-│   ├── external-services/      # External Service Adapters
-│   │   ├── email/
-│   │   │   ├── SendGridEmailService.ts
-│   │   │   └── SMTPEmailService.ts
-│   │   ├── payment/
-│   │   │   ├── StripePaymentService.ts
-│   │   │   └── PayPalPaymentService.ts
-│   │   └── notification/
-│   │       ├── SlackNotificationService.ts
-│   │       └── PushNotificationService.ts
-│   ├── messaging/              # Message Bus Adapters
-│   │   ├── rabbitmq/
-│   │   │   ├── RabbitMQEventPublisher.ts
-│   │   │   └── RabbitMQEventConsumer.ts
-│   │   └── redis/
-│   │       ├── RedisEventPublisher.ts
-│   │       └── connection.ts
-│   └── config/
-│       ├── database.ts
-│       ├── messaging.ts
-│       └── external-services.ts
-├── adapters/                   # Primary Adapters (Driver Adapters)
-│   ├── web/                    # HTTP/REST Adapters
-│   │   ├── controllers/
-│   │   │   ├── UserController.ts
-│   │   │   ├── ProductController.ts
-│   │   │   └── OrderController.ts
-│   │   ├── routes/
-│   │   │   ├── userRoutes.ts
-│   │   │   ├── productRoutes.ts
-│   │   │   └── orderRoutes.ts
-│   │   ├── middleware/
-│   │   │   ├── authMiddleware.ts
-│   │   │   ├── validationMiddleware.ts
-│   │   │   └── errorMiddleware.ts
-│   │   └── dto/
-│   │       ├── CreateUserDto.ts
-│   │       ├── UpdateUserDto.ts
-│   │       └── UserResponseDto.ts
-│   ├── graphql/                # GraphQL Adapters
-│   │   ├── resolvers/
-│   │   │   ├── UserResolver.ts
-│   │   │   └── ProductResolver.ts
-│   │   └── schema/
-│   │       ├── userSchema.ts
-│   │       └── productSchema.ts
-│   ├── cli/                    # Command Line Adapters
-│   │   ├── commands/
-│   │   │   ├── SeedDataCommand.ts
-│   │   │   └── MigrateCommand.ts
-│   │   └── CommandRunner.ts
-│   └── messaging/              # Message Consumer Adapters
-│       ├── EventHandler.ts
-│       └── CommandHandler.ts
-└── tests/
-    └── architecture/
+├── core/          # Business logic (center of hexagon)
+├── ports/         # Interfaces defining contracts
+├── adapters/      # Implementations of ports
+│   ├── primary/   # Driving adapters (controllers, CLI)
+│   └── secondary/ # Driven adapters (databases, external APIs)
 ```
+
+## Essential Architecture Tests
+
+```typescript
+import { projectFiles, projectSlices } from 'archunit';
+
+describe('Hexagonal Architecture Tests', () => {
+  it('core should not depend on adapters', async () => {
+    const rule = projectFiles()
+      .inFolder('src/core/**')
+      .shouldNot()
+      .dependOnFiles()
+      .inFolder('src/adapters/**');
+
+    await expect(rule).toPassAsync();
+  });
+
+  it('adapters should depend on ports', async () => {
+    const rule = projectFiles()
+      .inFolder('src/adapters/**')
+      .should()
+      .dependOnFiles()
+      .inFolder('src/ports/**');
+
+    await expect(rule).toPassAsync();
+  });
+
+  it('should adhere to hexagonal structure', async () => {
+    const diagram = `
+@startuml
+component [core]
+component [ports]
+component [adapters]
+
+[core] --> [ports]
+[adapters] --> [ports]
+@enduml`;
+
+    const rule = projectSlices().definedBy('src/(**)').should().adhereToDiagram(diagram);
+
+    await expect(rule).toPassAsync();
+  });
+
+  it('should have no circular dependencies', async () => {
+    const rule = projectFiles().inFolder('src/**').should().haveNoCycles();
+
+    await expect(rule).toPassAsync();
+  });
+});
+```
+
+│ ├── persistence/ # Database Adapters
+│ │ ├── mongodb/
+│ │ │ ├── MongoUserRepository.ts
+│ │ │ ├── MongoProductRepository.ts
+│ │ │ └── connection.ts
+│ │ └── postgres/
+│ │ ├── PostgresUserRepository.ts
+│ │ └── connection.ts
+│ ├── external-services/ # External Service Adapters
+│ │ ├── email/
+│ │ │ ├── SendGridEmailService.ts
+│ │ │ └── SMTPEmailService.ts
+│ │ ├── payment/
+│ │ │ ├── StripePaymentService.ts
+│ │ │ └── PayPalPaymentService.ts
+│ │ └── notification/
+│ │ ├── SlackNotificationService.ts
+│ │ └── PushNotificationService.ts
+│ ├── messaging/ # Message Bus Adapters
+│ │ ├── rabbitmq/
+│ │ │ ├── RabbitMQEventPublisher.ts
+│ │ │ └── RabbitMQEventConsumer.ts
+│ │ └── redis/
+│ │ ├── RedisEventPublisher.ts
+│ │ └── connection.ts
+│ └── config/
+│ ├── database.ts
+│ ├── messaging.ts
+│ └── external-services.ts
+├── adapters/ # Primary Adapters (Driver Adapters)
+│ ├── web/ # HTTP/REST Adapters
+│ │ ├── controllers/
+│ │ │ ├── UserController.ts
+│ │ │ ├── ProductController.ts
+│ │ │ └── OrderController.ts
+│ │ ├── routes/
+│ │ │ ├── userRoutes.ts
+│ │ │ ├── productRoutes.ts
+│ │ │ └── orderRoutes.ts
+│ │ ├── middleware/
+│ │ │ ├── authMiddleware.ts
+│ │ │ ├── validationMiddleware.ts
+│ │ │ └── errorMiddleware.ts
+│ │ └── dto/
+│ │ ├── CreateUserDto.ts
+│ │ ├── UpdateUserDto.ts
+│ │ └── UserResponseDto.ts
+│ ├── graphql/ # GraphQL Adapters
+│ │ ├── resolvers/
+│ │ │ ├── UserResolver.ts
+│ │ │ └── ProductResolver.ts
+│ │ └── schema/
+│ │ ├── userSchema.ts
+│ │ └── productSchema.ts
+│ ├── cli/ # Command Line Adapters
+│ │ ├── commands/
+│ │ │ ├── SeedDataCommand.ts
+│ │ │ └── MigrateCommand.ts
+│ │ └── CommandRunner.ts
+│ └── messaging/ # Message Consumer Adapters
+│ ├── EventHandler.ts
+│ └── CommandHandler.ts
+└── tests/
+└── architecture/
+
+````
 
 ## Key Architectural Rules
 
@@ -187,7 +206,7 @@ describe('Hexagonal Architecture Dependency Rules', () => {
     await expect(rule).toPassAsync();
   });
 });
-```
+````
 
 ### 2. Port and Adapter Rules
 
