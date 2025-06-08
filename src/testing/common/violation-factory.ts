@@ -12,6 +12,7 @@ import { TestViolation } from './result-factory';
 import { ColorUtils } from './color-utils';
 import { getPatternString } from '../../common/regex-factory';
 import { Filter } from '../../common';
+import path from 'path';
 
 class UnknownTestViolation implements TestViolation {
 	details: Object = Object();
@@ -23,15 +24,14 @@ class UnknownTestViolation implements TestViolation {
 
 export class ViolationFactory {
 	// Convert relative path to absolute path
-	private static getAbsolutePath(relativePath: string): string {
-		const turnedOff = true;
-		if (turnedOff) {
-			// Even when turned off, ensure we use forward slashes for better IDE compatibility
-			return relativePath.replace(/\\/g, '/');
+	private static preparePath(relativePath: string): string {
+		const makePathAbsolute = true;
+		if (!makePathAbsolute) {
+			return path.normalize(relativePath);
 		}
 		// If the path is already absolute (contains : or starts with /), return it
 		if (relativePath.includes(':') || relativePath.startsWith('/')) {
-			return relativePath.replace(/\\/g, '/'); // Ensure forward slashes
+			return path.normalize(relativePath);
 		}
 
 		// For relative paths, use Node.js path handling
@@ -40,10 +40,10 @@ export class ViolationFactory {
 			const path = require('path');
 			const cwd = process.cwd();
 			// Convert to forward slashes for better IDE clickability
-			return path.resolve(cwd, relativePath).replace(/\\/g, '/');
+			return path.normalize(path.resolve(cwd, relativePath));
 		} catch (error) {
 			// Fallback in case we're not in Node environment
-			return relativePath.replace(/\\/g, '/');
+			return path.normalize(relativePath);
 		}
 	}
 
@@ -77,7 +77,7 @@ export class ViolationFactory {
 	private static fromMetricViolation(metric: MetricViolation): TestViolation {
 		const comparisonText = this.getComparisonDescription(metric.comparison);
 		const message = `${ColorUtils.formatViolationType('Metric violation')} in class '${ColorUtils.cyan(metric.className)}':
-   File: ${ColorUtils.formatFilePath(`${this.getAbsolutePath(metric.filePath)}:1:1`)}
+   File: ${ColorUtils.formatFilePath(`${this.preparePath(metric.filePath)}:1:1`)}
    Metric: ${ColorUtils.formatMetricValue(metric.metricName)}
    Actual value: ${ColorUtils.formatMetricValue(metric.metricValue.toString())}
    Expected: ${ColorUtils.formatRule(`${comparisonText} ${metric.threshold}`)}`;
@@ -90,7 +90,7 @@ export class ViolationFactory {
 	private static fromFileCountViolation(violation: FileCountViolation): TestViolation {
 		const comparisonText = this.getComparisonDescription(violation.comparison);
 		const message = `${ColorUtils.formatViolationType('File count violation')}:
-   File: ${ColorUtils.formatFilePath(`${this.getAbsolutePath(violation.filePath)}:1:1`)}
+   File: ${ColorUtils.formatFilePath(`${this.preparePath(violation.filePath)}:1:1`)}
    Metric: ${ColorUtils.formatMetricValue(violation.metricName)}
    Actual value: ${ColorUtils.formatMetricValue(violation.metricValue.toString())}
    Expected: ${ColorUtils.formatRule(`${comparisonText} ${violation.threshold}`)}`;
@@ -104,13 +104,13 @@ export class ViolationFactory {
 		violation: CustomFileViolation
 	): TestViolation {
 		const message = `${ColorUtils.formatViolationType('Custom file condition violation')}:
-   File: ${ColorUtils.formatFilePath(`${this.getAbsolutePath(violation.fileInfo.path)}:1:1`)}
+   File: ${ColorUtils.formatFilePath(`${this.preparePath(violation.fileInfo.path)}:1:1`)}
    Rule: ${ColorUtils.formatRule(violation.message)}
    
    ${ColorUtils.dim('File details:')}
    ${ColorUtils.dim(`• Name: ${violation.fileInfo.name}`)}
    ${ColorUtils.dim(`• Extension: ${violation.fileInfo.extension}`)}
-   ${ColorUtils.dim(`• Directory: ${this.getAbsolutePath(violation.fileInfo.directory)}`)}
+   ${ColorUtils.dim(`• Directory: ${this.preparePath(violation.fileInfo.directory)}`)}
    ${ColorUtils.dim(`• Lines of code: ${violation.fileInfo.linesOfCode}`)}`;
 
 		return {
@@ -121,7 +121,7 @@ export class ViolationFactory {
 	private static fromViolatingFile(file: ViolatingNode): TestViolation {
 		const action = file.isNegated ? 'should not match' : 'should match';
 		const message = `${ColorUtils.formatViolationType('File pattern violation')}:
-   File: ${ColorUtils.formatFilePath(`${this.getAbsolutePath(file.projectedNode.label)}:1:1`)}
+   File: ${ColorUtils.formatFilePath(`${this.preparePath(file.projectedNode.label)}:1:1`)}
    Rule: ${ColorUtils.formatRule(`${action} pattern '${file.checkPattern}'`)}`;
 
 		return {
@@ -171,8 +171,8 @@ export class ViolationFactory {
 
 		// Create a comprehensive violation message
 		let message = `${ColorUtils.formatViolationType('Slice dependency violation')}:
-   From slice: ${ColorUtils.formatFilePath(`${this.getAbsolutePath(edge.projectedEdge.sourceLabel)}:1:1`)}
-   To slice: ${ColorUtils.formatFilePath(`${this.getAbsolutePath(edge.projectedEdge.targetLabel)}:1:1`)}
+   From slice: ${ColorUtils.formatFilePath(`${this.preparePath(edge.projectedEdge.sourceLabel)}:1:1`)}
+   To slice: ${ColorUtils.formatFilePath(`${this.preparePath(edge.projectedEdge.targetLabel)}:1:1`)}
    Rule: ${ColorUtils.formatRule('This dependency is not allowed')}`;
 
 		// Add detailed file-level information if available
@@ -183,7 +183,7 @@ export class ViolationFactory {
 					file.importKinds && file.importKinds.length > 0
 						? ` (${file.importKinds.join(', ')})`
 						: '';
-				message += `\n   ${index + 1}. ${ColorUtils.formatFilePath(`${this.getAbsolutePath(file.source)}:1:1`)} → ${ColorUtils.formatFilePath(`${this.getAbsolutePath(file.target)}:1:1`)}${importInfo}`;
+				message += `\n   ${index + 1}. ${ColorUtils.formatFilePath(`${this.preparePath(file.source)}:1:1`)} → ${ColorUtils.formatFilePath(`${this.preparePath(file.target)}:1:1`)}${importInfo}`;
 			});
 		}
 
@@ -207,8 +207,8 @@ export class ViolationFactory {
 		}));
 
 		let message = `${ColorUtils.formatViolationType('File dependency violation')}:
-   From pattern: ${ColorUtils.formatFilePath(`${this.getAbsolutePath(edge.dependency.sourceLabel)}:1:1`)}
-   To pattern: ${ColorUtils.formatFilePath(`${this.getAbsolutePath(edge.dependency.targetLabel)}:1:1`)}
+   From pattern: ${ColorUtils.formatFilePath(`${this.preparePath(edge.dependency.sourceLabel)}:1:1`)}
+   To pattern: ${ColorUtils.formatFilePath(`${this.preparePath(edge.dependency.targetLabel)}:1:1`)}
    Rule: ${ColorUtils.formatRule(ruleDescription)}`;
 
 		// Add detailed file-level information if available
@@ -219,7 +219,7 @@ export class ViolationFactory {
 					file.importKinds && file.importKinds.length > 0
 						? ` (${file.importKinds.join(', ')})`
 						: '';
-				message += `\n   ${index + 1}. ${ColorUtils.formatFilePath(`${this.getAbsolutePath(file.source)}:1:1`)} → ${ColorUtils.formatFilePath(`${this.getAbsolutePath(file.target)}:1:1`)}${importInfo}`;
+				message += `\n   ${index + 1}. ${ColorUtils.formatFilePath(`${this.preparePath(file.source)}:1:1`)} → ${ColorUtils.formatFilePath(`${this.preparePath(file.target)}:1:1`)}${importInfo}`;
 			});
 		}
 
@@ -232,11 +232,11 @@ export class ViolationFactory {
 		// Make each file in the cycle clickable with colors
 		const coloredCycle = cycle.cycle
 			.map((edge) =>
-				ColorUtils.formatFilePath(`${this.getAbsolutePath(edge.sourceLabel)}:1:1`)
+				ColorUtils.formatFilePath(`${this.preparePath(edge.sourceLabel)}:1:1`)
 			)
 			.concat(
 				ColorUtils.formatFilePath(
-					`${this.getAbsolutePath(cycle.cycle[cycle.cycle.length - 1].targetLabel)}:1:1`
+					`${this.preparePath(cycle.cycle[cycle.cycle.length - 1].targetLabel)}:1:1`
 				)
 			)
 			.join(` ${ColorUtils.gray('→')} `);
@@ -253,13 +253,13 @@ export class ViolationFactory {
 			message += `\n\n   ${ColorUtils.formatViolationType('Detailed cycle dependencies:')}`;
 			cycle.cycle.forEach((edge, index) => {
 				if (edge.cumulatedEdges && edge.cumulatedEdges.length > 0) {
-					message += `\n   ${index + 1}. ${ColorUtils.formatFilePath(`${this.getAbsolutePath(edge.sourceLabel)}:1:1`)} → ${ColorUtils.formatFilePath(`${this.getAbsolutePath(edge.targetLabel)}:1:1`)}`;
+					message += `\n   ${index + 1}. ${ColorUtils.formatFilePath(`${this.preparePath(edge.sourceLabel)}:1:1`)} → ${ColorUtils.formatFilePath(`${this.preparePath(edge.targetLabel)}:1:1`)}`;
 					edge.cumulatedEdges.forEach((file, fileIndex) => {
 						const importInfo =
 							file.importKinds && file.importKinds.length > 0
 								? ` (${file.importKinds.join(', ')})`
 								: '';
-						message += `\n      ${String.fromCharCode(97 + fileIndex)}. ${ColorUtils.formatFilePath(`${this.getAbsolutePath(file.source)}:1:1`)} → ${ColorUtils.formatFilePath(`${this.getAbsolutePath(file.target)}:1:1`)}${importInfo}`;
+						message += `\n      ${String.fromCharCode(97 + fileIndex)}. ${ColorUtils.formatFilePath(`${this.preparePath(file.source)}:1:1`)} → ${ColorUtils.formatFilePath(`${this.preparePath(file.target)}:1:1`)}${importInfo}`;
 					});
 				}
 			});
