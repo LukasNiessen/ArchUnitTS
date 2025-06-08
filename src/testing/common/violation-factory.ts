@@ -106,7 +106,7 @@ export class ViolationFactory {
 		const message = `${ColorUtils.formatViolationType('Custom file condition violation')}:
    File: ${ColorUtils.formatFilePath(`${this.preparePath(violation.fileInfo.path)}:1:1`)}
    Rule: ${ColorUtils.formatRule(violation.message)}
-   
+
    ${ColorUtils.dim('File details:')}
    ${ColorUtils.dim(`• Name: ${violation.fileInfo.name}`)}
    ${ColorUtils.dim(`• Extension: ${violation.fileInfo.extension}`)}
@@ -122,6 +122,7 @@ export class ViolationFactory {
 		const action = file.isNegated ? 'should not match' : 'should match';
 		const message = `${ColorUtils.formatViolationType('File pattern violation')}:
    File: ${ColorUtils.formatFilePath(`${this.preparePath(file.projectedNode.label)}:1:1`)}
+   File: (${this.preparePath(file.projectedNode.label)}:1:1)
    Rule: ${ColorUtils.formatRule(`${action} pattern '${file.checkPattern}'`)}`;
 
 		return {
@@ -146,12 +147,12 @@ export class ViolationFactory {
 		const message = `${ColorUtils.formatViolationType('Empty test violation')}:
    ${ColorUtils.formatRule('No files found matching the specified pattern(s)')}
    Patterns: ${ColorUtils.formatMetricValue(patternString)}
-   
+
    ${ColorUtils.yellow('This usually indicates:')}
    ${ColorUtils.dim('• Pattern is too restrictive or incorrect')}
    ${ColorUtils.dim('• Files might not exist in the expected location')}
    ${ColorUtils.dim('• Test is not actually testing anything')}
-   
+
    ${ColorUtils.cyan('To fix:')}
    ${ColorUtils.dim('• Verify the patterns match existing files')}
    ${ColorUtils.dim('• Use .check({ allowEmptyTests: true }) to disable this check')}`;

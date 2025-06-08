@@ -104,7 +104,7 @@ export class ColorUtils {
 		const parts = filePath.split(':');
 		if (parts.length >= 3) {
 			// We have file:line:column format
-			const file = parts.slice(0, -2).join(':').replace(/\\/g, '/'); // Handle paths with colons and ensure forward slashes
+			const file = parts.slice(0, -2).join(':'); // Handle paths with colons and ensure forward slashes
 			const line = parts[parts.length - 2];
 			const column = parts[parts.length - 1];
 
@@ -113,7 +113,7 @@ export class ColorUtils {
 		}
 
 		// Fallback: just color the whole path blue and ensure forward slashes
-		return this.blue(filePath.replace(/\\/g, '/'));
+		return this.blue(filePath);
 	}
 
 	/**
