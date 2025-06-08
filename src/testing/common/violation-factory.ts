@@ -25,7 +25,7 @@ class UnknownTestViolation implements TestViolation {
 export class ViolationFactory {
 	// Convert relative path to absolute path
 	private static preparePath(relativePath: string): string {
-		const makePathAbsolute = true;
+		const makePathAbsolute = false;
 		if (!makePathAbsolute) {
 			return path.normalize(relativePath);
 		}
