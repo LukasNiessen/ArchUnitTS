@@ -115,7 +115,8 @@ export class NegatedMatchPatternFileConditionBuilder {
 			this.filesShouldCondition.fileCondition.tsConfigFilePath,
 			condition,
 			message,
-			this.filesShouldCondition.filters
+			this.filesShouldCondition.filters,
+			this.isNegated
 		);
 	}
 }
@@ -153,7 +154,8 @@ export class PositiveMatchPatternFileConditionBuilder {
 			this.filesShouldCondition.fileCondition.tsConfigFilePath,
 			condition,
 			message,
-			this.filesShouldCondition.filters
+			this.filesShouldCondition.filters,
+			this.isNegated
 		);
 	}
 }
@@ -428,7 +430,8 @@ export class CustomFileCheckableCondition implements Checkable {
 		readonly tsConfigFilePath?: string,
 		readonly condition?: CustomFileCondition,
 		readonly message?: string,
-		readonly filters?: Filter[]
+		readonly filters?: Filter[],
+		readonly isNegated?: boolean
 	) {}
 
 	/**
@@ -473,6 +476,7 @@ export class CustomFileCheckableCondition implements Checkable {
 			this.filters || [],
 			this.condition,
 			this.message || 'Custom file condition failed',
+			this.isNegated || false,
 			options
 		);
 

@@ -1,10 +1,10 @@
 import { Violation } from '../../common/assertion/violation';
 import { ProjectedNode } from '../../common/projection/project-nodes';
 import { EmptyTestViolation } from '../../common/assertion/EmptyTestViolation';
+import { CheckOptions } from '../../..';
 import { sharedLogger } from '../../common/util/logger';
 import { matchesAllPatterns } from '../../common/pattern-matching';
 import { Filter } from '../../common/type';
-import { CheckOptions } from '../../common';
 
 // Type definitions for custom logic
 export type FileInfo = {
@@ -32,6 +32,7 @@ export const gatherCustomFileViolations = (
 	filters: Filter[],
 	condition: CustomFileCondition,
 	message: string,
+	isNegated: boolean,
 	options?: CheckOptions
 ): (CustomFileViolation | EmptyTestViolation)[] => {
 	const allowEmptyTests = options?.allowEmptyTests || false;
@@ -117,13 +118,20 @@ export const gatherCustomFileViolations = (
 			options?.logging,
 			`Evaluating custom condition for file: ${path}`
 		);
-		const isValid = condition(fileInfo);
+
+		const isPassingCondition = condition(fileInfo);
+		const isViolation = isNegated ? !isPassingCondition : isPassingCondition;
+
 		sharedLogger?.debug(
 			options?.logging,
-			`Custom condition result for '${path}': ${isValid}`
+			`Custom condition result for '${path}': ${isPassingCondition}`
+		);
+		sharedLogger?.debug(
+			options?.logging,
+			`isViolation: ${isViolation}, isNegated: ${isNegated}`
 		);
 
-		if (!isValid) {
+		if (!isViolation) {
 			sharedLogger?.warn(
 				options?.logging,
 				`Custom file condition failed for '${path}' - creating violation`
