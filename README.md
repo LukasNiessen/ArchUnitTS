@@ -1173,6 +1173,10 @@ ArchUnitTS has the following core modules.
 
 How does ArchUnitTS work under the hood? See [here](info/TECHNICAL.md) for a deep dive!
 
+### ArchUnitTS uses ArchUnitTS
+
+We used ourselves to ensure the architectural rules for this repository 😎
+
 ## 🦊 Contributing
 
 We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but with proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed. See more in [Contributing](CONTRIBUTING.md). See also our _'[Backlog](TODO.md)'_.
