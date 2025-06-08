@@ -104,16 +104,16 @@ export class ColorUtils {
 		const parts = filePath.split(':');
 		if (parts.length >= 3) {
 			// We have file:line:column format
-			const file = parts.slice(0, -2).join(':'); // Handle paths with colons
+			const file = parts.slice(0, -2).join(':').replace(/\\/g, '/'); // Handle paths with colons and ensure forward slashes
 			const line = parts[parts.length - 2];
 			const column = parts[parts.length - 1];
 
-			//return `${this.blue(file)}${this.gray(`:${line}:${column}`)}`;
-			return this.blue(`${file}(${line}:${column})`);
+			// Apply coloring separately to file path and line:column for better IDE link detection
+			return `${this.blue(file)}:${line}:${column}`;
 		}
 
-		// Fallback: just color the whole path blue
-		return this.blue(filePath);
+		// Fallback: just color the whole path blue and ensure forward slashes
+		return this.blue(filePath.replace(/\\/g, '/'));
 	}
 
 	/**

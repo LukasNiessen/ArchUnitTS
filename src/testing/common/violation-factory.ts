@@ -26,11 +26,12 @@ export class ViolationFactory {
 	private static getAbsolutePath(relativePath: string): string {
 		const turnedOff = true;
 		if (turnedOff) {
-			return relativePath;
+			// Even when turned off, ensure we use forward slashes for better IDE compatibility
+			return relativePath.replace(/\\/g, '/');
 		}
 		// If the path is already absolute (contains : or starts with /), return it
 		if (relativePath.includes(':') || relativePath.startsWith('/')) {
-			return relativePath;
+			return relativePath.replace(/\\/g, '/'); // Ensure forward slashes
 		}
 
 		// For relative paths, use Node.js path handling
@@ -38,10 +39,11 @@ export class ViolationFactory {
 		try {
 			const path = require('path');
 			const cwd = process.cwd();
-			return path.resolve(cwd, relativePath);
+			// Convert to forward slashes for better IDE clickability
+			return path.resolve(cwd, relativePath).replace(/\\/g, '/');
 		} catch (error) {
 			// Fallback in case we're not in Node environment
-			return relativePath;
+			return relativePath.replace(/\\/g, '/');
 		}
 	}
 
