@@ -5,12 +5,9 @@
 This example demonstrates enforcing component isolation, dependency rules, and code quality metrics in Angular applications using ArchUnitTS.
 
 ```typescript
-const isNgRxInjected = (file) => {
-  return (
-    file.content.match(/constructor\(.*store\s*:\s*Store</) || // Constructor injection: constructor(... , store: Store<...)
-    file.content.match(/inject\s*\(\s*Store\s*<\s*[^>]+>\s*\)/) // inject(Store<AppState>)
-  );
-};
+const isNgRxInjected = (file: FileInfo) =>
+  !!/constructor\(.*store\s*:\s*Store</.exec(file.content) || // Constructor injection: constructor(... , store: Store<...)
+  !!/inject\s*\(\s*Store\s*<\s*[^>]+>\s*\)/.exec(file.content); // inject(Store<AppState>)
 
 describe('Angular Architecture Rules', () => {
   it('components should not depend on HTTP services', async () => {
