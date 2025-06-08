@@ -35,15 +35,6 @@ describe('NestJS Clean Architecture Rules', () => {
     await expect(rule).toPassAsync();
   });
 
-  it('should maintain clean architecture layers', async () => {
-    const rule = metrics()
-      .inFolder('src/domain/**')
-      .count()
-      .methodCount()
-      .shouldBeBelow(15);
-    await expect(rule).toPassAsync();
-  });
-
   it('use cases should be focused and cohesive', async () => {
     const rule = metrics()
       .inFolder('src/application/use-cases/**')

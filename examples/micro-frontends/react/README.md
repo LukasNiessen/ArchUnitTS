@@ -26,14 +26,6 @@ describe('React Micro Frontend Architecture Rules', () => {
     await expect(rule).toPassAsync();
   });
 
-  it('apps should have module federation configuration', async () => {
-    const rule = projectFiles()
-      .inFolder('apps/**')
-      .should()
-      .adhereTo(hasModuleFederationConfig, 'Apps should have Module Federation config');
-    await expect(rule).toPassAsync();
-  });
-
   it('shared libraries should not be too large', async () => {
     const rule = metrics()
       .inFolder('libs/shared/**')

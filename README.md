@@ -127,10 +127,6 @@ Many common uses cases are covered in our examples folder. Note that they are no
 
 - [Fastify BackEnd using a UML Diagram](examples/layered-architecture/fastify-uml/README.md)
 
-**MicroServices:**
-
-- [Express MicroServices using Express and Nx](examples/micro-services/express/README.md)
-
 **Micro Frontends:**
 
 - [React Micro Frontends using Nx](examples/micro-frontends/react/README.md)
