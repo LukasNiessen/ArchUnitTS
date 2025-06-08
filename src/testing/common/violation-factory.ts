@@ -24,6 +24,10 @@ class UnknownTestViolation implements TestViolation {
 export class ViolationFactory {
 	// Convert relative path to absolute path
 	private static getAbsolutePath(relativePath: string): string {
+		const turnedOff = true;
+		if (turnedOff) {
+			return relativePath;
+		}
 		// If the path is already absolute (contains : or starts with /), return it
 		if (relativePath.includes(':') || relativePath.startsWith('/')) {
 			return relativePath;

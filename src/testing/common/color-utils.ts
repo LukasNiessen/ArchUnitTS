@@ -108,7 +108,8 @@ export class ColorUtils {
 			const line = parts[parts.length - 2];
 			const column = parts[parts.length - 1];
 
-			return `${this.blue(file)}${this.gray(`:${line}:${column}`)}`;
+			//return `${this.blue(file)}${this.gray(`:${line}:${column}`)}`;
+			return this.blue(`${file}(${line}:${column})`);
 		}
 
 		// Fallback: just color the whole path blue
