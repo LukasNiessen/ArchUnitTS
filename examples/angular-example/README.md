@@ -2,58 +2,65 @@
 
 > **Note**: This is a basic example to demonstrate ArchUnitTS capabilities. Real-world Angular applications may have more complex architectural patterns and requirements.
 
-This example demonstrates enforcing layered architecture patterns in Angular applications using ArchUnitTS.
-
-## Folder Structure
-
-```
-src/app/
-├── presentation/    # Components, directives, pipes
-├── core/           # Singletons, guards, interceptors
-├── shared/         # Shared components, utilities
-├── features/       # Feature modules
-└── data/          # Services, models, HTTP clients
-```
-
-## Essential Architecture Tests
+This example demonstrates enforcing component isolation, dependency rules, and code quality metrics in Angular applications using ArchUnitTS.
 
 ```typescript
-import { projectFiles } from 'archunit';
+const isNgRxInjected = (file) => {
+  return (
+    file.content.match(/constructor\(.*store\s*:\s*Store</) || // Constructor injection: constructor(... , store: Store<...)
+    file.content.match(/inject\s*\(\s*Store\s*<\s*[^>]+>\s*\)/) // inject(Store<AppState>)
+  );
+};
 
-describe('Angular Architecture Tests', () => {
-  it('components should not directly import HTTP services', async () => {
+describe('Angular Architecture Rules', () => {
+  it('components should not depend on HTTP services', async () => {
     const rule = projectFiles()
-      .inFolder('src/app/presentation/**')
+      .inFolder('src/app/components/**')
       .shouldNot()
-      .dependOnFiles(['**/data/**/*.service.ts']);
-
+      .dependOnFiles()
+      .inFolder('src/app/services/**')
+      .withName('*.http.ts');
     await expect(rule).toPassAsync();
   });
 
-  it('core should not depend on feature modules', async () => {
+  it('components should not inject NgRx state', async () => {
+    const rule = projectFiles()
+      .inFolder('src/app/components/**')
+      .shouldNot()
+      .adhereTo(isNgRxInjected, 'Components should not inject NgRx');
+    await expect(rule).toPassAsync();
+  });
+
+  it('core module should not depend on shared module', async () => {
     const rule = projectFiles()
       .inFolder('src/app/core/**')
       .shouldNot()
-      .dependOnFiles(['**/features/**']);
-
+      .dependOnFiles()
+      .inFolder('src/app/shared/**');
     await expect(rule).toPassAsync();
   });
 
-  it('shared should not depend on features', async () => {
-    const rule = projectFiles()
-      .inFolder('src/app/shared/**')
-      .shouldNot()
-      .dependOnFiles(['**/features/**']);
-
+  it('should not contain overly large files', async () => {
+    const rule = metrics()
+      .inFolder('src/app/**')
+      .count()
+      .linesOfCode()
+      .shouldBeBelow(1500);
     await expect(rule).toPassAsync();
   });
 
-  it('data layer should not depend on presentation', async () => {
-    const rule = projectFiles()
-      .inFolder('src/app/data/**')
-      .shouldNot()
-      .dependOnFiles(['**/presentation/**']);
+  it('should limit methods per component class', async () => {
+    const rule = metrics()
+      .inFolder('src/app/components/**')
+      .withName('*.component.ts')
+      .count()
+      .methodCount()
+      .shouldBeBelow(15);
+    await expect(rule).toPassAsync();
+  });
 
+  it('should maintain reasonable class cohesion', async () => {
+    const rule = metrics().inFolder('src/app/**').lcom().lcom96b().shouldBeBelow(0.8);
     await expect(rule).toPassAsync();
   });
 });

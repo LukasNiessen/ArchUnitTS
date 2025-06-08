@@ -125,31 +125,27 @@ Many common uses cases are covered in our examples folder. Note that they are no
 
 **Layered Architecture:**
 
-- [Fastify BackEnd using a UML Diagram](examples/layered-architecture/fastify-uml/README.md) - Fastify layered architecture with UML diagram validation
+- [Fastify BackEnd using a UML Diagram](examples/layered-architecture/fastify-uml/README.md)
 
 **MicroServices:**
 
-- [Express MicroServices using Nx](examples/micro-services/express/README.md) - Microservices architecture using Express and with Nx monorepo management
+- [Express MicroServices using Express and Nx](examples/micro-services/express/README.md)
 
 **Micro Frontends:**
 
-- [React MicroFrontEnds using Nx](examples/micro-frontends/react/README.md) - Micro-frontends architecture with React and Module Federation
+- [React Micro Frontends using Nx](examples/micro-frontends/react/README.md)
 
 **Clean Architecture:**
 
-- [NestJS BackEnd](examples/clean-architecture/nestjs/README.md) - Clean Architecture implementation with NestJS framework
+- [Clean Architecture implementation using NestJS](examples/clean-architecture/nestjs/README.md)
 
 **Hexagonal Architecture:**
 
-- [Express BackEnd](examples/hexagonal-architecture/express/README.md) - Ports and Adapters pattern implementation with Express.js
-
-**MVC:**
-
-- [Spring BackEnd](examples/mvc/spring/README.md) - Model-View-Controller architecture with Spring Boot and TypeScript frontend
+- [Hexagonal Architecture using Express](examples/hexagonal-architecture/express/README.md) - Ports and Adapters pattern implementation with Express.js
 
 **Angular Example:**
 
-- [Angular FrontEnd](examples/angular-example/README.md) - A typical Angular frontend architecture
+- [A typical Angular FrontEnd](examples/angular-example/README.md)
 
 ## 🐲 Example Repositories
 
