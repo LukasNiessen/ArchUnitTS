@@ -5,10 +5,6 @@
 This example demonstrates enforcing component isolation, dependency rules, and code quality metrics in Angular applications using ArchUnitTS.
 
 ```typescript
-const isNgRxInjected = (file: FileInfo) =>
-  !!/constructor\(.*store\s*:\s*Store</.exec(file.content) || // Constructor injection: constructor(... , store: Store<...)
-  !!/inject\s*\(\s*Store\s*<\s*[^>]+>\s*\)/.exec(file.content); // inject(Store<AppState>)
-
 describe('Angular Architecture Rules', () => {
   it('components should not depend on HTTP services', async () => {
     const rule = projectFiles()
@@ -20,11 +16,15 @@ describe('Angular Architecture Rules', () => {
     await expect(rule).toPassAsync();
   });
 
-  it('components should not inject NgRx state', async () => {
+  it('components should not dispatch to NgRx state', async () => {
+    const isStateDispatched = (file: FileInfo) =>
+      /(?:store|ngrxStore)\.dispatch\(/.test(file.content);
+
     const rule = projectFiles()
-      .inFolder('src/app/components/**')
+      .withName('*.component.ts')
       .shouldNot()
-      .adhereTo(isNgRxInjected, 'Components should not inject NgRx');
+      .adhereTo(isStateDispatched, 'Components should not dispatch to NgRx');
+
     await expect(rule).toPassAsync();
   });
 
