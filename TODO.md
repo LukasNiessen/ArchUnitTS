@@ -9,3 +9,4 @@ This our _"backlog"_. Contributions are highly welcome.
 - Check if its possible to "trick" the tests by using barrell files in a certain way for example. If so, write a guide on what to be careful with!
 - Make documentation responsive, in particular mobile friendly
 - Add more and robust integration tests
+- Logged paths, eg. from failing tests, are not clickable in IntelliJ (in VSCode they are though)
