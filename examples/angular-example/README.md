@@ -13,6 +13,7 @@ describe('Angular Architecture Rules', () => {
       .dependOnFiles()
       .inFolder('src/app/services/**')
       .withName('*.http.ts');
+
     await expect(rule).toPassAsync();
   });
 
@@ -34,6 +35,7 @@ describe('Angular Architecture Rules', () => {
       .shouldNot()
       .dependOnFiles()
       .inFolder('src/app/shared/**');
+
     await expect(rule).toPassAsync();
   });
 
@@ -43,6 +45,7 @@ describe('Angular Architecture Rules', () => {
       .count()
       .linesOfCode()
       .shouldBeBelow(1500);
+
     await expect(rule).toPassAsync();
   });
 
@@ -53,6 +56,7 @@ describe('Angular Architecture Rules', () => {
       .count()
       .methodCount()
       .shouldBeBelow(15);
+
     await expect(rule).toPassAsync();
   });
 
