@@ -1,8 +1,15 @@
 import * as ts from 'typescript';
 import * as path from 'path';
-import { Edge, extractGraph } from '../../common/extraction';
+import fs from 'fs';
+import {
+	Edge,
+	extractGraph,
+	getProjectFiles,
+	guessLocationOfTsconfig,
+} from '../../common/extraction';
 import { ClassInfo } from './interface';
-import { CheckOptions, Logger, sharedLogger } from '../../common';
+import { CheckOptions, sharedLogger, TechnicalError } from '../../common';
+import { CompilerOptions } from 'typescript';
 
 /**
  * Enhanced class information including abstractness and dependency data
@@ -42,7 +49,7 @@ export interface FileAnalysisResult {
  * Extracts class information from TypeScript source files for metrics calculation
  */
 export function extractClassInfo(
-	tsConfigFilePath?: string,
+	configFileName?: string,
 	projectPath: string = process.cwd(),
 	options?: CheckOptions
 ): ClassInfo[] {
@@ -50,63 +57,113 @@ export function extractClassInfo(
 
 	logger?.debug(
 		options?.logging,
-		`Starting class extraction with config: ${tsConfigFilePath || 'auto-detected'}`
+		`Starting class extraction with config: ${configFileName || 'auto-detected'}`
 	);
 	logger?.info(options?.logging, `Project path: ${projectPath}`);
 
-	// Get program from tsconfig or create a default one
-	const configPath = tsConfigFilePath
-		? path.resolve(projectPath, tsConfigFilePath)
-		: path.resolve(projectPath, 'tsconfig.json');
+	// // Get program from tsconfig or create a default one
+	// const configPath = tsConfigFilePath
+	// 	? path.resolve(projectPath, tsConfigFilePath)
+	// 	: path.resolve(projectPath, 'tsconfig.json');
 
-	logger?.info(options?.logging, `Using TypeScript config file: ${configPath}`);
-	logger?.debug(options?.logging, `Reading config file: ${configPath}`);
+	// logger?.info(options?.logging, `Using TypeScript config file: ${configPath}`);
+	// logger?.debug(options?.logging, `Reading config file: ${configPath}`);
 
-	const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
-	if (configFile.error) {
-		const error = `Error reading tsconfig file: ${configFile.error.messageText}`;
+	// const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
+	// if (configFile.error) {
+	// 	const error = `Error reading tsconfig file: ${configFile.error.messageText}`;
+	// 	logger?.error(options?.logging, error);
+	// 	throw new Error(error);
+	// }
+
+	// logger?.debug(options?.logging, 'Successfully read TypeScript configuration file');
+
+	// const parsedConfig = ts.parseJsonConfigFileContent(
+	// 	configFile.config,
+	// 	ts.sys,
+	// 	path.dirname(configPath),
+	// 	{},
+	// 	configPath
+	// );
+
+	// if (parsedConfig.errors.length > 0) {
+	// 	const error = `Error parsing tsconfig file: ${parsedConfig.errors[0].messageText}`;
+	// 	logger?.error(options?.logging, error);
+	// 	throw new Error(error);
+	// }
+
+	// logger?.debug(options?.logging, 'Successfully parsed TypeScript configuration');
+	// logger?.debug(
+	// 	options?.logging,
+	// 	`Compiler options: ${JSON.stringify(parsedConfig.options, null, 2).slice(0, 500)}...`
+	// );
+	// logger?.info(
+	// 	options?.logging,
+	// 	`Found ${parsedConfig.fileNames.length} files in project configuration`
+	// );
+
+	// logger?.debug(
+	// 	options?.logging,
+	// 	`Root files: ${parsedConfig.fileNames.slice(0, 10).join(', ')}${parsedConfig.fileNames.length > 10 ? `... and ${parsedConfig.fileNames.length - 10} more` : ''}`
+	// );
+
+	// logger?.debug(options?.logging, 'Creating TypeScript program');
+	// const program = ts.createProgram({
+	// 	rootNames: parsedConfig.fileNames,
+	// 	options: parsedConfig.options,
+	// });
+
+	// const sourceFiles = program.getSourceFiles();
+
+	const configFile = configFileName ?? guessLocationOfTsconfig(options);
+	if (!configFile) {
+		const error = 'Could not find configuration path';
 		logger?.error(options?.logging, error);
-		throw new Error(error);
+		throw new TechnicalError(error);
 	}
 
-	logger?.debug(options?.logging, 'Successfully read TypeScript configuration file');
+	logger?.info(options?.logging, `Using TypeScript config file: ${configFile}`);
 
-	const parsedConfig = ts.parseJsonConfigFileContent(
-		configFile.config,
-		ts.sys,
-		path.dirname(configPath),
-		{},
-		configPath
-	);
+	const config = ts.readConfigFile(configFile, (path: string) => {
+		logger?.debug(options?.logging, `Reading config file: ${path}`);
+		return fs.readFileSync(path).toString();
+	});
 
-	if (parsedConfig.errors.length > 0) {
-		const error = `Error parsing tsconfig file: ${parsedConfig.errors[0].messageText}`;
-		logger?.error(options?.logging, error);
-		throw new Error(error);
+	if (config.error) {
+		logger?.error(
+			options?.logging,
+			`Invalid config file: ${config.error.messageText}`
+		);
+		throw new TechnicalError('invalid config path');
 	}
 
 	logger?.debug(options?.logging, 'Successfully parsed TypeScript configuration');
+
+	const parsedConfig: CompilerOptions = config.config;
 	logger?.debug(
 		options?.logging,
-		`Compiler options: ${JSON.stringify(parsedConfig.options, null, 2).slice(0, 500)}...`
-	);
-	logger?.info(
-		options?.logging,
-		`Found ${parsedConfig.fileNames.length} files in project configuration`
+		`Compiler options: ${JSON.stringify(parsedConfig, null, 2).slice(0, 500)}...`
 	);
 
-	logger?.debug(
-		options?.logging,
-		`Root files: ${parsedConfig.fileNames.slice(0, 10).join(', ')}${parsedConfig.fileNames.length > 10 ? `... and ${parsedConfig.fileNames.length - 10} more` : ''}`
-	);
+	const rootDir = path.dirname(path.resolve(configFile));
+	logger?.info(options?.logging, `Project root directory: ${rootDir}`);
+
+	const compilerHost = ts.createCompilerHost(parsedConfig);
+	logger?.debug(options?.logging, 'Created TypeScript compiler host');
+
+	const files = getProjectFiles(rootDir, compilerHost, config?.config);
+
+	// --
 
 	logger?.debug(options?.logging, 'Creating TypeScript program');
 	const program = ts.createProgram({
-		rootNames: parsedConfig.fileNames,
-		options: parsedConfig.options,
+		rootNames: files ?? [],
+		options: parsedConfig,
+		host: compilerHost,
 	});
 
 	const sourceFiles = program.getSourceFiles();
+
 	logger?.info(
 		options?.logging,
 		`TypeScript program created with ${sourceFiles.length} source files`
@@ -202,6 +259,7 @@ function processSourceFile(
 				filePath: relativeFileName,
 				methods: [],
 				fields: [],
+				sourceFile: sourceFile,
 			};
 
 			let methodCount = 0;
@@ -408,6 +466,7 @@ function processSourceFileEnhanced(
 					sourceFile.fileName,
 					dependencyGraph
 				),
+				sourceFile: sourceFile,
 			};
 
 			// Process class members

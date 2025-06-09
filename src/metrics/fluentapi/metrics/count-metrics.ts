@@ -4,6 +4,7 @@ import { Violation, EmptyTestViolation } from '../../../common/assertion';
 import { Checkable, CheckOptions } from '../../../common/fluentapi';
 import { sharedLogger } from '../../../common/util';
 import { gatherMetricViolations } from '../../assertion';
+import fs from 'fs';
 import {
 	MethodCountMetric,
 	FieldCountMetric,
@@ -21,6 +22,12 @@ import { projectToMetricResults } from '../../projection';
 import { MetricsBuilder } from '../metrics';
 import { MetricComparison } from '../types';
 import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
+import {
+	getProjectFiles,
+	guessLocationOfTsconfig,
+	TechnicalError,
+} from '../../../common';
+import { CompilerOptions } from 'typescript';
 
 /**
  * File-level metric violation
@@ -403,7 +410,7 @@ export class CountThresholdBuilder implements Checkable {
 			classes;
 
 		sharedLogger.logProgress(
-			`Applied filters, ${filteredClasses.length} classes remainitng for analysis`,
+			`Applied filters, ${filteredClasses.length} classes remaining for analysis`,
 			options?.logging
 		);
 		filteredClasses.forEach((classToCheck) =>
@@ -497,20 +504,27 @@ export class FileCountThresholdBuilder implements Checkable {
 		);
 
 		const violations: Violation[] = [];
-		const program = this.createTypeScriptProgram();
-		const sourceFiles = program
-			.getSourceFiles()
-			.filter(
-				(sf) => !sf.isDeclarationFile && !sf.fileName.includes('node_modules')
-			);
+
+		const configFile =
+			this.metricsBuilder.tsConfigFilePath ?? guessLocationOfTsconfig(options);
+
+		if (!configFile) {
+			const error = 'Could not find configuration path';
+			sharedLogger.error(options?.logging, error);
+			throw new TechnicalError(error);
+		}
+
+		const classesExtracted = extractClassInfo(configFile, process.cwd(), options);
 
 		sharedLogger.logProgress(
-			`Analyzing ${sourceFiles.length} source files`,
+			`Analyzing ${classesExtracted.length} source files`,
 			options?.logging
 		);
 
+		const classes = this.metricsBuilder.getFilter()?.apply(classesExtracted) || [];
+
 		// Check for empty test condition
-		if (sourceFiles.length === 0 && !options?.allowEmptyTests) {
+		if (classes.length === 0 && !options?.allowEmptyTests) {
 			const emptyViolation = new EmptyTestViolation(
 				this.metricsBuilder.getFiltersAsFilterArray(),
 				'source files'
@@ -520,20 +534,27 @@ export class FileCountThresholdBuilder implements Checkable {
 			return [emptyViolation];
 		}
 
-		for (const sourceFile of sourceFiles) {
-			// Apply file filtering if specified
-			if (this.metricsBuilder.getFilter()) {
-				// For file-level metrics, we need to check if this file should be included
-				// This is a simplified check - in a more complete implementation,
-				// we'd need to enhance the filter system to work with files
-				// For now, we'll include all files and let class-level filters be ignored
-			}
-
+		for (const file of classes) {
 			sharedLogger.logProgress(
-				`Processing file: ${sourceFile.fileName}`,
+				`Processing file: ${file.filePath}`,
 				options?.logging
 			);
-			const value = this.metric.calculateFromFile(sourceFile);
+
+			if (!file.sourceFile) {
+				const violation = new FileCountViolation(
+					file.filePath,
+					'Unknown error: could not find source file of this file',
+					0,
+					this.threshold,
+					this.comparison
+				);
+				violations.push(violation);
+				sharedLogger.logViolation(violation.toString(), options?.logging);
+				continue;
+			}
+
+			const value = this.metric.calculateFromFile(file.sourceFile);
+
 			sharedLogger.logMetric(
 				this.metric.name,
 				value,
@@ -544,7 +565,7 @@ export class FileCountThresholdBuilder implements Checkable {
 			const passes = this.evaluateThreshold(value);
 			if (!passes) {
 				const violation = new FileCountViolation(
-					sourceFile.fileName,
+					file.filePath,
 					this.metric.name,
 					value,
 					this.threshold,
@@ -595,36 +616,57 @@ export class FileCountThresholdBuilder implements Checkable {
 		}
 	}
 
-	private createTypeScriptProgram(): ts.Program {
-		const projectPath = process.cwd();
-		const configPath = this.metricsBuilder.tsConfigFilePath
-			? path.resolve(projectPath, this.metricsBuilder.tsConfigFilePath)
-			: path.resolve(projectPath, 'tsconfig.json');
+	// private createTypeScriptProgram(options?: CheckOptions): ts.Program {
+	// 	const configFile =
+	// 		this.metricsBuilder.tsConfigFilePath ?? guessLocationOfTsconfig(options);
 
-		const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
-		if (configFile.error) {
-			throw new Error(
-				`Error reading tsconfig file: ${configFile.error.messageText}`
-			);
-		}
+	// 	if (!configFile) {
+	// 		const error = 'Could not find configuration path';
+	// 		sharedLogger.error(options?.logging, error);
+	// 		throw new TechnicalError(error);
+	// 	}
 
-		const parsedConfig = ts.parseJsonConfigFileContent(
-			configFile.config,
-			ts.sys,
-			path.dirname(configPath),
-			{},
-			configPath
-		);
+	// 	sharedLogger.info(
+	// 		options?.logging,
+	// 		`Using TypeScript config file: ${configFile}`
+	// 	);
 
-		if (parsedConfig.errors.length > 0) {
-			throw new Error(
-				`Error parsing tsconfig file: ${parsedConfig.errors[0].messageText}`
-			);
-		}
+	// 	const config = ts.readConfigFile(configFile, (path: string) => {
+	// 		sharedLogger.debug(options?.logging, `Reading config file: ${path}`);
+	// 		return fs.readFileSync(path).toString();
+	// 	});
 
-		return ts.createProgram({
-			rootNames: parsedConfig.fileNames,
-			options: parsedConfig.options,
-		});
-	}
+	// 	if (config.error) {
+	// 		sharedLogger.error(
+	// 			options?.logging,
+	// 			`Invalid config file: ${config.error.messageText}`
+	// 		);
+	// 		throw new TechnicalError('invalid config path');
+	// 	}
+
+	// 	sharedLogger.debug(
+	// 		options?.logging,
+	// 		'Successfully parsed TypeScript configuration'
+	// 	);
+
+	// 	const parsedConfig: CompilerOptions = config.config;
+	// 	sharedLogger.debug(
+	// 		options?.logging,
+	// 		`Compiler options: ${JSON.stringify(parsedConfig, null, 2).slice(0, 500)}...`
+	// 	);
+
+	// 	const rootDir = path.dirname(path.resolve(configFile));
+	// 	sharedLogger.info(options?.logging, `Project root directory: ${rootDir}`);
+
+	// 	const compilerHost = ts.createCompilerHost(parsedConfig);
+	// 	sharedLogger.debug(options?.logging, 'Created TypeScript compiler host');
+
+	// 	const files = getProjectFiles(rootDir, compilerHost, config?.config);
+
+	// 	return ts.createProgram({
+	// 		rootNames: files ?? [],
+	// 		options: parsedConfig,
+	// 		host: compilerHost,
+	// 	});
+	// }
 }

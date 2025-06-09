@@ -69,7 +69,7 @@ const guessLocationOfTsconfigRecursively = (
 	return guessLocationOfTsconfigRecursively(levelUp);
 };
 
-const getProjectFiles = (
+export const getProjectFiles = (
 	rootDir: string,
 	compilerHost: CompilerHost,
 	config: CompilerOptions & TypeAcquisition,
@@ -96,7 +96,7 @@ const getProjectFiles = (
 
 	const files = compilerHost.readDirectory(
 		rootDir,
-		['ts', 'tsx'], // IS JS EXCLUDED?
+		['ts', 'tsx'], // TODO: include js
 		config.exclude ?? [],
 		config.include ?? []
 	);

@@ -1,3 +1,5 @@
+import ts from 'typescript';
+
 export interface MethodInfo {
 	name: string;
 	accessedFields: string[];
@@ -13,6 +15,7 @@ export interface ClassInfo {
 	filePath: string;
 	methods: MethodInfo[];
 	fields: FieldInfo[];
+	sourceFile?: ts.SourceFile;
 }
 
 /**

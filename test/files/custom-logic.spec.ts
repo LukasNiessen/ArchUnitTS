@@ -42,21 +42,20 @@ describe('Custom File Logic', () => {
 	});
 
 	it.only('should create violations when custom conditions fail', async () => {
-		const containsNoDispatching = (file: FileInfo) => {
+		const containsDispatching = (file: FileInfo) => {
 			const res = /(?:store|ngrxStore)\.dispatch\(/.test(file.content);
-			// if (res) {
-			console.log('Checking: ', file.content);
-			console.log('Res: ', res);
-			console.log('------------------------');
-			// }
+			if (res) {
+				console.log('Checking: ', file.content);
+				console.log('Res: ', res);
+				console.log('------------------------');
+			}
 			return /(?:store|ngrxStore)\.dispatch\(/.test(file.content);
 		};
 		const rule = projectFiles()
 			.withName('*.ts')
-			.should()
-			.adhereTo(containsNoDispatching, 'Files should not contain ngrx dispatching');
+			.shouldNot()
+			.adhereTo(containsDispatching, 'Files should not contain ngrx dispatching');
 
-		const violations = await rule.check();
-		expect(violations).not.toBe([]);
+		await expect(rule).toPassAsync();
 	});
 });
