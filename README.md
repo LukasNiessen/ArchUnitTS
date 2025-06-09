@@ -1209,7 +1209,7 @@ File-based rules analyze import relationships between files, while class-based r
 
 • **[janMagnusHeimann](https://github.com/janMagnusHeimann)** - Maintainer
 
-• **[draugang](https://github.com/draugang)** - Maintainer
+• **[TristanKruse](https://github.com/TristanKruse)** - Maintainer
 
 ### Contributors
 
