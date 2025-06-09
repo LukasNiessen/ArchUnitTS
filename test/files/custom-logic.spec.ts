@@ -41,7 +41,7 @@ describe('Custom File Logic', () => {
 		expect(violations).not.toBe([]);
 	});
 
-	it.only('should create violations when custom conditions fail', async () => {
+	it('should create violations when custom conditions fail', async () => {
 		const containsDispatching = (file: FileInfo) =>
 			/(?:store|ngrxStore)\.dispatch\(/.test(file.content);
 
