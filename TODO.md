@@ -10,3 +10,4 @@ This our _"backlog"_. Contributions are highly welcome.
 - Make documentation responsive, in particular mobile friendly
 - Add more and robust integration tests
 - Logged paths, eg. from failing tests, are not clickable in IntelliJ (in VSCode they are though)
+- File/graph/class extraction across all modules (files and metrics in particular) is not DRY enough
