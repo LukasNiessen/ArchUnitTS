@@ -11,3 +11,4 @@ This our _"backlog"_. Contributions are highly welcome.
 - Add more and robust integration tests
 - Logged paths, eg. from failing tests, are not clickable in IntelliJ (in VSCode they are though)
 - File/graph/class extraction across all modules (files and metrics in particular) is not DRY enough
+- Sometimes there occurrs a bug when using metrics() without specifying a path. An easy workaround is to just specify the tsconfig path, however, this needs to be fixed
