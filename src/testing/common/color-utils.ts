@@ -108,8 +108,7 @@ export class ColorUtils {
 			const line = parts[parts.length - 2];
 			const column = parts[parts.length - 1];
 
-			// Apply coloring separately to file path and line:column for better IDE link detection
-			return `${this.blue(file)}:${line}:${column}`;
+			return `${this.blue(file)}${this.gray(`:${line}:${column}`)}`;
 		}
 
 		// Fallback: just color the whole path blue and ensure forward slashes

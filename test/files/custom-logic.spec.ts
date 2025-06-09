@@ -42,15 +42,9 @@ describe('Custom File Logic', () => {
 	});
 
 	it.only('should create violations when custom conditions fail', async () => {
-		const containsDispatching = (file: FileInfo) => {
-			const res = /(?:store|ngrxStore)\.dispatch\(/.test(file.content);
-			if (res) {
-				console.log('Checking: ', file.content);
-				console.log('Res: ', res);
-				console.log('------------------------');
-			}
-			return /(?:store|ngrxStore)\.dispatch\(/.test(file.content);
-		};
+		const containsDispatching = (file: FileInfo) =>
+			/(?:store|ngrxStore)\.dispatch\(/.test(file.content);
+
 		const rule = projectFiles()
 			.withName('*.ts')
 			.shouldNot()
