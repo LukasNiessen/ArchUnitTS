@@ -1201,6 +1201,10 @@ Use the filtering and targeting capabilities to exclude specific files or patter
 
 File-based rules analyze import relationships between files, while class-based rules examine dependencies between classes and their members. Choose based on your architecture validation needs.
 
+## 🐣 Origin Story
+
+While working as a consultant on an Express backend project, I needed to implement architectural fitness functions similar to how one can do it with ArchUnit. Finding no good TypeScript library for this purpose, I decided to build ArchUnitTS. With the rise of LLMs and AI integration in companies, enforcing architectural boundaries and QA in general has become more critical than ever.
+
 ## 💟 Community
 
 ### Maintainers
