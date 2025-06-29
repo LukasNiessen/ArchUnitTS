@@ -1218,7 +1218,7 @@ While working as a consultant on an Express backend project, I needed to impleme
 ### Contributors
 
 <a href="https://github.com/LukasNiessen/ArchUnitTS/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS&max=1000&contributors=7" />
+  <img src="https://contrib.rocks/image?repo=LukasNiessen/ArchUnitTS&max=1000&contributors=10" />
 </a>
 
 ### Questions
