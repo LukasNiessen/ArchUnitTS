@@ -453,10 +453,10 @@ ArchUnitTS provides two main methods for executing architecture rules.
 
 This is special syntax we have added for Jest, Vitest and Jasmine. If you're using one of these testing frameworks, you should always use `toPassAsync()`. Many benefits come with it, for example beautiful error messages in case of a failing tests.
 
-**Important:** If you're using Vitest, you must have configured Vitest with `globals: true` in your `vitest.config.ts`. See below.
+**Important:** If you're using Vitest or Jasmine, please read below!
 
 ```typescript
-// Jest/Vitest/Jasmine - Use toPassAsync()
+// Jest/Vitest
 await expect(rule).toPassAsync();
 
 // With configuration options
@@ -496,9 +496,36 @@ export default defineConfig({
 		include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
 	},
 });
-
 ```
 
+**Jasmine Hint:**
+
+If you're using Jasmine, unfortunately the full automatic set up is not possible due to Jasmine constraints. You will need just one line of code though:
+
+```typescript
+beforeEach(() => {
+  jasmine.addAsyncMatchers(jasmineMatcher);
+});
+```
+
+Include this in your spec files. And, since this is an asynchronous matcher, you must use `expectAsync` with Jasmine.
+
+```typescript
+describe('architecture', () => {
+	beforeEach(() => {
+		jasmine.addAsyncMatchers(jasmineMatcher);
+	});
+
+	it('business logic should not depend on the ui', async () => {
+		const rule = projectFiles()
+			.inFolder('business')
+			.shouldNot()
+			.dependOnFiles()
+			.inFolder('ui');
+
+		await expectAsync(rule).toPassAsync(); // expectAsync, not expect !!
+	});
+```
 
 #### `check()`
 

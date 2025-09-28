@@ -63,7 +63,6 @@ Here's how the auto-detection works (simplified from `auto-detect.ts`):
 // Auto-detect and setup all available testing frameworks
 // Each adapter function has built-in checks for framework availability
 extendJestMatchers(); // Only sets up if Jest is available
-extendJasmineMatchers(); // Only sets up if Jasmine is available
 extendVitestMatchers(); // Only sets up if Vitest is available
 ```
 

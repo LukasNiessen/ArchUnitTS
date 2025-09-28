@@ -6,6 +6,8 @@ function isJasmineProject(): boolean {
 	return typeof jasmine !== 'undefined';
 }
 
+// Not working
+/*
 export function extendJasmineMatchers(force: boolean = true) {
 	// Unless we force it, only apply extend logic if its a jasmine project
 	if (!force && !isJasmineProject()) {
@@ -23,11 +25,11 @@ export function extendJasmineMatchers(force: boolean = true) {
 	if (jasmineObj && beforeEachFn) {
 		beforeEachFn(() => {
 			jasmineObj.addMatchers!(jasmineMatcher);
-		});
 	}
 }
+*/
 
-const jasmineMatcher = {
+export const jasmineMatcher = {
 	toPassAsync: () => ({
 		compare: async (checkable: Checkable, options?: CheckOptions) => {
 			if (!checkable) {
