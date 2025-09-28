@@ -1,12 +1,12 @@
 // Auto-detect and setup all available testing frameworks
 import { extendJestMatchers } from '../jest';
-import { extendJasmineMatchers } from '../jasmine';
+//import { extendJasmineMatchers } from '../jasmine';
 import { extendVitestMatchers } from '../vitest';
 
 // Auto-detect and setup all available testing frameworks
 // Each adapter function already includes conditional checks for framework availability
 extendJestMatchers(false); // Only sets up if Jest is available
-extendJasmineMatchers(false); // Only sets up if Jasmine is available
+//extendJasmineMatchers(false); // Only sets up if Jasmine is available
 extendVitestMatchers(false); // Only sets up if Vitest is available
 
 // TODO: not working yet, needs work
