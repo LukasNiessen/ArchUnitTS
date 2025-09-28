@@ -117,6 +117,14 @@ test:
 
 ## 🚐 Setup 
 
+Installation:
+
+```bash
+npm install archunit --save-dev
+```
+
+If you're using Jest, that's it already. For Vitest, Jasmine or any other framework, please read below.
+
 We have added special syntax for Jest, Vitest and Jasmine: `toPassAsync()`. We strongly recommend using it. Many benefits come with it, for example beautiful error messages in case of a failing tests.
 
 ### Jest
@@ -166,6 +174,10 @@ describe('architecture', () => {
 		await expectAsync(rule).toPassAsync(); // expectAsync, not expect !!
 	});
 ```
+
+### Other Framework
+
+If you're not using Jest, Vitest or Jasmine, we do not have special syntax support but you can of course still use ArchUnitTS. Please read [here](#check).
 
 ## 🎬 Demo
 
