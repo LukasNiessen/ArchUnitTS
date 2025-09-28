@@ -14,9 +14,13 @@ declare global {
 	}
 }
 
-export function extendJestMatchers() {
-	// Check if we're in a Jest environment (not Vitest)
-	if (typeof expect === 'undefined' || !expect.extend || typeof jest === 'undefined') {
+function isJestProject(): boolean {
+	return typeof jest !== 'undefined';
+}
+
+export function extendJestMatchers(force: boolean): void {
+	// Unless we force it, only apply extend logic if its a jest project
+	if (!force && !isJestProject()) {
 		return;
 	}
 

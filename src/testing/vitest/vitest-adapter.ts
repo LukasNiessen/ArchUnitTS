@@ -9,9 +9,14 @@ declare global {
 	}
 }
 
-export function extendVitestMatchers() {
-	// Check if we're in a Vitest environment
-	if (typeof expect === 'undefined' || !expect.extend || !('vi' in globalThis)) {
+function isVitestProject(): boolean {
+	//return typeof process !== 'undefined' && !!process.env.VITEST;
+	return 'vi' in globalThis;
+}
+
+export function extendVitestMatchers(force = true) {
+	// Unless we force it, only apply extend logic if its a vitest project
+	if (!force && !isVitestProject()) {
 		return;
 	}
 
