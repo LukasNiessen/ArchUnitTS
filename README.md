@@ -19,7 +19,7 @@ The #1 architecture testing library for TypeScript, measured by GitHub stars.
 
 _Inspired by the amazing ArchUnit library but we are not affiliated with ArchUnit._
 
-[Documentation](https://lukasniessen.github.io/ArchUnitTS/) • [Use Cases](#-use-cases) • [Features](#-features) • [Contributing](CONTRIBUTING.md)
+[Setup](#-setup) • [Documentation](https://lukasniessen.github.io/ArchUnitTS/) • [Use Cases](#-use-cases) • [Features](#-features) • [Contributing](CONTRIBUTING.md)
 
 ## ⚡ 5 min Quickstart
 
@@ -113,6 +113,58 @@ test:
     when: always
     paths:
       - reports
+```
+
+## Setup 
+
+We have added special syntax for Jest, Vitest and Jasmine: `toPassAsync()`. We strongly recommend using it. Many benefits come with it, for example beautiful error messages in case of a failing tests.
+
+### Jest
+
+Works out of the box.
+
+### Vitest
+
+Works out of the box too, **but** you must have configured Vitest with `globals: true` in your `vitest.config.ts`. This means you need a `vitest.config.ts` file at project root with content that may look like this:
+
+```ts
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+	test: {
+		globals: true,  // This line matters !!
+		...
+	},
+});
+```
+
+### Jasmine
+
+Jasmine unfortunately has some constraints and requires minimal setup. You will need just one line of code:
+
+```typescript
+beforeEach(() => {
+  jasmine.addAsyncMatchers(jasmineMatcher);
+});
+```
+
+Include this in your test files. And, since this is an asynchronous matcher, you must use `expectAsync` with Jasmine, not `expect`. Example:
+
+```typescript
+describe('architecture', () => {
+	beforeEach(() => {
+		jasmine.addAsyncMatchers(jasmineMatcher);
+	});
+
+	it('business logic should not depend on the ui', async () => {
+		const rule = projectFiles()
+			.inFolder('business')
+			.shouldNot()
+			.dependOnFiles()
+			.inFolder('ui');
+
+		await expectAsync(rule).toPassAsync(); // expectAsync, not expect !!
+	});
 ```
 
 ## 🎬 Demo
@@ -508,7 +560,7 @@ beforeEach(() => {
 });
 ```
 
-Include this in your spec files. And, since this is an asynchronous matcher, you must use `expectAsync` with Jasmine.
+Include this in your test files. And, since this is an asynchronous matcher, you must use `expectAsync` with Jasmine.
 
 ```typescript
 describe('architecture', () => {
