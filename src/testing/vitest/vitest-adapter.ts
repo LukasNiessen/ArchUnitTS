@@ -19,6 +19,32 @@ export function extendVitestMatchers(force: boolean = true) {
 		return;
 	}
 
+	if (typeof expect === 'undefined') {
+		throw Error(`ArchUnitTS Vitest Integration Error: 'expect' is not defined globally.
+
+**Vitest Hint:**
+
+If you're using Vitest, you must have configured Vitest with \`globals: true\` in your \`vitest.config.ts\`. This means you need a \`vitest.config.ts\` file at project root with content that may look like this:
+
+\`\`\`ts
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+	test: {
+		globals: true,  // This line matters !!
+		environment: 'node',
+		coverage: {
+			provider: 'v8',
+			reporter: ['text', 'json', 'html'],
+		},
+		include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+	},
+});
+\`\`\`
+
+Without \`globals: true\`, the global \`expect\` function is not available, which prevents ArchUnitTS from extending Vitest with custom matchers like \`toPassAsync()\`.`);
+	}
+
 	expect.extend({
 		async toPassAsync(
 			checkable: Checkable,

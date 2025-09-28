@@ -453,6 +453,8 @@ ArchUnitTS provides two main methods for executing architecture rules.
 
 This is special syntax we have added for Jest, Vitest and Jasmine. If you're using one of these testing frameworks, you should always use `toPassAsync()`. Many benefits come with it, for example beautiful error messages in case of a failing tests.
 
+**Important:** If you're using Vitest, you must have configured Vitest with `globals: true` in your `vitest.config.ts`. See below.
+
 ```typescript
 // Jest/Vitest/Jasmine - Use toPassAsync()
 await expect(rule).toPassAsync();
@@ -475,6 +477,28 @@ Here `options` can be used for enabling logging, disable caching, or to not fail
   clearCache: true // reading nodes, imports etc is normally cached,
 }
 ```
+
+**Vitest Hint:**
+
+If you're using Vitest, you must have configured Vitest with `globals: true` in your `vitest.config.ts`. This means you need a `vitest.config.ts` file at project root with content that may look like this:
+
+```ts
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+	test: {
+		globals: true,  // This line matters !!
+		environment: 'node',
+		coverage: {
+			provider: 'v8',
+			reporter: ['text', 'json', 'html'],
+		},
+		include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+	},
+});
+
+```
+
 
 #### `check()`
 
