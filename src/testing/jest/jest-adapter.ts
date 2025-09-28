@@ -18,7 +18,7 @@ function isJestProject(): boolean {
 	return typeof jest !== 'undefined';
 }
 
-export function extendJestMatchers(force: boolean): void {
+export function extendJestMatchers(force: boolean = true) {
 	// Unless we force it, only apply extend logic if its a jest project
 	if (!force && !isJestProject()) {
 		return;

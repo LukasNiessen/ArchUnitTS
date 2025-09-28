@@ -6,7 +6,7 @@ function isJasmineProject(): boolean {
 	return typeof jasmine !== 'undefined';
 }
 
-export function extendJasmineMatchers(force = true): void {
+export function extendJasmineMatchers(force: boolean = true) {
 	// Unless we force it, only apply extend logic if its a jasmine project
 	if (!force && !isJasmineProject()) {
 		return;

@@ -14,7 +14,7 @@ function isVitestProject(): boolean {
 	return 'vi' in globalThis;
 }
 
-export function extendVitestMatchers(force = true) {
+export function extendVitestMatchers(force: boolean = true) {
 	// Unless we force it, only apply extend logic if its a vitest project
 	if (!force && !isVitestProject()) {
 		return;

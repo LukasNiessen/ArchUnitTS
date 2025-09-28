@@ -1,4 +1,4 @@
-// Auto-setup all testing frameworks
+// Auto-setup testing frameworks
 import './src/testing/setup';
 
 // Core functionality exports
