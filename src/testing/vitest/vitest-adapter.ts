@@ -10,8 +10,7 @@ declare global {
 }
 
 function isVitestProject(): boolean {
-	//return typeof process !== 'undefined' && !!process.env.VITEST;
-	return 'vi' in globalThis;
+	return typeof process !== 'undefined' && !!process.env.VITEST;
 }
 
 export function extendVitestMatchers(force: boolean = true) {
