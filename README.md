@@ -19,7 +19,7 @@ The #1 architecture testing library for TypeScript, measured by GitHub stars.
 
 _Inspired by the amazing ArchUnit library but we are not affiliated with ArchUnit._
 
-[Setup](#-setup) • [Documentation](https://lukasniessen.github.io/ArchUnitTS/) • [Use Cases](#-use-cases) • [Features](#-features) • [Contributing](CONTRIBUTING.md)
+[Setup](#-setup) • [Demo](#-demo) • [Use Cases](#-use-cases) • [Features](#-features) • [Why ArchUnitTS?](#-library-comparison) • [Contributing](CONTRIBUTING.md) • [Documentation](https://lukasniessen.github.io/ArchUnitTS/)
 
 ## ⚡ 5 min Quickstart
 
@@ -115,7 +115,7 @@ test:
       - reports
 ```
 
-## Setup 
+## 🚐 Setup 
 
 We have added special syntax for Jest, Vitest and Jasmine: `toPassAsync()`. We strongly recommend using it. Many benefits come with it, for example beautiful error messages in case of a failing tests.
 
@@ -140,7 +140,7 @@ export default defineConfig({
 
 ### Jasmine
 
-Jasmine unfortunately has some constraints and requires minimal setup. You will need just one line of code:
+Jasmine unfortunately has some constraints and requires minimal setup. However, you will need just one line of code:
 
 ```typescript
 beforeEach(() => {
