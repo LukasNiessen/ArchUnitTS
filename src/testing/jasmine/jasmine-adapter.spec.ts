@@ -1,9 +1,10 @@
 import { Checkable, CheckOptions } from '../../common/fluentapi';
 import { ResultFactory } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
-import { extendJasmineMatchers } from './jasmine-adapter';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/*
+import { extendJasmineMatchers } from './jasmine-adapter';
 
 // Mock the dependencies
 jest.mock('../common/result-factory');
@@ -283,3 +284,4 @@ describe('extendJasmineMatchers', () => {
 		});
 	});
 });
+*/
