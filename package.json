@@ -1,6 +1,6 @@
 {
 	"name": "archunit",
-	"version": "2.1.54",
+	"version": "2.1.55",
 	"description": "ArchUnit TypeScript is an architecture testing library, to specify and assert architecture rules in your TypeScript app",
 	"keywords": [
 		"architecture",
