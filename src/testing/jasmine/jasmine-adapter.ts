@@ -16,12 +16,8 @@ export function extendJasmineMatchers(force: boolean = true) {
 		addMatchers?: (matchers: Record<string, unknown>) => void;
 	};
 
-	// const beforeEachFn = (
-	// 	globalThis as unknown as { beforeEach?: (fn: () => void) => void }
-	// ).beforeEach;
-
 	const beforeEachFn = (
-		beforeEach as unknown as { beforeEach?: (fn: () => void) => void }
+		globalThis as unknown as { beforeEach?: (fn: () => void) => void }
 	).beforeEach;
 
 	if (jasmineObj && beforeEachFn) {
