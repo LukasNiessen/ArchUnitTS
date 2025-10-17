@@ -1148,6 +1148,34 @@ As you see in the table, there are some features that are only supported by us. 
 
 - **HTML Reports**: We support auto generated dashboards with charts and detailed breakdowns. Other libraries do not.
 
+### ArchUnitTS vs Linters (ESLint plugins)
+
+Many developers wonder how ArchUnitTS compares to linter plugins like `eslint-plugin-import`. While both can validate dependencies between modules, **ArchUnitTS goes far beyond what linter plugins offer**:
+
+**What ArchUnitTS provides that linters don't:**
+
+- **Code Metrics Analysis**: LCOM (cohesion) metrics, cyclomatic complexity, coupling factor, abstractness, instability, distance from main sequence, and custom metrics
+- **Architecture Slices and Layers**: UML diagram validation, slice-to-slice dependency rules, multi-layer architecture validation
+- **Nx Monorepo Support**: Built-in validation against Nx project graphs, boundaries, and naming conventions
+- **HTML Report Generation**: Rich dashboards with charts and comprehensive architecture analysis reports
+- **Empty Test Protection**: Fails by default when no files match patterns (prevents false positives from typos)
+- **Custom Architecture Rules**: Define completely custom rules with arbitrary validation logic
+- **Test Framework Integration**: Works with ANY testing framework (Jest, Vitest, Jasmine, Mocha, etc.) with special async matchers
+- **Advanced Logging**: Multiple log levels, file logging for CI/CD, detailed violation tracking with timestamps
+- **Class-Level Analysis**: Analyze class structures, methods, fields, and cohesion - not just module imports
+- **Circular Dependency Detection with Context**: More granular control and better reporting than linter cycle detection
+
+**When to use linters:**
+
+Linters like `eslint-plugin-import` excel at:
+- **Real-time feedback** while coding
+- **Auto-fixing** certain issues automatically
+- **Simpler setup** with just ESLint configuration
+
+**The Bottom Line:**
+
+Use **eslint-plugin-import** if you want immediate feedback on import/export issues while coding. Use **ArchUnitTS** if you want comprehensive architecture testing, metrics analysis, declarative rules, and enforcing architectural boundaries as part of your test suite and CI/CD pipeline.
+
 ## 📢 Informative Error Messages
 
 When tests fail, you get helpful, colorful output with clickable file paths.
