@@ -1344,6 +1344,12 @@ Use the filtering and targeting capabilities to exclude specific files or patter
 
 File-based rules analyze import relationships between files, while class-based rules examine dependencies between classes and their members. Choose based on your architecture validation needs.
 
+## 📅 Plans
+
+We want to extract a core engine and provide the same functionality not just for TypeScript, but also languages like Python, Go and more. 
+
+Furthermore, we are planning to develop an LLM-based architecture testing library. For more info on that concept, please read [this](https://lukasniessen.com/blog/155-fitness-functions-guide/#llms-for-fuzzy-fitness-functions).
+
 ## 🐣 Origin Story
 
 While working as a consultant on an Express backend project, I needed to implement architectural fitness functions similar to how one can do it with ArchUnit. Finding no good TypeScript library for this purpose, I decided to build ArchUnitTS. With the rise of LLMs and AI integration in companies, enforcing architectural boundaries and QA in general has become more critical than ever.
