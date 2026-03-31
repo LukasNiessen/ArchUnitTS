@@ -142,6 +142,6 @@
 		"@zerollup/ts-helpers": "^1.7.18",
 		"minimatch": "^10.0.1",
 		"plantuml-parser": "^0.4.0",
-		"typescript": "^5.3.3"
+		"typescript": "^6.0.2"
 	}
 }
