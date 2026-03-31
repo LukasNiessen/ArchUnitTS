@@ -21,7 +21,7 @@ jobs:
                   restore-keys: |
                       npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
                       npm-${{ runner.os }}-
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - run: npm ci
             - run: npm run lint
             - run: npm run test
@@ -36,7 +36,7 @@ jobs:
             pull-requests: write
             id-token: write
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
               with:
                   fetch-depth: 0
                   persist-credentials: false
