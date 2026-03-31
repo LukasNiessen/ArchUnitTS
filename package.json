@@ -126,7 +126,7 @@
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-import": "^2.29.1",
 		"eslint-plugin-jsdoc": "^62.8.1",
-		"globals": "^13.24.0",
+		"globals": "^17.4.0",
 		"jest": "^30.3.0",
 		"lint-staged": "^16.4.0",
 		"prettier": "^3.2.5",
