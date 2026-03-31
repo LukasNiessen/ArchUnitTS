@@ -1,3 +1,10 @@
+## [2.1.64](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.63...v2.1.64) (2026-03-31)
+
+
+### Bug Fixes
+
+* **test:** update README ([db085d5](https://github.com/LukasNiessen/ArchUnitTS/commit/db085d55864a6fb382c357c3d4c82bc8302abce7))
+
 ## [2.1.55](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.54...v2.1.55) (2026-03-31)
 
 
