@@ -1,3 +1,10 @@
+## [2.1.66](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.65...v2.1.66) (2026-03-31)
+
+
+### Bug Fixes
+
+* **deps:** bump actions/checkout from 3 to 6 ([9676d17](https://github.com/LukasNiessen/ArchUnitTS/commit/9676d17222ea01bd23af34696e8f153a4e6e44df))
+
 ## [2.1.65](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.64...v2.1.65) (2026-03-31)
 
 
