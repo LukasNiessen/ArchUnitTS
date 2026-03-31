@@ -1322,9 +1322,7 @@ We used ourselves to ensure the architectural rules for this repository 😎
 
 ## 🦊 Contributing
 
-We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but with proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed. See more in [Contributing](CONTRIBUTING.md). See also our _'[Backlog](TODO.md)'_.
-
-Note that _deploy_ here means updating the docs. We consider auto deploying the library to npm too risky given the fact that there are no full time maintainers.
+We highly appreciate contributions. We use GitHub Flow, meaning that we use feature branches, similar to GitFlow, but with proper CI and CD. As soon as something is merged or pushed to `main` it gets deployed (docs are updated and the package is published to npm). Versioning is automated via [Conventional Commits](https://www.conventionalcommits.org/) — use `fix:` for patches, `feat:` for minor releases, and `feat!:` or `BREAKING CHANGE:` for major releases. See more in [Contributing](CONTRIBUTING.md). See also our _'[Backlog](TODO.md)'_.
 
 ## ℹ️ FAQ
 

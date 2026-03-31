@@ -25,3 +25,30 @@ jobs:
             - run: npm ci
             - run: npm run lint
             - run: npm run test
+
+    publish:
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        needs: integrate
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            issues: write
+            pull-requests: write
+            id-token: write
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22.x
+                  registry-url: https://registry.npmjs.org
+            - run: npm ci
+            - run: npm run build
+            - name: Release
+              run: npx semantic-release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

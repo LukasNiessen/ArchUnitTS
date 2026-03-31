@@ -36,10 +36,6 @@ jobs:
             - name: Build project
               run: npm run build
 
-            ## Note that we do not publish the library to npm ##
-            ## We only deploy the docs. We consider auto deploying the library ##
-            ## as too risky given the fact that there are no full time maintainers ##
-
             - name: Generate documentation
               run: npm run docs
 

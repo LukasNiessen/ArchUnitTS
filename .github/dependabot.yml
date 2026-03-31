@@ -1,0 +1,22 @@
+version: 2
+updates:
+    - package-ecosystem: npm
+      directory: /
+      schedule:
+          interval: weekly
+      commit-message:
+          prefix: 'fix'
+          include: 'scope'
+      labels:
+          - dependencies
+      open-pull-requests-limit: 500
+
+    - package-ecosystem: github-actions
+      directory: /
+      schedule:
+          interval: weekly
+      commit-message:
+          prefix: 'fix'
+          include: 'scope'
+      labels:
+          - dependencies

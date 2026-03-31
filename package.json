@@ -64,9 +64,6 @@
 	"scripts": {
 		"lint": "eslint src",
 		"clean": "rimraf dist",
-		"patchpub": "npm run clean && tsc && npm version patch && npm publish",
-		"minorpub": "npm run clean && tsc && npm version minor && npm publish",
-		"majorpub": "npm run clean && tsc && npm version major && npm publish",
 		"build": "npm run clean && tsc",
 		"docs": "typedoc --options typedoc.json && cp assets/logo-rounded.png docs/assets/logo-rounded.png",
 		"docs:watch": "typedoc --options typedoc.json --watch",
@@ -117,6 +114,8 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^8.56.0",
+		"@semantic-release/changelog": "^6.0.3",
+		"@semantic-release/git": "^10.0.1",
 		"@types/jest": "^29.5.12",
 		"@types/node": "^20.11.16",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -133,6 +132,7 @@
 		"prettier": "^3.2.5",
 		"prompt": "^1.3.0",
 		"rimraf": "^5.0.5",
+		"semantic-release": "^25.0.3",
 		"ts-jest": "^29.1.2",
 		"ts-node": "^10.9.2",
 		"tslib": "^2.6.2",

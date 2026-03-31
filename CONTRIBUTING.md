@@ -11,10 +11,36 @@ Thanks for contributing!
 
 ## Guidelines
 
-- Code Style: Run `npm run lint` and `npm run format` before commiting
-- Commits: Use Conventional Commits (e.g., `feat:`, `fix:`)
+- Code Style: Run `npm run lint` and `npm run format` before committing
+- Commits: Use [Conventional Commits](https://www.conventionalcommits.org/) (see below)
 - PRs: Use feature branches, clear descriptions, ensure CI passes
 - Tests: Maintain high coverage
+
+## Commit Convention
+
+We use [Conventional Commits](https://www.conventionalcommits.org/) to automate versioning and changelog generation via [semantic-release](https://github.com/semantic-release/semantic-release). Your commit messages determine the next version number:
+
+| Commit prefix | Version bump | Example |
+|---|---|---|
+| `fix:` | Patch (2.1.63 -> 2.1.64) | `fix: handle empty tsconfig in graph extraction` |
+| `feat:` | Minor (2.1.63 -> 2.2.0) | `feat: add support for JS file analysis` |
+| `feat!:` or `BREAKING CHANGE:` in footer | Major (2.1.63 -> 3.0.0) | `feat!: remove deprecated matchFilename API` |
+
+Other prefixes like `chore:`, `docs:`, `refactor:`, `test:`, `ci:` do **not** trigger a release.
+
+## Releases
+
+Releases are fully automated. When a PR is merged to `main`:
+
+1. CI runs lint + tests
+2. If CI passes, [semantic-release](https://github.com/semantic-release/semantic-release) analyzes commit messages since the last release
+3. If there are `fix:` or `feat:` commits, it automatically:
+   - Bumps the version in `package.json`
+   - Updates `CHANGELOG.md`
+   - Publishes to npm
+   - Creates a GitHub release with release notes
+
+No manual version bumping or publishing is needed.
 
 ## Documentation
 
@@ -47,5 +73,5 @@ Features: Check existing issues, provide use case
 
 ## Code of Conduct
 
-Be respectful and inclusive. 😇
-Happy coding! 🐲
+Be respectful and inclusive.
+Happy coding!
