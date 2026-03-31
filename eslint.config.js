@@ -2,7 +2,7 @@ import js from '@eslint/js';
 import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import prettier from 'eslint-config-prettier';
-import importPlugin from 'eslint-plugin-import';
+import importPlugin from 'eslint-plugin-import-x';
 import jsdoc from 'eslint-plugin-jsdoc';
 import globals from 'globals';
 
@@ -24,7 +24,7 @@ export default [
 		},
 		plugins: {
 			'@typescript-eslint': typescript,
-			import: importPlugin,
+			'import-x': importPlugin,
 			jsdoc: jsdoc,
 		},
 		rules: {
@@ -45,7 +45,7 @@ export default [
 			curly: ['error', 'multi-line'],
 
 			// Import rules
-			'import/no-deprecated': 'error',
+			'import-x/no-deprecated': 'error',
 		},
 	},
 	prettier,

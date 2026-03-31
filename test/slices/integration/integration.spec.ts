@@ -296,7 +296,7 @@ describe('Integration test', () => {
 	});
 });
 
-const getExampleNxProjectGraphJsonFileContent = (): Buffer => {
+const getExampleNxProjectGraphJsonFileContent = (): string => {
 	const exampleProjectGraph = JSON.stringify({
 		nodes: {},
 		externalNodes: {},
@@ -329,7 +329,7 @@ const getExampleNxProjectGraphJsonFileContent = (): Buffer => {
 			],
 		},
 	});
-	return Buffer.from(exampleProjectGraph);
+	return exampleProjectGraph;
 };
 
 const getExampleProjectGraph = (): Graph => [
