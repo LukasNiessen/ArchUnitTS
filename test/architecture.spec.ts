@@ -67,16 +67,16 @@ describe('architecture', () => {
 		}
 	});
 
-	it('code should be cycle free', async () => {
-		// TODO: we need some refactoring, a few cycles occurred unfortunately
-		//const arr = ['files', 'jest', 'metrics', 'slices', 'testing'];
-		//for (const el of arr) {
-		//	const rule = projectFiles().inFolder(`src/${el}`).should().haveNoCycles();
-		//	await expect(rule).toPassAsync();
-		//}
+	// TODO: we need some refactoring, a few cycles occurred unfortunately
+	it.skip('code should be cycle free', async () => {
+		const arr = ['files', 'jest', 'metrics', 'slices', 'testing'];
+		for (const el of arr) {
+			const rule = projectFiles().inFolder(`src/${el}`).should().haveNoCycles();
+			await expect(rule).toPassAsync();
+		}
 	});
 
-	it('should have the right naming convention for tests', async () => {
+	it.skip('should have the right naming convention for tests', async () => {
 		//const rule = projectFiles().inFolder('test').should().matchFilename('*.spec.ts');
 		//await expect(rule).toPassAsync();
 	});

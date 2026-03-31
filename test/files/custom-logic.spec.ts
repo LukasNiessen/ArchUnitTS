@@ -52,4 +52,18 @@ describe('Custom File Logic', () => {
 
 		await expect(rule).toPassAsync();
 	});
+
+	it('should generate violations for shouldNot().adhereTo() when condition matches', async () => {
+		// This condition matches all .ts files, so shouldNot().adhereTo() should produce violations
+		const rule = projectFiles()
+			.inPath('src/common/util/path-utils*')
+			.shouldNot()
+			.adhereTo(
+				(file: FileInfo) => file.extension === 'ts',
+				'Files should not be TypeScript files'
+			);
+
+		const violations = await rule.check();
+		expect(violations.length).toBeGreaterThan(0);
+	});
 });

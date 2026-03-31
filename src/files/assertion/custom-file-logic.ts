@@ -120,7 +120,7 @@ export const gatherCustomFileViolations = (
 		);
 
 		const isPassingCondition = condition(fileInfo);
-		const isViolation = isNegated ? !isPassingCondition : isPassingCondition;
+		const isPassingRule = isNegated ? !isPassingCondition : isPassingCondition;
 
 		sharedLogger?.debug(
 			options?.logging,
@@ -128,10 +128,10 @@ export const gatherCustomFileViolations = (
 		);
 		sharedLogger?.debug(
 			options?.logging,
-			`isViolation: ${isViolation}, isNegated: ${isNegated}`
+			`isPassingRule: ${isPassingRule}, isNegated: ${isNegated}`
 		);
 
-		if (!isViolation) {
+		if (!isPassingRule) {
 			sharedLogger?.warn(
 				options?.logging,
 				`Custom file condition failed for '${path}' - creating violation`
