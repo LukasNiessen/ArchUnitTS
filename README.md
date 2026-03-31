@@ -1400,7 +1400,7 @@ This project is under the **MIT** license.
 
 ---
 
-## P.S.
+## Post Scriptum
 
 ### Special Note on Cycle-Free Checks
 
