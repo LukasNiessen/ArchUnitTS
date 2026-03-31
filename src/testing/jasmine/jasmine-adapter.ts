@@ -6,6 +6,27 @@ function isJasmineProject(): boolean {
 	return typeof jasmine !== 'undefined';
 }
 
+export const jasmineMatcher = {
+	toPassAsync: () => ({
+		compare: async (checkable: Checkable, options?: CheckOptions) => {
+			if (!checkable) {
+				return {
+					pass: false,
+					message: 'expected something checkable as an argument for expect()',
+				};
+			}
+			const violations = await checkable.check(options);
+			const testViolations = violations.map((v) => ViolationFactory.from(v));
+			const result = ResultFactory.result(false, testViolations);
+			return {
+				pass: result.pass,
+				message: result.message(),
+			};
+		},
+	}),
+};
+
+
 // Not working
 /*
 export function extendJasmineMatchers(force: boolean = true) {
@@ -28,23 +49,3 @@ export function extendJasmineMatchers(force: boolean = true) {
 	}
 }
 */
-
-export const jasmineMatcher = {
-	toPassAsync: () => ({
-		compare: async (checkable: Checkable, options?: CheckOptions) => {
-			if (!checkable) {
-				return {
-					pass: false,
-					message: 'expected something checkable as an argument for expect()',
-				};
-			}
-			const violations = await checkable.check(options);
-			const testViolations = violations.map((v) => ViolationFactory.from(v));
-			const result = ResultFactory.result(false, testViolations);
-			return {
-				pass: result.pass,
-				message: result.message(),
-			};
-		},
-	}),
-};
