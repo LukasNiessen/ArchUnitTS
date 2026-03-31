@@ -1,5 +1,4 @@
 import { ResultFactory, TestViolation } from './result-factory';
-import { ColorUtils } from './color-utils';
 
 describe('ResultFactory', () => {
 	beforeEach(() => {

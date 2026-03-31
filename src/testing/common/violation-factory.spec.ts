@@ -9,6 +9,7 @@ import { MetricViolation } from '../../metrics/assertion/metric-thresholds';
 import { FileCountViolation } from '../../metrics/fluentapi/metrics/count-metrics';
 import { ProjectedNode } from '../../common/projection/project-nodes';
 import { ProjectedEdge } from '../../common/projection/project-edges';
+import { TestViolation } from './result-factory';
 
 describe('ViolationFactory', () => {
 	beforeEach(() => {
@@ -163,7 +164,7 @@ describe('ViolationFactory', () => {
 		it('should return UnknownTestViolation for unknown types', () => {
 			const unknownViolation = { someField: 'value' };
 
-			const result = ViolationFactory.from(unknownViolation as any);
+			const result = ViolationFactory.from(unknownViolation as unknown as TestViolation);
 
 			expect(result.message).toBe('Unknown Violation found');
 		});

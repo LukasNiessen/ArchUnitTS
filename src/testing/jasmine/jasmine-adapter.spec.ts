@@ -1,5 +1,5 @@
 import { Checkable, CheckOptions } from '../../common/fluentapi';
-import { ResultFactory } from '../common/result-factory';
+import { ResultFactory, TestResult, TestViolation } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 import { jasmineMatcher } from './jasmine-adapter';
 
@@ -25,7 +25,7 @@ describe('jasmineMatcher', () => {
 
 		it('should return failure when checkable is null', async () => {
 			const matcher = jasmineMatcher.toPassAsync();
-			const result = await matcher.compare(null as any);
+			const result = await matcher.compare(null as unknown as Checkable);
 
 			expect(result).toEqual({
 				pass: false,
@@ -36,7 +36,7 @@ describe('jasmineMatcher', () => {
 
 		it('should return failure when checkable is undefined', async () => {
 			const matcher = jasmineMatcher.toPassAsync();
-			const result = await matcher.compare(undefined as any);
+			const result = await matcher.compare(undefined as unknown as Checkable);
 
 			expect(result).toEqual({
 				pass: false,
@@ -57,9 +57,9 @@ describe('jasmineMatcher', () => {
 			};
 
 			mockViolationFactory.from.mockReturnValue(
-				mockProcessedViolation as any
+				mockProcessedViolation as unknown as TestViolation
 			);
-			mockResultFactory.result.mockReturnValue(mockResult as any);
+			mockResultFactory.result.mockReturnValue(mockResult as unknown as TestResult);
 
 			const matcher = jasmineMatcher.toPassAsync();
 			const result = await matcher.compare(mockCheckable);
@@ -89,12 +89,12 @@ describe('jasmineMatcher', () => {
 			];
 
 			mockViolationFactory.from
-				.mockReturnValueOnce(mockProcessedViolations[0] as any)
-				.mockReturnValueOnce(mockProcessedViolations[1] as any);
+				.mockReturnValueOnce(mockProcessedViolations[0] as unknown as TestViolation)
+				.mockReturnValueOnce(mockProcessedViolations[1] as unknown as TestViolation);
 			mockResultFactory.result.mockReturnValue({
 				pass: false,
 				message: jest.fn().mockReturnValue('2 violations'),
-			} as any);
+			} as unknown as TestResult);
 
 			const matcher = jasmineMatcher.toPassAsync();
 			await matcher.compare(mockCheckable);
@@ -114,7 +114,7 @@ describe('jasmineMatcher', () => {
 			mockResultFactory.result.mockReturnValue({
 				pass: true,
 				message: jest.fn().mockReturnValue('passed'),
-			} as any);
+			} as unknown as TestResult);
 
 			const matcher = jasmineMatcher.toPassAsync();
 			await matcher.compare(mockCheckable, options);

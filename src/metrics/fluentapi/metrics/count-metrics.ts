@@ -4,7 +4,6 @@ import { Violation, EmptyTestViolation } from '../../../common/assertion';
 import { Checkable, CheckOptions } from '../../../common/fluentapi';
 import { sharedLogger } from '../../../common/util';
 import { gatherMetricViolations } from '../../assertion';
-import fs from 'fs';
 import {
 	MethodCountMetric,
 	FieldCountMetric,
@@ -23,11 +22,9 @@ import { MetricsBuilder } from '../metrics';
 import { MetricComparison } from '../types';
 import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
 import {
-	getProjectFiles,
 	guessLocationOfTsconfig,
 	TechnicalError,
 } from '../../../common';
-import { CompilerOptions } from 'typescript';
 
 /**
  * File-level metric violation

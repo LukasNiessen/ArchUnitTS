@@ -1,5 +1,5 @@
 import { Checkable, CheckOptions } from '../../common/fluentapi';
-import { ResultFactory } from '../common/result-factory';
+import { ResultFactory, TestResult, TestViolation } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 import { extendVitestMatchers } from './vitest-adapter';
 
@@ -17,23 +17,27 @@ describe('extendVitestMatchers', () => {
 	});
 
 	it('should throw an error when expect is not defined', () => {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const originalExpect = (globalThis as any).expect;
 		try {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(globalThis as any).expect = undefined;
 			// We can't call expect() after removing it, so we use a try/catch
 			let threw = false;
 			let errorMessage = '';
 			try {
 				extendVitestMatchers();
-			} catch (e: any) {
+			} catch (e: unknown) {
 				threw = true;
-				errorMessage = e.message;
+				errorMessage = (e as Error).message;
 			}
 			// Restore before asserting
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(globalThis as any).expect = originalExpect;
 			expect(threw).toBe(true);
 			expect(errorMessage).toContain('ArchUnitTS Vitest Integration Error');
 		} catch (e) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(globalThis as any).expect = originalExpect;
 			throw e;
 		}
@@ -95,7 +99,7 @@ describe('extendVitestMatchers', () => {
 					'expected something checkable as an argument for expect()',
 			});
 
-			const result = await toPassAsync.call({ isNot: false }, undefined);
+			await toPassAsync.call({ isNot: false }, undefined);
 
 			expect(mockResultFactory.error).toHaveBeenCalledWith(
 				'expected something checkable as an argument for expect()'
@@ -113,10 +117,10 @@ describe('extendVitestMatchers', () => {
 				message: jest.fn().mockReturnValue('success'),
 			};
 
-			mockViolationFactory.from.mockReturnValue(mockProcessedViolation as any);
-			mockResultFactory.result.mockReturnValue(mockResult as any);
+			mockViolationFactory.from.mockReturnValue(mockProcessedViolation as unknown as TestViolation);
+			mockResultFactory.result.mockReturnValue(mockResult as unknown as TestResult);
 
-			const result = await toPassAsync.call({ isNot: false }, mockCheckable);
+			await toPassAsync.call({ isNot: false }, mockCheckable);
 
 			expect(mockCheckable.check).toHaveBeenCalled();
 			expect(mockViolationFactory.from).toHaveBeenCalledWith(mockViolations[0]);
@@ -134,7 +138,7 @@ describe('extendVitestMatchers', () => {
 				message: jest.fn().mockReturnValue('success'),
 			};
 
-			mockResultFactory.result.mockReturnValue(mockResult as any);
+			mockResultFactory.result.mockReturnValue(mockResult as unknown as TestResult);
 
 			await toPassAsync.call({ isNot: true }, mockCheckable);
 
@@ -151,7 +155,7 @@ describe('extendVitestMatchers', () => {
 				message: jest.fn().mockReturnValue('success'),
 			};
 
-			mockResultFactory.result.mockReturnValue(mockResult as any);
+			mockResultFactory.result.mockReturnValue(mockResult as unknown as TestResult);
 
 			await toPassAsync.call({ isNot: false }, mockCheckable, options);
 
