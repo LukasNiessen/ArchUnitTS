@@ -8,7 +8,7 @@ export class CycleUtils {
 		return currentNode.outgoing
 			.map((edge) => edge.to)
 			.map((id) => graph.find((n) => n.node === id))
-			.filter((x) => x !== undefined) as NumberNode[];
+			.filter((x) => x !== undefined);
 	}
 
 	public static transformEdgeData(edges: NumberEdge[]): NumberNode[] {

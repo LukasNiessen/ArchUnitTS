@@ -65,7 +65,7 @@
 		"includeCategories": true,
 		"includeGroups": true
 	},
-	"sitemapBaseUrl": "https://lukasniessen.github.io/ArchUnitTS/",
+	"hostedBaseUrl": "https://lukasniessen.github.io/ArchUnitTS/",
 	"titleLink": "https://github.com/LukasNiessen/ArchUnitTS",
 	"navigationLinks": {
 		"GitHub": "https://github.com/LukasNiessen/ArchUnitTS",
