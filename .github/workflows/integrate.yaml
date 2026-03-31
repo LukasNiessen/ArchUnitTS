@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Set up Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                   node-version: 22.x
             - name: Cache node modules
@@ -21,7 +21,7 @@ jobs:
                   restore-keys: |
                       npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
                       npm-${{ runner.os }}-
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
             - run: npm ci
             - run: npm run lint
             - run: npm run test
@@ -36,12 +36,12 @@ jobs:
             pull-requests: write
             id-token: write
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v6
               with:
                   fetch-depth: 0
                   persist-credentials: false
             - name: Set up Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                   node-version: 22.x
                   registry-url: https://registry.npmjs.org
