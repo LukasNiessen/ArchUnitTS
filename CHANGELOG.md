@@ -1,3 +1,10 @@
+## [2.1.67](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.66...v2.1.67) (2026-04-05)
+
+
+### Bug Fixes
+
+* **deps:** bump actions/setup-node from 4 to 6 ([1b68cc9](https://github.com/LukasNiessen/ArchUnitTS/commit/1b68cc9148b3f9806903fe93561c528e9b658a8a))
+
 ## [2.1.66](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.65...v2.1.66) (2026-03-31)
 
 
