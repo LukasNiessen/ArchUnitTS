@@ -1,3 +1,10 @@
+## [2.1.68](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.67...v2.1.68) (2026-04-06)
+
+
+### Bug Fixes
+
+* **deps:** bump the actions-updates group with 2 updates ([3cb96ee](https://github.com/LukasNiessen/ArchUnitTS/commit/3cb96eece572478d73336bdaaf9437a29fda61a5))
+
 ## [2.1.67](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.66...v2.1.67) (2026-04-05)
 
 
