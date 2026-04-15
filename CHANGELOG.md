@@ -1,3 +1,10 @@
+## [2.1.69](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.68...v2.1.69) (2026-04-15)
+
+
+### Bug Fixes
+
+* **deps:** bump lodash from 4.17.23 to 4.18.1 ([46eeb0c](https://github.com/LukasNiessen/ArchUnitTS/commit/46eeb0c7de4ccb2d6ab0322af2d253051705b911))
+
 ## [2.1.68](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.67...v2.1.68) (2026-04-06)
 
 
