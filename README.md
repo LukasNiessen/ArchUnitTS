@@ -493,6 +493,49 @@ We support string patterns and regular expressions. String patterns support glob
 .forClassesMatching(/^User.*/)     // Classes starting with 'User'
 ```
 
+### Excluding Matches
+
+All pattern methods accept an optional second argument with `except`. This is useful when a folder is generally forbidden, but a small public surface is allowed.
+
+```typescript
+it('should consume orders only through its public API', async () => {
+  const rule = projectFiles()
+    .inPath('src/app/**/*.ts', {
+      except: { inPath: 'src/app/orders/**' },
+    })
+    .shouldNot()
+    .dependOnFiles()
+    .inFolder('src/app/orders/**', {
+      except: ['index.ts', 'public-api.ts'],
+    });
+
+  await expect(rule).toPassAsync();
+});
+```
+
+You can also make exclusions explicit by target:
+
+```typescript
+projectFiles()
+  .inPath('src/app/**/*.ts', {
+    except: {
+      inPath: 'src/app/generated/**',
+      inFolder: 'src/app/testing/**',
+      withName: '*.spec.ts',
+    },
+  })
+  .should()
+  .beInPath('src/app/**');
+
+metrics()
+  .forClassesMatching('*Service', {
+    except: { forClassesMatching: '*Legacy*' },
+  })
+  .lcom()
+  .lcom96b()
+  .shouldBeBelow(0.8);
+```
+
 ### Case Sensitivity
 
 - **Strings/glob patterns**: Case **sensitive** by default

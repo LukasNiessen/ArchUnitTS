@@ -1,5 +1,6 @@
 import { gatherDependOnFileViolations } from './depend-on-files';
 import { ProjectedEdge } from '../../common/projection/project-edges';
+import { RegexFactory } from '../../common/regex-factory';
 
 describe('dependOnFiles', () => {
 	describe('when negated', () => {
@@ -81,6 +82,72 @@ describe('dependOnFiles', () => {
 						cumulatedEdges: expect.any(Array),
 						sourceLabel: 'a2',
 						targetLabel: 'c',
+					},
+					isNegated: true,
+				},
+			]);
+		});
+
+		it('should not report dependencies that match target exclusions', () => {
+			const edges = [
+				simpleEdge(
+					'src/app/customers/customer.component.ts',
+					'src/app/orders/index.ts'
+				),
+				simpleEdge(
+					'src/app/customers/customer.component.ts',
+					'src/app/orders/internal/order.service.ts'
+				),
+			];
+			const violations = gatherDependOnFileViolations(
+				edges,
+				[RegexFactory.pathMatcher('src/app/customers/**')],
+				[
+					RegexFactory.folderMatcher('src/app/orders/**', {
+						except: ['index.ts', 'public-api.ts'],
+					}),
+				],
+				true
+			);
+
+			expect(violations).toMatchObject([
+				{
+					dependency: {
+						sourceLabel: 'src/app/customers/customer.component.ts',
+						targetLabel: 'src/app/orders/internal/order.service.ts',
+					},
+					isNegated: true,
+				},
+			]);
+		});
+
+		it('should not report dependencies whose source matches source exclusions', () => {
+			const edges = [
+				simpleEdge(
+					'src/app/orders/orders-shell.component.ts',
+					'src/app/orders/internal/order.service.ts'
+				),
+				simpleEdge(
+					'src/app/customers/customer.component.ts',
+					'src/app/orders/internal/order.service.ts'
+				),
+			];
+			const violations = gatherDependOnFileViolations(
+				edges,
+				[
+					RegexFactory.pathMatcher('src/app/**/*.ts', {
+						except: 'src/app/orders/**',
+					}),
+				],
+				[RegexFactory.folderMatcher('src/app/orders/**')],
+				true
+			);
+
+			expect(violations).toMatchObject([
+				{
+					dependency: {
+						sourceLabel: 'src/app/customers/customer.component.ts',
+						targetLabel: 'src/app/orders/internal/order.service.ts',
 					},
 					isNegated: true,
 				},

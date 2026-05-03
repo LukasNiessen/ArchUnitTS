@@ -3,6 +3,7 @@ import { Filter } from '.';
 import { ClassInfo } from '../metrics';
 import { sharedLogger } from './util';
 import type { CheckOptions } from './fluentapi';
+import { PatternTarget } from './type';
 
 /**
  * Extract filename from a file path
@@ -24,30 +25,43 @@ function pathWithoutFilename(inp: string): string {
 	return parts.join('/');
 }
 
-export function matchesPattern(
-	file: ProjectedNode | string,
-	filter: Filter,
-	options?: CheckOptions
-): boolean {
-	const filePath = typeof file === 'string' ? file : file.label;
-
-	let targetString: string;
-	switch (filter.options.target) {
+function getTargetString(
+	filePath: string,
+	target: PatternTarget | undefined,
+	classInfo?: ClassInfo
+): string {
+	switch (target) {
 		case 'filename':
-			targetString = extractFilename(filePath);
-			break;
+			return extractFilename(filePath);
 		case 'path':
-			targetString = normalizePath(filePath);
-			break;
+			return normalizePath(filePath);
 		case 'path-no-filename':
-			targetString = pathWithoutFilename(filePath);
-			break;
+			return pathWithoutFilename(filePath);
+		case 'classname':
+			return classInfo ? classInfo.name : normalizePath(filePath);
 		default:
-			targetString = normalizePath(filePath);
-			break;
+			return normalizePath(filePath);
 	}
+}
 
-	const matches = filter.regExp.test(targetString);
+function regexMatches(regExp: RegExp, target: string): boolean {
+	regExp.lastIndex = 0;
+	return regExp.test(target);
+}
+
+function matchesFilter(
+	filePath: string,
+	filter: Filter,
+	options?: CheckOptions,
+	classInfo?: ClassInfo
+): boolean {
+	const targetString = getTargetString(filePath, filter.options.target, classInfo);
+	const matches = regexMatches(filter.regExp, targetString);
+	const excluded =
+		matches &&
+		filter.exclusions?.some((exclusion) =>
+			matchesFilter(filePath, exclusion, options, classInfo)
+		);
 
 	sharedLogger.info(options?.logging, `Testing file: ${filePath}`);
 	sharedLogger.info(
@@ -56,8 +70,18 @@ export function matchesPattern(
 	);
 	sharedLogger.info(options?.logging, `  Pattern: ${filter.regExp.source}`);
 	sharedLogger.info(options?.logging, `  Matches: ${matches}`);
+	sharedLogger.info(options?.logging, `  Excluded: ${Boolean(excluded)}`);
 
-	return matches;
+	return matches && !excluded;
+}
+
+export function matchesPattern(
+	file: ProjectedNode | string,
+	filter: Filter,
+	options?: CheckOptions
+): boolean {
+	const filePath = typeof file === 'string' ? file : file.label;
+	return matchesFilter(filePath, filter, options);
 }
 
 export function matchesPatternClassInfo(
@@ -65,41 +89,7 @@ export function matchesPatternClassInfo(
 	filter: Filter,
 	options?: CheckOptions
 ): boolean {
-	const filePath = classInfo.filePath;
-
-	let targetString: string;
-	switch (filter.options.target) {
-		case 'filename':
-			targetString = extractFilename(filePath);
-			break;
-		case 'path':
-			targetString = normalizePath(filePath);
-			break;
-		case 'path-no-filename':
-			targetString = pathWithoutFilename(filePath);
-			break;
-		case 'classname':
-			targetString = classInfo.name;
-			break;
-		default:
-			targetString = normalizePath(filePath);
-			break;
-	}
-
-	const matches = filter.regExp.test(targetString);
-
-	sharedLogger.info(
-		options?.logging,
-		`Testing class: ${classInfo.name} from ${filePath}`
-	);
-	sharedLogger.info(
-		options?.logging,
-		`  Target string (${filter.options.target}): "${targetString}"`
-	);
-	sharedLogger.info(options?.logging, `  Pattern: ${filter.regExp.source}`);
-	sharedLogger.info(options?.logging, `  Matches: ${matches}`);
-
-	return matches;
+	return matchesFilter(classInfo.filePath, filter, options, classInfo);
 }
 
 /**

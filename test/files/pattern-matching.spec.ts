@@ -1,10 +1,12 @@
 import {
 	matchesPattern,
+	matchesPatternClassInfo,
 	matchesAllPatterns,
 	matchesAnyPattern,
 } from '../../src/files/assertion';
 import { ProjectedNode } from '../../src/common/projection';
 import { RegexFactory } from '../../src/common';
+import { ClassInfo } from '../../src/metrics';
 
 describe('Pattern Matching', () => {
 	const createProjectedNode = (path: string): ProjectedNode => {
@@ -120,6 +122,113 @@ describe('Pattern Matching', () => {
 		it('should handle empty patterns array', () => {
 			const file = createProjectedNode('src/services/UserService.ts');
 			expect(matchesAnyPattern(file, [])).toBe(false);
+		});
+	});
+
+	describe('pattern exclusions', () => {
+		it('should exclude barrel files from folder matchers by file name shorthand', () => {
+			const matcher = RegexFactory.folderMatcher('src/app/orders/**', {
+				except: ['index.ts', 'public-api.ts'],
+			});
+
+			expect(
+				matchesPattern(
+					createProjectedNode('src/app/orders/internal/order.service.ts'),
+					matcher
+				)
+			).toBe(true);
+			expect(
+				matchesPattern(createProjectedNode('src/app/orders/index.ts'), matcher)
+			).toBe(false);
+			expect(
+				matchesPattern(
+					createProjectedNode('src/app/orders/public-api.ts'),
+					matcher
+				)
+			).toBe(false);
+		});
+
+		it('should exclude path matcher results by file name shorthand', () => {
+			const matcher = RegexFactory.pathMatcher('src/app/**/*.ts', {
+				except: '*.spec.ts',
+			});
+
+			expect(
+				matchesPattern(
+					createProjectedNode('src/app/orders/order.service.ts'),
+					matcher
+				)
+			).toBe(true);
+			expect(
+				matchesPattern(
+					createProjectedNode('src/app/orders/order.service.spec.ts'),
+					matcher
+				)
+			).toBe(false);
+		});
+
+		it('should support targeted exclusions for paths, folders, and names', () => {
+			const matcher = RegexFactory.pathMatcher('src/app/**/*.ts', {
+				except: {
+					inPath: 'src/app/generated/**',
+					inFolder: 'src/app/testing/**',
+					withName: '*.spec.ts',
+				},
+			});
+
+			expect(
+				matchesPattern(
+					createProjectedNode('src/app/orders/order.service.ts'),
+					matcher
+				)
+			).toBe(true);
+			expect(
+				matchesPattern(
+					createProjectedNode('src/app/generated/generated-client.ts'),
+					matcher
+				)
+			).toBe(false);
+			expect(
+				matchesPattern(
+					createProjectedNode('src/app/testing/test-helper.ts'),
+					matcher
+				)
+			).toBe(false);
+			expect(
+				matchesPattern(
+					createProjectedNode('src/app/orders/order.service.spec.ts'),
+					matcher
+				)
+			).toBe(false);
+		});
+
+		it('should support class name exclusions for metrics filters', () => {
+			const matcher = RegexFactory.classNameMatcher('*Service', {
+				except: '*Legacy*',
+			});
+			const orderService = createClassInfo(
+				'OrderService',
+				'src/app/orders/order.service.ts'
+			);
+			const legacyService = createClassInfo(
+				'OrderLegacyService',
+				'src/app/orders/order-legacy.service.ts'
+			);
+
+			expect(matchesPatternClassInfo(orderService, matcher)).toBe(true);
+			expect(matchesPatternClassInfo(legacyService, matcher)).toBe(false);
+		});
+
+		it('should keep matching all patterns only when no filter excludes the file', () => {
+			const file = createProjectedNode('src/app/orders/index.ts');
+			const patterns = [
+				RegexFactory.pathMatcher('src/app/**/*.ts'),
+				RegexFactory.folderMatcher('src/app/orders/**', {
+					except: 'index.ts',
+				}),
+			];
+
+			expect(matchesAllPatterns(file, patterns)).toBe(false);
 		});
 	});
 
@@ -240,4 +349,13 @@ describe('Pattern Matching', () => {
 			).toBe(false); // SService.ts
 		});
 	});
+
+	function createClassInfo(name: string, filePath: string): ClassInfo {
+		return {
+			name,
+			filePath,
+			methods: [],
+			fields: [],
+		};
+	}
 });

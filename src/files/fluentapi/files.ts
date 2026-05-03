@@ -15,7 +15,7 @@ import {
 	CustomFileCondition,
 } from '../assertion';
 import { Violation } from '../../common/assertion';
-import { Filter, Pattern, RegexFactory } from '../../common';
+import { Filter, Pattern, PatternOptions, RegexFactory } from '../../common';
 
 // Re-export types for external use
 export type { FileInfo, CustomFileCondition } from '../assertion/custom-file-logic';
@@ -29,16 +29,20 @@ export const files = projectFiles;
 export class FileConditionBuilder {
 	constructor(readonly tsConfigFilePath?: string) {}
 
-	public withName(name: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.fileNameMatcher(name)]);
+	public withName(name: Pattern, options?: PatternOptions): FilesShouldCondition {
+		return new FilesShouldCondition(this, [
+			RegexFactory.fileNameMatcher(name, options),
+		]);
 	}
 
-	public inFolder(folder: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.folderMatcher(folder)]);
+	public inFolder(folder: Pattern, options?: PatternOptions): FilesShouldCondition {
+		return new FilesShouldCondition(this, [
+			RegexFactory.folderMatcher(folder, options),
+		]);
 	}
 
-	public inPath(path: Pattern): FilesShouldCondition {
-		return new FilesShouldCondition(this, [RegexFactory.pathMatcher(path)]);
+	public inPath(path: Pattern, options?: PatternOptions): FilesShouldCondition {
+		return new FilesShouldCondition(this, [RegexFactory.pathMatcher(path, options)]);
 	}
 }
 
@@ -56,24 +60,24 @@ export class FilesShouldCondition {
 		return new NegatedMatchPatternFileConditionBuilder(this);
 	}
 
-	public withName(name: Pattern): FilesShouldCondition {
+	public withName(name: Pattern, options?: PatternOptions): FilesShouldCondition {
 		return new FilesShouldCondition(this.fileCondition, [
 			...this.filters,
-			RegexFactory.fileNameMatcher(name),
+			RegexFactory.fileNameMatcher(name, options),
 		]);
 	}
 
-	public inFolder(folder: Pattern): FilesShouldCondition {
+	public inFolder(folder: Pattern, options?: PatternOptions): FilesShouldCondition {
 		return new FilesShouldCondition(this.fileCondition, [
 			...this.filters,
-			RegexFactory.folderMatcher(folder),
+			RegexFactory.folderMatcher(folder, options),
 		]);
 	}
 
-	public inPath(path: Pattern): FilesShouldCondition {
+	public inPath(path: Pattern, options?: PatternOptions): FilesShouldCondition {
 		return new FilesShouldCondition(this.fileCondition, [
 			...this.filters,
-			RegexFactory.pathMatcher(path),
+			RegexFactory.pathMatcher(path, options),
 		]);
 	}
 
@@ -95,16 +99,34 @@ export class NegatedMatchPatternFileConditionBuilder {
 		return new DependOnFileConditionBuilder(this);
 	}
 
-	public beInFolder(folder: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(this, RegexFactory.folderMatcher(folder));
+	public beInFolder(
+		folder: Pattern,
+		options?: PatternOptions
+	): MatchPatternFileCondition {
+		return new MatchPatternFileCondition(
+			this,
+			RegexFactory.folderMatcher(folder, options)
+		);
 	}
 
-	public haveName(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(this, RegexFactory.fileNameMatcher(pattern));
+	public haveName(
+		pattern: Pattern,
+		options?: PatternOptions
+	): MatchPatternFileCondition {
+		return new MatchPatternFileCondition(
+			this,
+			RegexFactory.fileNameMatcher(pattern, options)
+		);
 	}
 
-	public beInPath(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(this, RegexFactory.pathMatcher(pattern));
+	public beInPath(
+		pattern: Pattern,
+		options?: PatternOptions
+	): MatchPatternFileCondition {
+		return new MatchPatternFileCondition(
+			this,
+			RegexFactory.pathMatcher(pattern, options)
+		);
 	}
 
 	public adhereTo(
@@ -134,16 +156,34 @@ export class PositiveMatchPatternFileConditionBuilder {
 		return new DependOnFileConditionBuilder(this);
 	}
 
-	public beInFolder(folder: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(this, RegexFactory.folderMatcher(folder));
+	public beInFolder(
+		folder: Pattern,
+		options?: PatternOptions
+	): MatchPatternFileCondition {
+		return new MatchPatternFileCondition(
+			this,
+			RegexFactory.folderMatcher(folder, options)
+		);
 	}
 
-	public haveName(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(this, RegexFactory.fileNameMatcher(pattern));
+	public haveName(
+		pattern: Pattern,
+		options?: PatternOptions
+	): MatchPatternFileCondition {
+		return new MatchPatternFileCondition(
+			this,
+			RegexFactory.fileNameMatcher(pattern, options)
+		);
 	}
 
-	public beInPath(pattern: Pattern): MatchPatternFileCondition {
-		return new MatchPatternFileCondition(this, RegexFactory.pathMatcher(pattern));
+	public beInPath(
+		pattern: Pattern,
+		options?: PatternOptions
+	): MatchPatternFileCondition {
+		return new MatchPatternFileCondition(
+			this,
+			RegexFactory.pathMatcher(pattern, options)
+		);
 	}
 
 	public adhereTo(
@@ -165,16 +205,22 @@ export class DependOnFileConditionBuilder {
 		readonly matchPatternFileConditionBuilder: NegatedMatchPatternFileConditionBuilder
 	) {}
 
-	public withName(name: Pattern): DependOnFileCondition {
-		return new DependOnFileCondition(this, [RegexFactory.fileNameMatcher(name)]);
+	public withName(name: Pattern, options?: PatternOptions): DependOnFileCondition {
+		return new DependOnFileCondition(this, [
+			RegexFactory.fileNameMatcher(name, options),
+		]);
 	}
 
-	public inFolder(folder: Pattern): DependOnFileCondition {
-		return new DependOnFileCondition(this, [RegexFactory.folderMatcher(folder)]);
+	public inFolder(folder: Pattern, options?: PatternOptions): DependOnFileCondition {
+		return new DependOnFileCondition(this, [
+			RegexFactory.folderMatcher(folder, options),
+		]);
 	}
 
-	public inPath(folder: Pattern): DependOnFileCondition {
-		return new DependOnFileCondition(this, [RegexFactory.pathMatcher(folder)]);
+	public inPath(folder: Pattern, options?: PatternOptions): DependOnFileCondition {
+		return new DependOnFileCondition(this, [
+			RegexFactory.pathMatcher(folder, options),
+		]);
 	}
 }
 
@@ -184,24 +230,24 @@ export class DependOnFileCondition implements Checkable {
 		readonly dependencyFilters: Filter[]
 	) {}
 
-	public inPath(pattern: Pattern): DependOnFileCondition {
+	public inPath(pattern: Pattern, options?: PatternOptions): DependOnFileCondition {
 		return new DependOnFileCondition(this.dependOnFileConditionBuilder, [
 			...this.dependencyFilters,
-			RegexFactory.pathMatcher(pattern),
+			RegexFactory.pathMatcher(pattern, options),
 		]);
 	}
 
-	public withName(name: Pattern): DependOnFileCondition {
+	public withName(name: Pattern, options?: PatternOptions): DependOnFileCondition {
 		return new DependOnFileCondition(this.dependOnFileConditionBuilder, [
 			...this.dependencyFilters,
-			RegexFactory.fileNameMatcher(name),
+			RegexFactory.fileNameMatcher(name, options),
 		]);
 	}
 
-	public inFolder(folder: Pattern): DependOnFileCondition {
+	public inFolder(folder: Pattern, options?: PatternOptions): DependOnFileCondition {
 		return new DependOnFileCondition(this.dependOnFileConditionBuilder, [
 			...this.dependencyFilters,
-			RegexFactory.folderMatcher(folder),
+			RegexFactory.folderMatcher(folder, options),
 		]);
 	}
 

@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"target": "es2020",
+		"paths": {
+			"@app/*": ["src/app/*"]
+		}
+	},
+	"include": ["src/**/*.ts"]
+}

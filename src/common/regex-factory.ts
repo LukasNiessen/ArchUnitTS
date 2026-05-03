@@ -1,5 +1,12 @@
 import { minimatch } from 'minimatch';
-import { Filter, Pattern } from './type';
+import {
+	Filter,
+	Pattern,
+	PatternList,
+	PatternOptions,
+	PatternTarget,
+	TargetedPatternExclusions,
+} from './type';
 
 /**
  * Helper function to extract readable pattern strings from regex
@@ -30,66 +37,117 @@ export class RegexFactory {
 		return ret;
 	};
 
-	public static fileNameMatcher(name: Pattern): Filter {
-		let regExp;
-		if (typeof name === 'string') {
-			regExp = this.globToRegExp(name);
-		} else {
-			regExp = name;
+	private static patternToRegExp(pattern: Pattern): RegExp {
+		if (typeof pattern === 'string') {
+			return this.globToRegExp(pattern);
 		}
+		return pattern;
+	}
 
+	private static toPatternArray(patterns?: PatternList): Pattern[] {
+		if (patterns === undefined) {
+			return [];
+		}
+		return Array.isArray(patterns) ? patterns : [patterns];
+	}
+
+	private static isTargetedExclusion(
+		exclusion: PatternOptions['except']
+	): exclusion is TargetedPatternExclusions {
+		return (
+			typeof exclusion === 'object' &&
+			exclusion !== null &&
+			!Array.isArray(exclusion) &&
+			!(exclusion instanceof RegExp)
+		);
+	}
+
+	private static createSimpleFilter(pattern: Pattern, target: PatternTarget): Filter {
 		return {
-			regExp,
+			regExp: this.patternToRegExp(pattern),
 			options: {
-				target: 'filename',
+				target,
 			},
 		};
 	}
 
-	public static classNameMatcher(name: Pattern): Filter {
-		let regExp;
-		if (typeof name === 'string') {
-			regExp = this.globToRegExp(name);
-		} else {
-			regExp = name;
+	private static createFilter(
+		pattern: Pattern,
+		target: PatternTarget,
+		options?: PatternOptions
+	): Filter {
+		const exclusions = this.createExclusionFilters(target, options?.except);
+		const filter = this.createSimpleFilter(pattern, target);
+
+		if (exclusions.length > 0) {
+			filter.exclusions = exclusions;
 		}
 
-		return {
-			regExp,
-			options: {
-				target: 'classname',
-			},
-		};
+		return filter;
 	}
 
-	public static folderMatcher(folder: Pattern): Filter {
-		let regExp;
-		if (typeof folder === 'string') {
-			regExp = this.globToRegExp(folder);
-		} else {
-			regExp = folder;
+	private static createExclusionFilters(
+		parentTarget: PatternTarget,
+		exclusion: PatternOptions['except']
+	): Filter[] {
+		if (exclusion === undefined) {
+			return [];
 		}
-		return {
-			regExp,
-			options: {
-				target: 'path-no-filename',
-			},
-		};
+
+		if (this.isTargetedExclusion(exclusion)) {
+			return [
+				...this.toPatternArray(exclusion.inPath).map((pattern) =>
+					this.createSimpleFilter(pattern, 'path')
+				),
+				...this.toPatternArray(exclusion.inFolder).map((pattern) =>
+					this.createSimpleFilter(pattern, 'path-no-filename')
+				),
+				...this.toPatternArray(exclusion.withName).map((pattern) =>
+					this.createSimpleFilter(pattern, 'filename')
+				),
+				...this.toPatternArray(exclusion.forClassesMatching).map((pattern) =>
+					this.createSimpleFilter(pattern, 'classname')
+				),
+			];
+		}
+
+		const targets = this.getDefaultExclusionTargets(parentTarget);
+		return this.toPatternArray(exclusion).flatMap((pattern) =>
+			targets.map((target) => this.createSimpleFilter(pattern, target))
+		);
 	}
 
-	public static pathMatcher(path: Pattern): Filter {
-		let regExp;
-		if (typeof path === 'string') {
-			regExp = this.globToRegExp(path);
-		} else {
-			regExp = path;
+	private static getDefaultExclusionTargets(
+		parentTarget: PatternTarget
+	): PatternTarget[] {
+		switch (parentTarget) {
+			case 'filename':
+				return ['filename'];
+			case 'path':
+				return ['path', 'filename'];
+			case 'path-no-filename':
+				return ['path', 'path-no-filename', 'filename'];
+			case 'classname':
+				return ['classname'];
+			default:
+				return [parentTarget];
 		}
-		return {
-			regExp,
-			options: {
-				target: 'path',
-			},
-		};
+	}
+
+	public static fileNameMatcher(name: Pattern, options?: PatternOptions): Filter {
+		return this.createFilter(name, 'filename', options);
+	}
+
+	public static classNameMatcher(name: Pattern, options?: PatternOptions): Filter {
+		return this.createFilter(name, 'classname', options);
+	}
+
+	public static folderMatcher(folder: Pattern, options?: PatternOptions): Filter {
+		return this.createFilter(folder, 'path-no-filename', options);
+	}
+
+	public static pathMatcher(path: Pattern, options?: PatternOptions): Filter {
+		return this.createFilter(path, 'path', options);
 	}
 
 	/**

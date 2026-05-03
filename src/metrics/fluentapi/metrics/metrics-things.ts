@@ -6,7 +6,7 @@ import { MetricComparison } from '../types';
 import { Checkable, CheckOptions } from '../../../common/fluentapi';
 import { Violation, EmptyTestViolation } from '../../../common/assertion';
 import { sharedLogger } from '../../../common/util';
-import { Filter, Pattern, RegexFactory } from '../../../common';
+import { Filter, Pattern, PatternOptions, RegexFactory } from '../../../common';
 import { ClassFilter, CompositeFilter } from '../../projection';
 
 /**
@@ -74,8 +74,8 @@ export class MetricsBuilder {
 	 * Filter classes by filename using regex pattern with glob support
 	 * @param name String or regex pattern matching filenames only
 	 */
-	public withName(name: Pattern): MetricsBuilder {
-		this.filters.push(new ClassFilter(RegexFactory.fileNameMatcher(name)));
+	public withName(name: Pattern, options?: PatternOptions): MetricsBuilder {
+		this.filters.push(new ClassFilter(RegexFactory.fileNameMatcher(name, options)));
 		return this;
 	}
 
@@ -83,8 +83,10 @@ export class MetricsBuilder {
 	 * Filter classes by folder path (without filename) using regex pattern with glob support
 	 * @param folder String or regex pattern matching folder paths
 	 */
-	public inFolder(folderPattern: Pattern): MetricsBuilder {
-		this.filters.push(new ClassFilter(RegexFactory.folderMatcher(folderPattern)));
+	public inFolder(folderPattern: Pattern, options?: PatternOptions): MetricsBuilder {
+		this.filters.push(
+			new ClassFilter(RegexFactory.folderMatcher(folderPattern, options))
+		);
 		return this;
 	}
 
@@ -92,8 +94,8 @@ export class MetricsBuilder {
 	 * Filter classes by full path using regex pattern with glob support
 	 * @param path String or regex pattern matching full file paths
 	 */
-	public inPath(path: Pattern): MetricsBuilder {
-		this.filters.push(new ClassFilter(RegexFactory.pathMatcher(path)));
+	public inPath(path: Pattern, options?: PatternOptions): MetricsBuilder {
+		this.filters.push(new ClassFilter(RegexFactory.pathMatcher(path, options)));
 		return this;
 	}
 
@@ -101,8 +103,13 @@ export class MetricsBuilder {
 	 * Filter classes by name using regex pattern or by string with glob support
 	 * @param namePattern String or regex pattern matching class names
 	 */
-	public forClassesMatching(namePattern: Pattern): MetricsBuilder {
-		this.filters.push(new ClassFilter(RegexFactory.classNameMatcher(namePattern)));
+	public forClassesMatching(
+		namePattern: Pattern,
+		options?: PatternOptions
+	): MetricsBuilder {
+		this.filters.push(
+			new ClassFilter(RegexFactory.classNameMatcher(namePattern, options))
+		);
 		return this;
 	}
 

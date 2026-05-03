@@ -1,4 +1,5 @@
 export type MatchingType = 'exact' | 'partial';
+export type PatternTarget = 'filename' | 'path' | 'path-no-filename' | 'classname';
 
 /**
  * Pattern matching configuration for file checks
@@ -10,7 +11,7 @@ export interface PatternMatchingOptions {
 	 * - 'path': Match against the full relative path (e.g., 'src/services/Service.ts')
 	 * @default 'filename'
 	 */
-	target?: 'filename' | 'path' | 'path-no-filename' | 'classname';
+	target?: PatternTarget;
 
 	/**
 	 * Whether to require the pattern to match the entire string or allow partial matches
@@ -23,7 +24,28 @@ export interface PatternMatchingOptions {
 
 export type Pattern = string | RegExp;
 
+export type PatternList = Pattern | Pattern[];
+
+export type TargetedPatternExclusions = {
+	inPath?: PatternList;
+	inFolder?: PatternList;
+	withName?: PatternList;
+	forClassesMatching?: PatternList;
+};
+
+export type PatternExclusion = PatternList | TargetedPatternExclusions;
+
+export type PatternOptions = {
+	/**
+	 * Exclude files/classes from this matcher. Plain strings and regexes are
+	 * interpreted ergonomically for the parent matcher; targeted exclusions can
+	 * be used when the matching target should be explicit.
+	 */
+	except?: PatternExclusion;
+};
+
 export type Filter = {
 	regExp: RegExp;
 	options: PatternMatchingOptions;
+	exclusions?: Filter[];
 };
