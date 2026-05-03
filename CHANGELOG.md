@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.69...v2.2.0) (2026-05-03)
+
+
+### Features
+
+* add dependency graph generation ([a2a928a](https://github.com/LukasNiessen/ArchUnitTS/commit/a2a928a7438add6cc2eac9c9765602e44fe301ff))
+
 ## [2.1.69](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.68...v2.1.69) (2026-04-15)
 
 
