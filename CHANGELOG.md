@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.2.0...v2.3.0) (2026-05-03)
+
+
+### Features
+
+* add exclude option to pattern methods ([4f5ed1f](https://github.com/LukasNiessen/ArchUnitTS/commit/4f5ed1fdee501514dea5801dbf4d96b531465172))
+
 # [2.2.0](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.1.69...v2.2.0) (2026-05-03)
 
 
