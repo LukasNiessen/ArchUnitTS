@@ -1159,27 +1159,28 @@ note top of Core : Business logic isolated\nfrom external concerns
 
 Here's how ArchUnitTS compares to other TypeScript architecture testing libraries:
 
-| Feature                           | **ArchUnitTS**                                    | **ts-arch**           | **arch-unit-ts**   | **ts-arch-unit** |
-| --------------------------------- | ------------------------------------------------- | --------------------- | ------------------ | ---------------- |
-| **API Stability**                 | ✅ Stable                                         | ✅ Stable             | ⚠️ Unstable        | ⚠️ Unstable      |
-| **Circular Dependency Detection** | ✅ Supported                                      | ✅ Supported          | ❌ Limited         | ❌ No            |
-| **Layer Dependency Rules**        | ✅ Advanced patterns                              | ✅ Advanced patterns  | ⚠️ Limited         | ❌ No            |
-| **File Pattern Matching**         | ✅ Glob + Regex                                   | ✅ Glob + Regex       | ⚠️ Simple patterns | ❌ Basic         |
-| **Custom Rules**                  | ✅ Full support                                   | ❌ No                 | ❌ No              | ❌ No            |
-| **Code Metrics**                  | ✅ Comprehensive                                  | ❌ No                 | ❌ No              | ❌ No            |
-| **Empty Test Detection**          | ✅ Fails by default (configurable)                | ❌ No                 | ❌ No              | ❌ No            |
-| **Debug Logging**                 | ✅ Optional (off by default)                      | ❌ No                 | ❌ No              | ❌ No            |
-| **LCOM Cohesion Analysis**        | ✅ Multiple algorithms                            | ❌ No                 | ❌ No              | ❌ No            |
-| **Distance Metrics**              | ✅ Coupling & abstraction                         | ❌ No                 | ❌ No              | ❌ No            |
-| **UML Diagram Validation**        | ✅ Supported                                      | ✅ Supported          | ❌ No              | ❌ No            |
-| **Architecture Slicing**          | ✅ Supported                                      | ✅ Supported          | ❌ No              | ❌ No            |
-| **Testing Framework Integration** | ✅ Universal (Jest, Vitest, Jasmine, Mocha, etc.) | ⚠️ Jest only          | ⚠️ Limited         | ⚠️ Basic         |
-| **HTML Report Generation**        | ✅ Rich dashboards                                | ❌ No                 | ❌ No              | ❌ No            |
-| **TypeScript AST Analysis**       | ✅ Deep analysis                                  | ⚠️ Basic              | ⚠️ Limited         | ⚠️ Basic         |
-| **Performance Optimization**      | ✅ Caching + parallel                             | ⚠️ Basic              | ❌ No              | ❌ No            |
-| **Error Messages**                | ✅ Detailed + clickable                           | ⚠️ Basic              | ⚠️ Basic           | ⚠️ Basic         |
-| **Documentation**                 | ✅ Comprehensive                                  | ⚠️ Basic              | ⚠️ Minimal         | ⚠️ Minimal       |
-| **Community Support**             | ✅ Active maintenance                             | ✅ Active maintenance | ❌ Inactive        | ❌ Inactive      |
+| Feature                           | **ArchUnitTS**                                    | **ts-arch**           | **dependency-cruiser**        | **arch-unit-ts**   |
+| --------------------------------- | ------------------------------------------------- | --------------------- | ----------------------------- | ------------------ |
+| **API Stability**                 | ✅ Stable                                         | ✅ Stable             | ✅ Stable CLI/API             | ⚠️ Unstable        |
+| **Circular Dependency Detection** | ✅ Supported                                      | ✅ Supported          | ✅ Supported                  | ❌ No              |
+| **Layer Dependency Rules**        | ✅ Advanced patterns                              | ✅ Advanced patterns  | ⚠️ Config-driven              | ❌ No              |
+| **File Pattern Matching**         | ✅ Glob + Regex                                   | ✅ Glob + Regex       | ⚠️ Regex/config filters       | ❌ Basic           |
+| **Custom Rules**                  | ✅ Full support                                   | ❌ No                 | ⚠️ Config rules               | ❌ No              |
+| **Code Metrics**                  | ✅ Comprehensive                                  | ❌ No                 | ❌ No                         | ❌ No              |
+| **Empty Test Detection**          | ✅ Fails by default (configurable)                | ❌ No                 | ❌ No test concept            | ❌ No              |
+| **Debug Logging**                 | ✅ Optional (off by default)                      | ❌ No                 | ⚠️ CLI progress               | ❌ No              |
+| **LCOM Cohesion Analysis**        | ✅ Multiple algorithms                            | ❌ No                 | ❌ No                         | ❌ No              |
+| **Distance Metrics**              | ✅ Coupling & abstraction                         | ❌ No                 | ⚠️ Dependency metrics         | ❌ No              |
+| **UML Diagram Validation**        | ✅ Supported                                      | ✅ Supported          | ❌ No                         | ❌ No              |
+| **Architecture Slicing**          | ✅ Supported                                      | ✅ Supported          | ⚠️ Graph filtering            | ❌ No              |
+| **Testing Framework Integration** | ✅ Universal (Jest, Vitest, Jasmine, Mocha, etc.) | ⚠️ Jest only          | ❌ CLI/API, no matcher        | ⚠️ Basic           |
+| **Dependency Graph Reports**      | ✅ DOT, Mermaid, D2, CSV, JSON, HTML              | ❌ No                 | ✅ Extensive CLI reports      | ❌ No              |
+| **HTML Report Generation**        | ✅ Rich dashboards                                | ❌ No                 | ⚠️ Dependency reports         | ❌ No              |
+| **TypeScript AST Analysis**       | ✅ Deep analysis                                  | ⚠️ Basic              | ⚠️ Dependency-focused         | ⚠️ Basic           |
+| **Performance Optimization**      | ✅ Caching + parallel                             | ⚠️ Basic              | ⚠️ CLI caching/filtering      | ❌ No              |
+| **Error Messages**                | ✅ Detailed + clickable                           | ⚠️ Basic              | ⚠️ CLI/CI reports             | ⚠️ Basic           |
+| **Documentation**                 | ✅ Comprehensive                                  | ⚠️ Basic              | ✅ Comprehensive              | ⚠️ Minimal         |
+| **Community Support**             | ✅ Active maintenance                             | ⚠️ Infrequent | ✅ Active maintenance         | ❌ Inactive        |
 
 As you see in the table, there are some features that are only supported by us. Here is a brief highlight of those that we believe are the most critical of them:
 
