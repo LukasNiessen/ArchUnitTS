@@ -102,6 +102,20 @@ it('should generate HTML reports', async () => {
 });
 ```
 
+You can also export dependency graph reports as CI artifacts:
+
+```typescript
+it('should generate dependency graph reports', async () => {
+  await projectGraph()
+    .collapseToFolderDepth(2)
+    .exportAsHTML('reports/dependency-graph.html');
+
+  await projectGraph().exportAsMermaid('reports/dependency-graph.mmd');
+
+  expect(0).toBe(0);
+});
+```
+
 In your `gitlab-ci.yml`:
 
 ```yml
@@ -377,6 +391,42 @@ it('should not contain forbidden dependencies', async () => {
   await expect(rule).toPassAsync();
 });
 ```
+
+### Dependency Graph Reports
+
+Generate dependency graph reports in multiple formats and narrow them to the part of the codebase you want to inspect.
+
+```typescript
+import { projectGraph } from 'archunit';
+
+it('should export dependency graph reports', async () => {
+  const graph = projectGraph().titled('Application Architecture');
+
+  await graph.collapseToFolderDepth(2).exportAsMermaid('reports/dependencies.mmd');
+
+  await graph.focusOn('src/**', 1).exportAsHTML('reports/source-dependencies.html');
+
+  expect(0).toBe(0);
+});
+```
+
+Supported formats:
+
+- DOT (`exportAsDOT`, `toDOT`)
+- Mermaid (`exportAsMermaid`, `toMermaid`)
+- D2 (`exportAsD2`, `toD2`)
+- CSV (`exportAsCSV`, `toCSV`)
+- JSON (`exportAsJSON`, `toJSON`)
+- HTML (`exportAsHTML`, `toHTML`)
+
+Graph exploration options:
+
+- `focusOn(pattern, depth)` keeps matching files and their neighbors.
+- `reachableFrom(pattern)` keeps matching files and their transitive dependencies.
+- `dependentsOf(pattern)` keeps files that transitively depend on the matching files.
+- `collapseToFolderDepth(depth)` aggregates files to folder-level graph nodes.
+- `collapseByPattern(pattern, replacement)` maps files to custom graph nodes.
+- `includeExternalDependencies()` includes external edges when graph extraction provides them.
 
 ### Reports
 
@@ -1307,6 +1357,7 @@ ArchUnitTS has the following core modules.
 | **Files**   | File and folder based rules          | Stable       | [`src/files/`](src/files/) • [README](src/files/README.md)                       |
 | **Metrics** | Code quality metrics                 | Stable       | [`src/metrics/`](src/metrics/) • [README](src/metrics/README.md)                 |
 | **Slices**  | Architecture slicing                 | Stable       | [`src/slices/`](src/slices/) • [README](src/slices/README.md)                    |
+| **Graph**   | Dependency graph reports and queries | Experimental | [`src/graph/`](src/graph/)                                                       |
 | **Testing** | Universal test framework integration | Stable       | [`src/testing/`](src/testing/) • [README](src/testing/README.md)                 |
 | **Common**  | Shared utilities                     | Stable       | [`src/common/`](src/common/)                                                     |
 | **Reports** | Generate reports                     | Experimental | [`src/metrics/fluentapi/export-utils.ts`](src/metrics/fluentapi/export-utils.ts) |

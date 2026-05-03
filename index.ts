@@ -5,6 +5,7 @@ import './src/testing/setup';
 export * from './src/slices';
 export * from './src/files';
 export * from './src/metrics';
+export * from './src/graph';
 
 // Graph extraction and debugging
 export { extractGraph, clearGraphCache } from './src/common/extraction';
