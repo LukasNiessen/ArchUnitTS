@@ -1,6 +1,7 @@
 export * from './assertion';
 export * from './error';
 export * from './extraction';
+export { guessLocationOfTsconfig } from './extraction/extract-graph';
 export * from './fluentapi';
 export * from './logging';
 export * from './projection';
