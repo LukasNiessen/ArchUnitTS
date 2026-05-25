@@ -40,8 +40,7 @@ describe('Dependency Graph Showcase', () => {
 
 	it('should showcase dependency graph capabilities', async () => {
 		const graph = projectGraph()
-			.titled('ArchUnitTS - Module Dependencies')
-			.description('Showing internal module dependencies and their relationships');
+			.titled('ArchUnitTS - Module Dependencies');
 
 		// Show full architecture with external dependencies
 		await graph
@@ -62,7 +61,7 @@ describe('Dependency Graph Showcase', () => {
 
 		// Show reachability from entry point
 		await graph
-			.reachableFrom('src/files/**', 2)
+			.reachableFrom('src/files/**')
 			.collapseToFolderDepth(2)
 			.exportAsHTML('temp/showcase-files-reachability.html');
 
