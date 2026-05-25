@@ -1,6 +1,7 @@
 import { ArchIgnoreFilter } from './archignore-filter';
 import { ArchIgnoreParser } from './archignore-parser';
 import { Graph } from '../extraction/graph';
+import { ImportKind } from '../util/import-kinds';
 
 describe('ArchIgnoreFilter', () => {
 	let filter: ArchIgnoreFilter;
@@ -17,13 +18,13 @@ describe('ArchIgnoreFilter', () => {
 					source: 'src/index.ts',
 					target: 'node_modules/lib/index.js',
 					external: false,
-					importKinds: ['default'],
+					importKinds: [ImportKind.DEFAULT],
 				},
 				{
 					source: 'src/handler.ts',
 					target: 'src/service.ts',
 					external: false,
-					importKinds: ['named'],
+					importKinds: [ImportKind.NAMED],
 				},
 			];
 
@@ -39,13 +40,13 @@ describe('ArchIgnoreFilter', () => {
 					source: 'src/index.ts',
 					target: 'dist/index.js',
 					external: false,
-					importKinds: ['default'],
+					importKinds: [ImportKind.DEFAULT],
 				},
 				{
 					source: 'src/handler.ts',
 					target: 'src/service.ts',
 					external: false,
-					importKinds: ['named'],
+					importKinds: [ImportKind.NAMED],
 				},
 			];
 
@@ -61,13 +62,13 @@ describe('ArchIgnoreFilter', () => {
 					source: 'src/handler.ts',
 					target: 'src/service.ts',
 					external: false,
-					importKinds: ['named'],
+					importKinds: [ImportKind.NAMED],
 				},
 				{
 					source: 'src/service.ts',
 					target: 'src/utils.ts',
 					external: false,
-					importKinds: ['default'],
+					importKinds: [ImportKind.DEFAULT],
 				},
 			];
 

@@ -1,8 +1,14 @@
-import { Graph } from '../extraction/graph';
 import { ArchIgnoreParser } from './archignore-parser';
 
+interface EdgeLike {
+	source: string;
+	target: string;
+	external?: boolean;
+	importKinds?: unknown[];
+}
+
 /**
- * Filter graph edges based on .archignore patterns
+ * Filter edges/graph based on .archignore patterns
  */
 export class ArchIgnoreFilter {
 	private parser: ArchIgnoreParser;
@@ -12,11 +18,11 @@ export class ArchIgnoreFilter {
 	}
 
 	/**
-	 * Filter graph to exclude ignored files
+	 * Filter edges to exclude ignored files
 	 * Removes any edges where source or target matches ignore patterns
 	 */
-	public filterGraph(graph: Graph): Graph {
-		return graph.filter((edge) => {
+	public filterGraph<T extends EdgeLike>(edges: T[]): T[] {
+		return edges.filter((edge) => {
 			const sourceIgnored = this.parser.shouldIgnore(edge.source);
 			const targetIgnored = this.parser.shouldIgnore(edge.target);
 
@@ -33,12 +39,12 @@ export class ArchIgnoreFilter {
 	}
 
 	/**
-	 * Get count of ignored files in graph
+	 * Get count of ignored files in edges
 	 */
-	public getIgnoredFileCount(graph: Graph): number {
+	public getIgnoredFileCount(edges: EdgeLike[]): number {
 		const ignoredFiles = new Set<string>();
 
-		for (const edge of graph) {
+		for (const edge of edges) {
 			if (this.parser.shouldIgnore(edge.source)) {
 				ignoredFiles.add(edge.source);
 			}
@@ -51,12 +57,12 @@ export class ArchIgnoreFilter {
 	}
 
 	/**
-	 * Get list of ignored files in graph
+	 * Get list of ignored files in edges
 	 */
-	public getIgnoredFiles(graph: Graph): string[] {
+	public getIgnoredFiles(edges: EdgeLike[]): string[] {
 		const ignoredFiles = new Set<string>();
 
-		for (const edge of graph) {
+		for (const edge of edges) {
 			if (this.parser.shouldIgnore(edge.source)) {
 				ignoredFiles.add(edge.source);
 			}
