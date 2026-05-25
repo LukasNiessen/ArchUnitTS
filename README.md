@@ -130,6 +130,64 @@ it('should generate dependency graph reports', async () => {
 
 **Supported formats:** Mermaid, HTML, DOT, JSON, CSV
 
+#### Example Output: ArchUnitTS Architecture Graph
+
+Here's what a generated dependency graph looks like for a typical TypeScript project:
+
+```mermaid
+graph TB
+    subgraph presentation["📱 Presentation Layer"]
+        files["Files Module"]
+        slices["Slices Module"]
+    end
+    
+    subgraph business["⚙️ Business Logic"]
+        assertion["Assertion Module"]
+        fluentapi["Fluent API"]
+    end
+    
+    subgraph domain["🎯 Core Domain"]
+        extraction["Extraction Engine"]
+        projection["Projection Engine"]
+        patterns["Pattern Matching"]
+    end
+    
+    subgraph infrastructure["🔌 Infrastructure"]
+        util["Utilities"]
+        logging["Logging"]
+        errors["Error Handling"]
+    end
+    
+    subgraph shared["🛠️ Shared"]
+        metrics["Metrics Calculation"]
+        graph["Graph Models"]
+    end
+    
+    files -->|depends on| extraction
+    files -->|depends on| assertion
+    slices -->|depends on| extraction
+    slices -->|depends on| assertion
+    assertion -->|uses| projection
+    assertion -->|uses| patterns
+    extraction -->|uses| util
+    projection -->|uses| util
+    logging -->|supports| assertion
+    logging -->|supports| extraction
+    metrics -->|uses| graph
+    metrics -->|uses| extraction
+    
+    style presentation fill:#e1f5ff
+    style business fill:#f3e5f5
+    style domain fill:#fff3e0
+    style infrastructure fill:#f1f8e9
+    style shared fill:#fce4ec
+```
+
+This diagram shows:
+- **Module dependencies** - What depends on what
+- **Layered architecture** - Clear separation of concerns
+- **Reachability** - Data flow through the system
+
 **Exploration options:** 
 - `collapseToFolderDepth(n)` - Group by directory
 - `focusOn(pattern)` - Zoom into modules
