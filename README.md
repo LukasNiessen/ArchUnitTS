@@ -18,7 +18,7 @@ The #1 architecture testing library for TypeScript, measured by GitHub stars.
 
 _Inspired by the amazing ArchUnit library but we are not affiliated with ArchUnit._
 
-[Setup](#-setup) • [Demo](#-demo) • [Use Cases](#-use-cases) • [Features](#-features) • [Why ArchUnitTS?](#-library-comparison) • [Contributing](CONTRIBUTING.md) • [Documentation](https://lukasniessen.github.io/ArchUnitTS/)
+[Setup](#-setup) • [Demo](#-demo) • [Dependency Graphs](docs/DEPENDENCY_GRAPH_SHOWCASE.md) • [Use Cases](#-use-cases) • [Features](#-features) • [Why ArchUnitTS?](#-library-comparison) • [Contributing](CONTRIBUTING.md) • [Documentation](https://lukasniessen.github.io/ArchUnitTS/)
 
 ## ⚡ 5 min Quickstart
 
@@ -102,19 +102,42 @@ it('should generate HTML reports', async () => {
 });
 ```
 
-You can also export dependency graph reports as CI artifacts:
+### 📊 Dependency Graph Reports
+
+You can also generate and visualize your project's dependency graph as CI artifacts:
 
 ```typescript
 it('should generate dependency graph reports', async () => {
-  await projectGraph()
-    .collapseToFolderDepth(2)
-    .exportAsHTML('reports/dependency-graph.html');
+  const graph = projectGraph()
+    .titled('Application Architecture');
 
-  await projectGraph().exportAsMermaid('reports/dependency-graph.mmd');
+  // Export interactive HTML report
+  await graph
+    .collapseToFolderDepth(2)
+    .exportAsHTML('reports/architecture.html');
+
+  // Export Mermaid diagram (renders on GitHub)
+  await graph
+    .collapseToFolderDepth(2)
+    .exportAsMermaid('reports/architecture.mmd');
+
+  // Export JSON for analysis
+  await graph.exportAsJSON('reports/architecture.json');
 
   expect(0).toBe(0);
 });
 ```
+
+**Supported formats:** Mermaid, HTML, DOT, JSON, CSV
+
+**Exploration options:** 
+- `collapseToFolderDepth(n)` - Group by directory
+- `focusOn(pattern)` - Zoom into modules
+- `dependentsOf(pattern)` - Find what depends on a module
+- `reachableFrom(pattern)` - Find reachability
+- `includeExternalDependencies()` - Show npm packages
+
+[📚 Full Dependency Graph Guide →](docs/DEPENDENCY_GRAPH_SHOWCASE.md)
 
 In your `gitlab-ci.yml`:
 
