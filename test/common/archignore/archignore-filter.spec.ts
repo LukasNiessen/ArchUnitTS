@@ -1,7 +1,7 @@
-import { ArchIgnoreFilter } from './archignore-filter';
-import { ArchIgnoreParser } from './archignore-parser';
-import { Graph } from '../extraction/graph';
-import { ImportKind } from '../util/import-kinds';
+import { ArchIgnoreFilter } from '../../../src/common/archignore/archignore-filter';
+import { ArchIgnoreParser } from '../../../src/common/archignore/archignore-parser';
+import { Graph } from '../../../src/common/extraction/graph';
+import { ImportKind } from '../../../src/common/util/import-kinds';
 
 describe('ArchIgnoreFilter', () => {
 	let filter: ArchIgnoreFilter;

@@ -1,4 +1,4 @@
-import { ArchIgnoreParser } from './archignore-parser';
+import { ArchIgnoreParser } from '../../../src/common/archignore/archignore-parser';
 
 describe('ArchIgnoreParser', () => {
 	describe('pattern parsing', () => {
