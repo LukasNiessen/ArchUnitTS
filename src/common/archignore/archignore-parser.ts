@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 
 /**
  * Parses .archignore file and converts patterns to glob format
@@ -20,6 +19,18 @@ export class ArchIgnoreParser {
 			const content = fs.readFileSync(filePath, 'utf-8');
 			parser.parse(content);
 		}
+		return parser;
+	}
+
+	/**
+	 * Parse archignore content from string
+	 * Useful for testing and programmatic usage
+	 * @param content - Raw .archignore file content
+	 * @returns ArchIgnoreParser instance for chaining
+	 */
+	public static fromString(content: string): ArchIgnoreParser {
+		const parser = new ArchIgnoreParser();
+		parser.parse(content);
 		return parser;
 	}
 

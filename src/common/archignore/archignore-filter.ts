@@ -1,4 +1,4 @@
-import { Edge, Graph } from '../extraction/graph';
+import { Graph } from '../extraction/graph';
 import { ArchIgnoreParser } from './archignore-parser';
 
 /**

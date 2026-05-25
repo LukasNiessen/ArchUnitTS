@@ -6,8 +6,7 @@ describe('ArchIgnoreFilter', () => {
 	let filter: ArchIgnoreFilter;
 
 	beforeEach(() => {
-		const parser = new ArchIgnoreParser();
-		(parser as any).parse('node_modules/\ndist/\n');
+		const parser = ArchIgnoreParser.fromString('node_modules/\ndist/\n');
 		filter = new ArchIgnoreFilter(parser);
 	});
 
