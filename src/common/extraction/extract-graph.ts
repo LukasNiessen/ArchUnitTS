@@ -9,7 +9,6 @@ import { determineImportKinds } from '../util/import-kinds-helper';
 import { CheckOptions, sharedLogger } from '..';
 
 // Constant to control whether node_modules files should be excluded from the graph
-// TODO: introduce a .archignore file instead a la .gitignore
 const EXCLUDE_NODE_MODULES = true;
 const EXCLUDE_DIST = true;
 

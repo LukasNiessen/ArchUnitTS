@@ -5,6 +5,7 @@ import { extractGraph } from '../common/extraction';
 import { Edge } from '../common/extraction/graph';
 import { Pattern } from '../common/type';
 import { CheckOptions } from '../common/fluentapi';
+import { ArchIgnoreParser, ArchIgnoreFilter } from '../common/archignore';
 
 export type GraphReportFormat = 'dot' | 'mermaid' | 'd2' | 'csv' | 'json' | 'html';
 
@@ -188,7 +189,21 @@ export class ProjectGraphBuilder {
 	}
 
 	private async getGraph(): Promise<Edge[]> {
-		return extractGraph(this.tsConfigFilePath, this.checkOptions);
+		const graph = await extractGraph(this.tsConfigFilePath, this.checkOptions);
+
+		// Apply .archignore filtering if it exists
+		const projectRoot = this.tsConfigFilePath
+			? path.dirname(path.resolve(this.tsConfigFilePath))
+			: process.cwd();
+		const archignoreFile = path.join(projectRoot, '.archignore');
+
+		if (fs.existsSync(archignoreFile)) {
+			const parser = ArchIgnoreParser.fromFile(archignoreFile);
+			const filter = new ArchIgnoreFilter(parser);
+			return filter.filterGraph(graph);
+		}
+
+		return graph;
 	}
 }
 
