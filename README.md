@@ -18,7 +18,7 @@ The #1 architecture testing library for TypeScript, measured by GitHub stars.
 
 _Inspired by the amazing ArchUnit library but we are not affiliated with ArchUnit._
 
-[Setup](#-setup) • [Demo](#-demo) • [Use Cases](#-use-cases) • [Features](#-features) • [Why ArchUnitTS?](#-library-comparison) • [Contributing](CONTRIBUTING.md) • [Documentation](https://lukasniessen.github.io/ArchUnitTS/)
+[Setup](#-setup) • [Demo](#-demo) • [Use Cases](#-use-cases) • [Features](#-features) • [Why ArchUnitTS?](#-library-comparison) • [Sponsor](https://github.com/sponsors/LukasNiessen) • [Contributing](CONTRIBUTING.md) • [Documentation](https://lukasniessen.github.io/ArchUnitTS/)
 
 ## ⚡ 5 min Quickstart
 

@@ -1,5 +1,5 @@
 import { Checkable, CheckOptions } from '../../common/fluentapi';
-import { ResultFactory, TestResult, TestViolation } from '../common/result-factory';
+import { ResultFactory } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 import { extendVitestMatchers } from './vitest-adapter';
 
@@ -117,8 +117,8 @@ describe('extendVitestMatchers', () => {
 				message: jest.fn().mockReturnValue('success'),
 			};
 
-			mockViolationFactory.from.mockReturnValue(mockProcessedViolation as unknown as TestViolation);
-			mockResultFactory.result.mockReturnValue(mockResult as unknown as TestResult);
+			mockViolationFactory.from.mockReturnValue(mockProcessedViolation);
+			mockResultFactory.result.mockReturnValue(mockResult);
 
 			await toPassAsync.call({ isNot: false }, mockCheckable);
 
@@ -138,7 +138,7 @@ describe('extendVitestMatchers', () => {
 				message: jest.fn().mockReturnValue('success'),
 			};
 
-			mockResultFactory.result.mockReturnValue(mockResult as unknown as TestResult);
+			mockResultFactory.result.mockReturnValue(mockResult);
 
 			await toPassAsync.call({ isNot: true }, mockCheckable);
 
@@ -155,7 +155,7 @@ describe('extendVitestMatchers', () => {
 				message: jest.fn().mockReturnValue('success'),
 			};
 
-			mockResultFactory.result.mockReturnValue(mockResult as unknown as TestResult);
+			mockResultFactory.result.mockReturnValue(mockResult);
 
 			await toPassAsync.call({ isNot: false }, mockCheckable, options);
 

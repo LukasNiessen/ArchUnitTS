@@ -2,10 +2,6 @@ import { Checkable, CheckOptions } from '../../common/fluentapi';
 import { ResultFactory } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 
-function isJasmineProject(): boolean {
-	return typeof jasmine !== 'undefined';
-}
-
 export const jasmineMatcher = {
 	toPassAsync: () => ({
 		compare: async (checkable: Checkable, options?: CheckOptions) => {

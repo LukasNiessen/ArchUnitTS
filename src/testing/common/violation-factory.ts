@@ -41,7 +41,7 @@ export class ViolationFactory {
 			const cwd = process.cwd();
 			// Convert to forward slashes for better IDE clickability
 			return path.normalize(path.resolve(cwd, relativePath));
-		} catch (error) {
+		} catch {
 			// Fallback in case we're not in Node environment
 			return path.normalize(relativePath);
 		}

@@ -9,6 +9,7 @@ jobs:
     integrate:
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v6
             - name: Set up Node.js
               uses: actions/setup-node@v6
               with:
@@ -21,7 +22,6 @@ jobs:
                   restore-keys: |
                       npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
                       npm-${{ runner.os }}-
-            - uses: actions/checkout@v6
             - run: npm ci
             - run: npm run lint
             - run: npm run test

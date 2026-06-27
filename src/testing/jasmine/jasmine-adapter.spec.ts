@@ -1,5 +1,5 @@
 import { Checkable, CheckOptions } from '../../common/fluentapi';
-import { ResultFactory, TestResult, TestViolation } from '../common/result-factory';
+import { ResultFactory } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 import { jasmineMatcher } from './jasmine-adapter';
 
@@ -56,10 +56,8 @@ describe('jasmineMatcher', () => {
 				message: jest.fn().mockReturnValue('success'),
 			};
 
-			mockViolationFactory.from.mockReturnValue(
-				mockProcessedViolation as unknown as TestViolation
-			);
-			mockResultFactory.result.mockReturnValue(mockResult as unknown as TestResult);
+			mockViolationFactory.from.mockReturnValue(mockProcessedViolation);
+			mockResultFactory.result.mockReturnValue(mockResult);
 
 			const matcher = jasmineMatcher.toPassAsync();
 			const result = await matcher.compare(mockCheckable);
@@ -89,12 +87,12 @@ describe('jasmineMatcher', () => {
 			];
 
 			mockViolationFactory.from
-				.mockReturnValueOnce(mockProcessedViolations[0] as unknown as TestViolation)
-				.mockReturnValueOnce(mockProcessedViolations[1] as unknown as TestViolation);
+				.mockReturnValueOnce(mockProcessedViolations[0])
+				.mockReturnValueOnce(mockProcessedViolations[1]);
 			mockResultFactory.result.mockReturnValue({
 				pass: false,
 				message: jest.fn().mockReturnValue('2 violations'),
-			} as unknown as TestResult);
+			});
 
 			const matcher = jasmineMatcher.toPassAsync();
 			await matcher.compare(mockCheckable);
@@ -114,7 +112,7 @@ describe('jasmineMatcher', () => {
 			mockResultFactory.result.mockReturnValue({
 				pass: true,
 				message: jest.fn().mockReturnValue('passed'),
-			} as unknown as TestResult);
+			});
 
 			const matcher = jasmineMatcher.toPassAsync();
 			await matcher.compare(mockCheckable, options);
