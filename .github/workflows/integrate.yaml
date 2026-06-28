@@ -25,6 +25,7 @@ jobs:
             - run: npm ci
             - run: npm run lint
             - run: npm run test
+            - run: npm run build
 
     publish:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
