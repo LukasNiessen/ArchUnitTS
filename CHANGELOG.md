@@ -1,3 +1,10 @@
+## [2.3.3](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.3.2...v2.3.3) (2026-07-05)
+
+
+### Bug Fixes
+
+* **deps:** resolve vulnerable npm transitive dependencies ([06a73fd](https://github.com/LukasNiessen/ArchUnitTS/commit/06a73fd9be6c3c43ad4218e14ffb9e403523320c))
+
 ## [2.3.2](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.3.1...v2.3.2) (2026-07-05)
 
 
