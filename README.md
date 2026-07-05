@@ -396,6 +396,8 @@ it('should not contain forbidden dependencies', async () => {
 
 Generate dependency graph reports in multiple formats and narrow them to the part of the codebase you want to inspect.
 
+![ArchUnitTS dependency graph showing the architecture of the library's modules (common, files, slices, metrics, graph, testing) and their dependencies, collapsed to folder depth 2](assets/dependency-graph-example.svg)
+
 ```typescript
 import { projectGraph } from 'archunit';
 
@@ -427,6 +429,7 @@ Graph exploration options:
 - `collapseToFolderDepth(depth)` aggregates files to folder-level graph nodes.
 - `collapseByPattern(pattern, replacement)` maps files to custom graph nodes.
 - `includeExternalDependencies()` includes external edges when graph extraction provides them.
+- `includeSelfDependencies()` includes files' self-referencing edges in the graph.
 
 ### Reports
 
