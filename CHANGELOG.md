@@ -1,3 +1,10 @@
+## [2.3.2](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.3.1...v2.3.2) (2026-07-05)
+
+
+### Bug Fixes
+
+* **deps-dev:** bump markdown-it from 14.1.1 to 14.2.0 ([cffe225](https://github.com/LukasNiessen/ArchUnitTS/commit/cffe2257644ad01321fb7e4d9fa51353033c27a4))
+
 ## [2.3.1](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.3.0...v2.3.1) (2026-06-28)
 
 
