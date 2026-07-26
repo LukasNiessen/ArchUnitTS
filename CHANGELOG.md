@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.3.3...v2.4.0) (2026-07-26)
+
+
+### Features
+
+* improve README dependency graph visualization example ([2818e98](https://github.com/LukasNiessen/ArchUnitTS/commit/2818e98c6db05bc45af665c077dde7da88023758)), closes [#66](https://github.com/LukasNiessen/ArchUnitTS/issues/66)
+
 ## [2.3.3](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.3.2...v2.3.3) (2026-07-05)
 
 
