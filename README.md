@@ -1483,7 +1483,7 @@ If ArchUnitTS helps your project, please consider:
 
 ### Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://www.star-history.com/#LukasNiessen/ArchUnitTS&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=LukasNiessen/ArchUnitTS&type=Date)](https://star-history.dera.page/#LukasNiessen/ArchUnitTS&Date)
 
 ## 📄 License
 
