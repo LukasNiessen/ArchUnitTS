@@ -8,7 +8,6 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build & tests](https://img.shields.io/github/actions/workflow/status/LukasNiessen/ArchUnitTS/integrate.yaml?branch=main&label=build%20%26%20tests)](https://github.com/LukasNiessen/ArchUnitTS/actions/workflows/integrate.yaml) [![GitHub stars](https://img.shields.io/github/stars/LukasNiessen/ArchUnitTS.svg)](https://github.com/LukasNiessen/ArchUnitTS)<br>
 [![npm downloads](https://img.shields.io/npm/dm/archunit.svg?color=007ec6)](https://www.npmjs.com/package/archunit) [![npm total downloads](https://img.shields.io/npm/dt/archunit.svg?label=total%20downloads&color=007ec6)](https://www.npmjs.com/package/archunit)
-<!-- [![npm version](https://img.shields.io/npm/v/archunit.svg)](https://www.npmjs.com/package/archunit) -->
 
 </div>
 
