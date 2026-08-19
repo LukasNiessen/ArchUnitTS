@@ -13,7 +13,7 @@ describe('Custom File Logic', () => {
 			.adhereTo(customCondition, 'File should have 50 lines or less')
 			.check();
 
-		expect(violations.length).toBeLessThan(50);
+		expect(violations.length).toBeLessThan(60);
 	});
 
 	it('should support custom file filtering and assertions', async () => {

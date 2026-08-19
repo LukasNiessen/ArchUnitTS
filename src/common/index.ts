@@ -1,6 +1,7 @@
 export * from './assertion';
 export * from './error';
 export * from './extraction';
+export { guessLocationOfTsconfig } from './extraction/extract-graph';
 export * from './fluentapi';
 export * from './logging';
 export * from './projection';
@@ -8,3 +9,4 @@ export * from './regex-factory';
 export * from './type';
 export * from './util';
 export * from './pattern-matching';
+export * from './archignore';
