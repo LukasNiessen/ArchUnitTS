@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.4.3...v2.5.0) (2026-09-12)
+
+
+### Features
+
+* resolve imports in referenced tsconfig contexts ([7c8e828](https://github.com/LukasNiessen/ArchUnitTS/commit/7c8e828cb963d6428a59a883a72f627f204b8bcd))
+
 ## [2.4.3](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.4.2...v2.4.3) (2026-09-12)
 
 
