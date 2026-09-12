@@ -621,7 +621,8 @@ await expect(rule).toPassAsync();
 await expect(rule).toPassAsync(options);
 ```
 
-Here `options` can be used for enabling logging, disable caching, or to not fail on empty tests.
+Here `options` can be used to enable logging, disable caching, allow empty tests,
+or opt into best-effort extraction when a referenced TypeScript config is broken.
 
 ```javascript
 {
@@ -632,6 +633,8 @@ Here `options` can be used for enabling logging, disable caching, or to not fail
   },
   // if your rule 'passes' because it 'passed' zero files, the test normally fails. You can turn this off by setting this true
   allowEmptyTests: true,
+  // skip unreadable or invalid referenced tsconfigs; this can produce an incomplete dependency graph
+  ignoreReferencedConfigErrors: true,
   clearCache: true // reading nodes, imports etc is normally cached,
 }
 ```
@@ -715,9 +718,35 @@ interface CheckOptions {
     level: 'debug' | 'info' | 'warn' | 'error';
   };
   allowEmptyTests?: boolean; // Default: false
+  ignoreReferencedConfigErrors?: boolean; // Default: false
   clearCache?: boolean; // Default: false
 }
 ```
+
+#### Referenced TypeScript config errors
+
+**Introduced in ArchUnitTS 2.5.0 on 12 September 2026.**
+
+ArchUnitTS now throws a `TechnicalError` when a referenced TypeScript config is
+missing, unreadable, or invalid. Previously, the broken reference was skipped,
+which could let an architecture rule pass after silently omitting part of the
+project. Failing by default prevents that false-positive result.
+
+The error shown by `check()` and `toPassAsync()` includes the configuration below
+and a link to this section. For explicit best-effort extraction, skip broken
+references per check:
+
+```typescript
+await rule.check({
+  ignoreReferencedConfigErrors: true,
+});
+```
+
+The root TypeScript config must always be readable and valid. Enabling this option
+only skips broken referenced configs, so rules may inspect an incomplete project.
+ArchUnitTS does not currently support project-wide option defaults; that broader
+configuration facility is tracked in
+[#101](https://github.com/LukasNiessen/ArchUnitTS/issues/101).
 
 #### When to Use Which Method
 

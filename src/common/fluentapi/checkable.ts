@@ -13,6 +13,13 @@ export interface CheckOptions {
 	 */
 	logging?: LoggingOptions;
 
+	/**
+	 * When true, skips unreadable or invalid referenced TypeScript configs.
+	 * The root config must always be valid. Defaults to false because skipping a
+	 * referenced config can produce an incomplete dependency graph.
+	 */
+	ignoreReferencedConfigErrors?: boolean;
+
 	clearCache?: boolean;
 }
 

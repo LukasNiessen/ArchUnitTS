@@ -1,0 +1,14 @@
+{
+	"include": ["src/**/*.ts"],
+	"compilerOptions": {
+		"composite": true,
+		"declaration": true,
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"outDir": ".build/app",
+		"rootDir": "src",
+		"paths": {
+			"@shared": ["./src/app-shared.ts"]
+		}
+	}
+}
