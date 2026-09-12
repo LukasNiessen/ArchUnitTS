@@ -274,7 +274,8 @@ export function calculateFileDistanceMetrics(
 export async function calculateDistanceMetricsForProject(
 	tsConfigPath?: string,
 	projectPath?: string,
-	options?: CheckOptions
+	options?: CheckOptions,
+	analysisFilter?: (result: FileAnalysisResult) => boolean
 ): Promise<{
 	fileResults: Array<{
 		filePath: string;
@@ -295,11 +296,14 @@ export async function calculateDistanceMetricsForProject(
 		filesOnMainSequence: number; // files with distance < 0.1
 	};
 }> {
-	const analysisResults = await extractEnhancedClassInfo(
+	const extractedResults = await extractEnhancedClassInfo(
 		tsConfigPath,
 		projectPath,
 		options
 	);
+	const analysisResults = analysisFilter
+		? extractedResults.filter(analysisFilter)
+		: extractedResults;
 	const fileCount = analysisResults.length;
 
 	// Use the helper function to calculate metrics for each file
