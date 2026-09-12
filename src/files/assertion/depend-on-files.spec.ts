@@ -4,6 +4,43 @@ import { RegexFactory } from '../../common/regex-factory';
 
 describe('dependOnFiles', () => {
 	describe('when negated', () => {
+		it('passes when source and target files exist but no prohibited dependency matches', () => {
+			const violations = gatherDependOnFileViolations(
+				[simpleEdge('src/spa/current.ts', 'src/spa/current.ts')],
+				[RegexFactory.folderMatcher('src/spa/**')],
+				[RegexFactory.folderMatcher('../apps/**')],
+				true,
+				false,
+				['../apps/legacy.ts']
+			);
+
+			expect(violations).toEqual([]);
+		});
+
+		it('reports an empty test when no target file matches', () => {
+			const violations = gatherDependOnFileViolations(
+				[simpleEdge('src/spa/current.ts', 'src/spa/current.ts')],
+				[RegexFactory.folderMatcher('src/spa/**')],
+				[RegexFactory.folderMatcher('../apps/**')],
+				true
+			);
+
+			expect(violations).toMatchObject([{ filters: expect.any(Array) }]);
+		});
+
+		it('reports an empty test when no source file matches', () => {
+			const violations = gatherDependOnFileViolations(
+				[simpleEdge('src/spa/current.ts', 'src/spa/current.ts')],
+				[RegexFactory.folderMatcher('src/missing/**')],
+				[RegexFactory.folderMatcher('../apps/**')],
+				true,
+				false,
+				['../apps/legacy.ts']
+			);
+
+			expect(violations).toMatchObject([{ filters: expect.any(Array) }]);
+		});
+
 		it('should find violations', () => {
 			const edges = [
 				simpleEdge('a', 'b'),
@@ -162,6 +199,17 @@ describe('dependOnFiles', () => {
 	});
 
 	describe('when not negated', () => {
+		it('retains empty-target protection for positive dependency rules', () => {
+			const violations = gatherDependOnFileViolations(
+				[simpleEdge('src/spa/current.ts', 'src/spa/current.ts')],
+				[RegexFactory.folderMatcher('src/spa/**')],
+				[RegexFactory.folderMatcher('../apps/**')],
+				false
+			);
+
+			expect(violations).toMatchObject([{ filters: expect.any(Array) }]);
+		});
+
 		it('should throw a user error when no patterns are given', () => {
 			expect(() => gatherDependOnFileViolations([], [], [], false)).toThrow(
 				'object and subject patterns must be set'

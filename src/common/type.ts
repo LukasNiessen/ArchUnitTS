@@ -46,6 +46,8 @@ export type PatternOptions = {
 
 export type Filter = {
 	regExp: RegExp;
+	/** Original user-supplied pattern, retained for file discovery. */
+	pattern?: Pattern;
 	options: PatternMatchingOptions;
 	exclusions?: Filter[];
 };

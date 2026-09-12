@@ -65,6 +65,7 @@ export class RegexFactory {
 	private static createSimpleFilter(pattern: Pattern, target: PatternTarget): Filter {
 		return {
 			regExp: this.patternToRegExp(pattern),
+			pattern,
 			options: {
 				target,
 			},
@@ -160,6 +161,7 @@ export class RegexFactory {
 
 		return {
 			regExp,
+			pattern: filePath,
 			options: {
 				target: 'path',
 			},

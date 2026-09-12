@@ -1229,7 +1229,7 @@ Here's how ArchUnitTS compares to other TypeScript architecture testing librarie
 
 As you see in the table, there are some features that are only supported by us. Here is a brief highlight of those that we believe are the most critical of them:
 
-- **Empty Test Protection**: This one is extremely important. Let's say you define architectural boundaries that shall not be crossed - but you have a typo in the path to some folder. **Your test will just pass with other libraries!** They will _'check the rule'_ on _0 files_ and the test _'passes'_. ArchUnitTS detects this, we call it an _empty test_, and your test fails. This is the default behvaior, you can customize it to allow empty tests if you want to.
+- **Empty Test Protection**: This one is extremely important. Let's say you define architectural boundaries that shall not be crossed - but you have a typo in the path to some folder. **Your test will just pass with other libraries!** They will _'check the rule'_ on _0 files_ and the test _'passes'_. ArchUnitTS detects this, we call it an _empty test_, and your test fails. This is the default behavior, and you can customize it to allow empty tests if you want to. Dependency rules validate both selections: at least one analyzed file must match the source filters, and at least one file on disk must match the target filters. A negative dependency rule then passes only when both sides exist and no prohibited dependency edge connects them.
 
 - **Testing framework support**: ArchUnitTS works with any testing framework, plus we have special syntax extensions for Jest, Vitest and Jasmine. Other libraries such as ts-arch only have special support for Jest, or no special support at all.
 

@@ -20,13 +20,15 @@ export const gatherDependOnFileViolations = (
 	objectPatterns: Filter[],
 	subjectPatterns: Filter[],
 	isNegated: boolean,
-	allowEmptyTests: boolean = false
+	allowEmptyTests: boolean = false,
+	discoveredTargetFiles: string[] = []
 ): (ViolatingFileDependency | EmptyTestViolation)[] => {
 	if (objectPatterns.length === 0 && subjectPatterns.length === 0) {
 		throw new UserError('object and subject patterns must be set');
 	}
 
-	// empty check
+	// Source emptiness is based on analyzed files. Graph extraction adds a
+	// self-reference for every analyzed project file, including files without imports.
 	const edgesInSource = projectedEdges.filter((edge) =>
 		matchesAllPatterns(edge.sourceLabel, objectPatterns)
 	);
@@ -37,7 +39,14 @@ export const gatherDependOnFileViolations = (
 	const edgesInTarget = projectedEdges.filter((edge) =>
 		matchesAllPatterns(edge.targetLabel, subjectPatterns)
 	);
-	if (edgesInTarget.length === 0 && !allowEmptyTests) {
+	const knownTargetFiles = new Set([
+		...projectedEdges.flatMap((edge) => [edge.sourceLabel, edge.targetLabel]),
+		...discoveredTargetFiles,
+	]);
+	const matchingTargetFiles = [...knownTargetFiles].filter((file) =>
+		matchesAllPatterns(file, subjectPatterns)
+	);
+	if (matchingTargetFiles.length === 0 && !allowEmptyTests) {
 		return [new EmptyTestViolation(subjectPatterns)];
 	}
 

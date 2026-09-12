@@ -1,4 +1,5 @@
-import { extractGraph } from '../../common/extraction';
+import path from 'path';
+import { extractGraph, guessLocationOfTsconfig } from '../../common/extraction';
 import { Checkable, CheckOptions } from '../../common/fluentapi';
 import { sharedLogger } from '../../common/util/logger';
 import {
@@ -14,6 +15,7 @@ import {
 	gatherCustomFileViolations,
 	CustomFileCondition,
 } from '../assertion';
+import { discoverMatchingFiles } from '../assertion/matching-file-discovery';
 import { Violation } from '../../common/assertion';
 import { Filter, Pattern, PatternOptions, RegexFactory } from '../../common';
 
@@ -265,6 +267,14 @@ export class DependOnFileCondition implements Checkable {
 				.filesShouldCondition.fileCondition.tsConfigFilePath;
 
 		const graph = await extractGraph(configFileName, options);
+		const effectiveConfigFileName =
+			configFileName ?? guessLocationOfTsconfig(options);
+		const discoveredTargetFiles = effectiveConfigFileName
+			? discoverMatchingFiles(
+					path.dirname(path.resolve(effectiveConfigFileName)),
+					this.dependencyFilters
+				)
+			: [];
 
 		const projectedEdges = projectEdges(graph, perEdge());
 		sharedLogger.logProgress(
@@ -297,7 +307,8 @@ export class DependOnFileCondition implements Checkable {
 				.filesShouldCondition.filters,
 			this.dependencyFilters,
 			this.dependOnFileConditionBuilder.matchPatternFileConditionBuilder.isNegated,
-			options?.allowEmptyTests || false
+			options?.allowEmptyTests || false,
+			discoveredTargetFiles
 		);
 
 		// Log violations if logging is enabled
