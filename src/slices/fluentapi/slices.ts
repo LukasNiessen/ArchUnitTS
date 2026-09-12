@@ -10,7 +10,7 @@ import { MapFunction, projectEdges } from '../../common/projection';
 import { sharedLogger } from '../../common/util';
 
 export const projectSlices = (filename?: string): SliceConditionBuilder => {
-	const graphProvider = () => extractGraph(filename);
+	const graphProvider = (options?: CheckOptions) => extractGraph(filename, options);
 	return new SliceConditionBuilder(graphProvider);
 };
 
@@ -46,8 +46,8 @@ export class NegativeSliceCondition implements Checkable {
 		]);
 	};
 
-	public check = async (): Promise<Violation[]> => {
-		const graph = await this.sliceConditionBuilder.graphProvider();
+	public check = async (options?: CheckOptions): Promise<Violation[]> => {
+		const graph = await this.sliceConditionBuilder.graphProvider(options);
 		const mapped = projectEdges(graph, this.sliceConditionBuilder.mapFunction);
 		return gatherViolations(mapped, this.forbiddenEdges);
 	};
@@ -86,7 +86,9 @@ export class PositiveSliceCondition implements Checkable {
 
 	public async check(options?: CheckOptions): Promise<Violation[]> {
 		const graph =
-			await this.positiveConditionBuilder.sliceConditionBuilder.graphProvider();
+			await this.positiveConditionBuilder.sliceConditionBuilder.graphProvider(
+				options
+			);
 		const filtered = this.positiveConditionBuilder.ignoreExternals
 			? graph.filter((edge) => !edge.external)
 			: graph;
@@ -124,7 +126,7 @@ export class PositiveSliceCondition implements Checkable {
 	}
 }
 
-type GraphProvider = () => Promise<Graph>;
+type GraphProvider = (options?: CheckOptions) => Promise<Graph>;
 
 export const nxProjectSlices = (rootFolder?: string): SliceConditionBuilder => {
 	const graphProvider = () => Promise.resolve(extractNxGraph(rootFolder));

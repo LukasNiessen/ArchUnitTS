@@ -1,0 +1,6 @@
+{
+	"compilerOptions": {
+		"moduleResolution": "not-a-module-resolution-mode"
+	},
+	"include": ["src/**/*.ts"]
+}

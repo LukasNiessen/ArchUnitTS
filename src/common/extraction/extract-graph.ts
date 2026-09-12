@@ -12,6 +12,10 @@ import { CheckOptions, sharedLogger } from '..';
 // TODO: introduce a .archignore file instead a la .gitignore
 const EXCLUDE_NODE_MODULES = true;
 const EXCLUDE_DIST = true;
+const REFERENCED_CONFIG_ERROR_GUIDANCE =
+	'Starting with ArchUnitTS 2.5.0, checks fail when a referenced TypeScript config cannot be loaded, preventing rules from running against an incomplete dependency graph. ' +
+	'To continue with the remaining configs, pass { ignoreReferencedConfigErrors: true } to check() or toPassAsync(). This may produce a partial graph. ' +
+	'See https://github.com/LukasNiessen/ArchUnitTS#referenced-typescript-config-errors';
 
 // Logger instance for debugging graph extraction
 const logger = sharedLogger;
@@ -116,7 +120,91 @@ export const getProjectFiles = (
 	return files;
 };
 
-const graphCache: Map<string | undefined, Promise<Edge[]>> = new Map();
+type ProjectConfigContext = {
+	parsedConfig: ts.ParsedCommandLine;
+	fileNames: Set<string>;
+};
+
+const normalizeFileIdentity = (fileName: string): string => {
+	const normalized = path.normalize(path.resolve(fileName));
+	return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
+};
+
+const loadProjectConfigContexts = (
+	configFileName: string,
+	options?: CheckOptions
+): ProjectConfigContext[] => {
+	const contexts: ProjectConfigContext[] = [];
+	const visitedConfigs = new Set<string>();
+	const handleConfigError = (message: string, isRootConfig: boolean): void => {
+		if (!isRootConfig && options?.ignoreReferencedConfigErrors) {
+			logger?.warn(
+				options.logging,
+				`${message}. Skipping this referenced config because ignoreReferencedConfigErrors is enabled.`
+			);
+			return;
+		}
+
+		const technicalErrorMessage = isRootConfig
+			? message
+			: `${message}\n\n${REFERENCED_CONFIG_ERROR_GUIDANCE}`;
+		logger?.error(options?.logging, technicalErrorMessage);
+		throw new TechnicalError(technicalErrorMessage);
+	};
+
+	const visitConfig = (candidate: string, isRootConfig = false): void => {
+		const resolvedConfig = path.resolve(candidate);
+		const configIdentity = normalizeFileIdentity(resolvedConfig);
+		if (visitedConfigs.has(configIdentity)) {
+			return;
+		}
+		visitedConfigs.add(configIdentity);
+
+		const config = ts.readConfigFile(resolvedConfig, ts.sys.readFile);
+		if (config.error) {
+			const message = `Could not read TypeScript config ${resolvedConfig}: ${formatDiagnostic(config.error)}`;
+			handleConfigError(message, isRootConfig);
+			return;
+		}
+
+		const parsedConfig = ts.parseJsonConfigFileContent(
+			config.config,
+			ts.sys,
+			path.dirname(resolvedConfig),
+			{},
+			resolvedConfig
+		);
+		if (parsedConfig.errors.length > 0) {
+			const diagnostics = parsedConfig.errors.map(formatDiagnostic).join('; ');
+			const message = `Invalid TypeScript config ${resolvedConfig}: ${diagnostics}`;
+			handleConfigError(message, isRootConfig);
+			return;
+		}
+
+		contexts.push({
+			parsedConfig,
+			fileNames: new Set(parsedConfig.fileNames.map(normalizeFileIdentity)),
+		});
+
+		for (const reference of parsedConfig.projectReferences ?? []) {
+			visitConfig(ts.resolveProjectReferencePath(reference));
+		}
+	};
+
+	visitConfig(configFileName, true);
+	return contexts;
+};
+
+const formatDiagnostic = (diagnostic: ts.Diagnostic): string =>
+	ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+
+const graphCache: Map<string, Promise<Edge[]>> = new Map();
+
+const graphCacheKey = (
+	configFileName: string | undefined,
+	options: CheckOptions | undefined
+): string =>
+	JSON.stringify([configFileName, options?.ignoreReferencedConfigErrors ?? false]);
 
 export const clearGraphCache = (options?: CheckOptions): void => {
 	const cacheSize = graphCache.size;
@@ -141,7 +229,8 @@ export const extractGraph = async (
 		clearGraphCache();
 	}
 
-	const cachedResult = graphCache.get(configFileName);
+	const cacheKey = graphCacheKey(configFileName, options);
+	const cachedResult = graphCache.get(cacheKey);
 	if (cachedResult) {
 		logger?.debug(options?.logging, 'Using cached graph extraction result');
 		return cachedResult;
@@ -149,7 +238,7 @@ export const extractGraph = async (
 
 	logger?.debug(options?.logging, 'No cached result found, computing new graph');
 	const computedResult = extractGraphUncached(configFileName, options);
-	graphCache.set(configFileName, computedResult);
+	graphCache.set(cacheKey, computedResult);
 	const result = await computedResult;
 	logger?.info(
 		options?.logging,
@@ -173,22 +262,9 @@ const extractGraphUncached = async (
 
 	logger?.info(options?.logging, `Using TypeScript config file: ${configFile}`);
 
-	const config = ts.readConfigFile(configFile, (path: string) => {
-		logger?.debug(options?.logging, `Reading config file: ${path}`);
-		return fs.readFileSync(path).toString();
-	});
-
-	if (config.error) {
-		logger?.error(
-			options?.logging,
-			`Invalid config file: ${config.error.messageText}`
-		);
-		throw new TechnicalError('invalid config path');
-	}
-
+	const configContexts = loadProjectConfigContexts(configFile, options);
+	const parsedConfig: CompilerOptions = configContexts[0].parsedConfig.options;
 	logger?.debug(options?.logging, 'Successfully parsed TypeScript configuration');
-
-	const parsedConfig: CompilerOptions = config.config;
 	logger?.debug(
 		options?.logging,
 		`Compiler options: ${JSON.stringify(parsedConfig, null, 2).slice(0, 500)}...`
@@ -200,11 +276,13 @@ const extractGraphUncached = async (
 	const compilerHost = ts.createCompilerHost(parsedConfig);
 	logger?.debug(options?.logging, 'Created TypeScript compiler host');
 
-	const files = getProjectFiles(rootDir, compilerHost, config?.config);
+	const files = [
+		...new Set(configContexts.flatMap((context) => context.parsedConfig.fileNames)),
+	];
 
 	logger?.debug(options?.logging, 'Creating TypeScript program');
 	const program = ts.createProgram({
-		rootNames: files ?? [],
+		rootNames: files,
 		options: parsedConfig,
 		host: compilerHost,
 	});
@@ -242,6 +320,13 @@ const extractGraphUncached = async (
 
 	for (const sourceFile of program.getSourceFiles()) {
 		const isProjectFile = !sourceFile.fileName.includes('node_modules');
+		const sourceConfigs = configContexts.filter((context) =>
+			context.fileNames.has(normalizeFileIdentity(sourceFile.fileName))
+		);
+		const sourceCompilerOptions =
+			sourceConfigs.length > 0
+				? sourceConfigs.map((context) => context.parsedConfig.options)
+				: [parsedConfig];
 
 		if (isProjectFile) {
 			processedFiles++;
@@ -278,33 +363,56 @@ const extractGraphUncached = async (
 					`Processing import: "${module}" in ${normalizedSourceFileName}`
 				);
 
-				const resolver = new ImportPathsResolver(
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					(parsedConfig as any).compilerOptions
-				);
+				// A file may belong to multiple referenced projects (for example, app
+				// and Vitest configs). Resolve it in every applicable compiler context
+				// so reference order cannot hide a valid edge.
+				const resolvedModules = new Map<string, ts.ResolvedModuleFull>();
+				for (const compilerOptions of sourceCompilerOptions) {
+					try {
+						let resolvedModule = ts.resolveModuleName(
+							module,
+							sourceFile.fileName,
+							compilerOptions,
+							compilerHost
+						).resolvedModule;
 
-				const suggestion = resolver.getImportSuggestions(
-					module,
-					path.dirname(normalizedSourceFileName)
-				);
+						if (resolvedModule === undefined) {
+							const resolver = new ImportPathsResolver(compilerOptions);
+							const suggestion = resolver.getImportSuggestions(
+								module,
+								path.dirname(normalizedSourceFileName)
+							);
+							const bestGuess = suggestion?.[0];
+							if (bestGuess && bestGuess !== module) {
+								logger?.debug(
+									options?.logging,
+									`Import path resolved from "${module}" to "${bestGuess}"`
+								);
+								resolvedModule = ts.resolveModuleName(
+									bestGuess,
+									sourceFile.fileName,
+									compilerOptions,
+									compilerHost
+								).resolvedModule;
+							}
+						}
 
-				const bestGuess = suggestion !== undefined ? suggestion[0] : undefined;
-				if (bestGuess && bestGuess !== module) {
-					logger?.debug(
-						options?.logging,
-						`Import path resolved from "${module}" to "${bestGuess}"`
-					);
+						if (resolvedModule) {
+							const resolutionIdentity = `${normalizeFileIdentity(
+								resolvedModule.resolvedFileName
+							)}:${resolvedModule.isExternalLibraryImport ?? false}`;
+							resolvedModules.set(resolutionIdentity, resolvedModule);
+						}
+					} catch (importError) {
+						erroredImports++;
+						logger?.warn(
+							options?.logging,
+							`Error resolving import "${module}" in ${normalizedSourceFileName}: ${importError}`
+						);
+					}
 				}
 
-				// TODO Might use some module resolution cache in future
-				const resolvedModule = ts.resolveModuleName(
-					bestGuess ?? module,
-					sourceFile.fileName,
-					parsedConfig,
-					compilerHost
-				).resolvedModule;
-
-				if (resolvedModule === undefined) {
+				if (resolvedModules.size === 0) {
 					logger?.debug(
 						options?.logging,
 						`Could not resolve module "${module}" from ${normalizedSourceFileName}`
@@ -313,46 +421,51 @@ const extractGraphUncached = async (
 					return;
 				}
 
-				const { resolvedFileName, isExternalLibraryImport } = resolvedModule;
-				const normalizedTargetFileName = path.relative(rootDir, resolvedFileName);
+				for (const resolvedModule of resolvedModules.values()) {
+					const { resolvedFileName, isExternalLibraryImport } = resolvedModule;
+					const normalizedTargetFileName = path.relative(
+						rootDir,
+						resolvedFileName
+					);
 
-				logger?.debug(
-					options?.logging,
-					`Resolved "${module}" to: ${normalizedTargetFileName} (external: ${isExternalLibraryImport})`
-				);
-
-				// Skip node_modules files if configured so
-				if (
-					EXCLUDE_NODE_MODULES &&
-					normalizedTargetFileName.startsWith('node_modules')
-				) {
 					logger?.debug(
 						options?.logging,
-						`Excluding node_modules file: ${normalizedTargetFileName}`
+						`Resolved "${module}" to: ${normalizedTargetFileName} (external: ${isExternalLibraryImport})`
 					);
-					skippedImports++;
-					return;
+
+					// Skip node_modules files if configured so
+					if (
+						EXCLUDE_NODE_MODULES &&
+						normalizedTargetFileName.startsWith('node_modules')
+					) {
+						logger?.debug(
+							options?.logging,
+							`Excluding node_modules file: ${normalizedTargetFileName}`
+						);
+						skippedImports++;
+						continue;
+					}
+					// Skip dist files if configured so
+					if (EXCLUDE_DIST && normalizedTargetFileName.startsWith('dist')) {
+						logger?.debug(
+							options?.logging,
+							`Excluding dist file: ${normalizedTargetFileName}`
+						);
+						skippedImports++;
+						continue;
+					}
+
+					const importKinds = determineImportKinds(x);
+
+					const edge: Edge = {
+						source: normalizeWindowsPaths(normalizedSourceFileName),
+						target: normalizeWindowsPaths(normalizedTargetFileName),
+						external: isExternalLibraryImport ?? false,
+						importKinds: importKinds,
+					};
+
+					imports.push(edge);
 				}
-				// Skip dist files if configured so
-				if (EXCLUDE_DIST && normalizedTargetFileName.startsWith('dist')) {
-					logger?.debug(
-						options?.logging,
-						`Excluding dist file: ${normalizedTargetFileName}`
-					);
-					skippedImports++;
-					return;
-				}
-
-				const importKinds = determineImportKinds(x);
-
-				const edge: Edge = {
-					source: normalizeWindowsPaths(normalizedSourceFileName),
-					target: normalizeWindowsPaths(normalizedTargetFileName),
-					external: isExternalLibraryImport ?? false,
-					importKinds: importKinds,
-				};
-
-				imports.push(edge);
 
 				if (imports.length % 100 === 0) {
 					logger?.debug(
