@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { parse } from 'plantuml-parser';
 import { extractGraph, extractNxGraph, Graph, projectEdges } from '../../../src/common';
 import {
 	gatherPositiveViolations,
@@ -9,6 +8,7 @@ import {
 	sliceByFileSuffix,
 	sliceByPattern,
 	exportDiagram,
+	generateRule,
 } from '../../../src/slices';
 
 describe('Integration test', () => {
@@ -152,7 +152,7 @@ describe('Integration test', () => {
 		const reducedGraph = projectEdges(graph, mapFunction);
 
 		const stringDiagram = exportDiagram(reducedGraph);
-		const parsedActual = parse(stringDiagram);
+		const parsedActual = generateRule(stringDiagram);
 
 		const expectedDiagram = `
 @startuml
@@ -162,7 +162,7 @@ describe('Integration test', () => {
 @enduml
             `;
 
-		const parsedExpected = parse(expectedDiagram);
+		const parsedExpected = generateRule(expectedDiagram);
 		expect(parsedActual).toEqual(parsedExpected);
 	});
 
@@ -175,7 +175,7 @@ describe('Integration test', () => {
 		const reducedGraph = projectEdges(graph, mapFunction);
 
 		const stringDiagram = exportDiagram(reducedGraph);
-		const parsedActual = parse(stringDiagram);
+		const parsedActual = generateRule(stringDiagram);
 
 		const expectedDiagram = `
 @startuml
@@ -186,7 +186,7 @@ describe('Integration test', () => {
 @enduml
             `;
 
-		const parsedExpected = parse(expectedDiagram);
+		const parsedExpected = generateRule(expectedDiagram);
 		expect(parsedActual).toEqual(parsedExpected);
 	});
 
