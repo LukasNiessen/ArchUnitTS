@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.4.1...v2.4.2) (2026-09-12)
+
+
+### Bug Fixes
+
+* apply filters to distance metric summaries ([3d59a9d](https://github.com/LukasNiessen/ArchUnitTS/commit/3d59a9d4353cf54de4e3de61eebc170f3f6c3316))
+
 ## [2.4.1](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.4.0...v2.4.1) (2026-09-12)
 
 
