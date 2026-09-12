@@ -135,7 +135,7 @@ export class MetricsBuilder {
 	 * Configure distance metrics (Abstractness, Instability, Distance from Main Sequence)
 	 */
 	public distance(): DistanceMetricsBuilder {
-		return new DistanceMetricsBuilder(this.tsConfigFilePath);
+		return new DistanceMetricsBuilder(this);
 	}
 
 	/**

@@ -10,10 +10,17 @@ import {
 	CouplingFactor,
 	NormalizedDistance,
 } from '../../calculation';
-import { extractEnhancedClassInfo } from '../../extraction';
+import { extractEnhancedClassInfo, FileAnalysisResult } from '../../extraction';
 import { MetricComparison } from '../types';
 import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
 import * as path from 'path';
+import type { MetricsBuilder } from './metrics-things';
+import {
+	Filter,
+	matchesPattern,
+	matchesPatternClassInfo,
+	RegexFactory,
+} from '../../../common';
 
 /**
  * Project summary for distance metrics
@@ -34,8 +41,18 @@ export interface DistanceMetricsSummary {
 export class DistanceMetricsBuilder {
 	private targetFile?: string;
 	private targetFolder?: string;
+	readonly tsConfigFilePath?: string;
+	private readonly inheritedFilters: Filter[];
 
-	constructor(readonly tsConfigFilePath?: string) {}
+	constructor(source?: string | MetricsBuilder) {
+		if (typeof source === 'string' || source === undefined) {
+			this.tsConfigFilePath = source;
+			this.inheritedFilters = [];
+		} else {
+			this.tsConfigFilePath = source.tsConfigFilePath;
+			this.inheritedFilters = source.getFiltersAsFilterArray();
+		}
+	}
 
 	/**
 	 * Target a specific file for distance metrics analysis
@@ -141,7 +158,18 @@ export class DistanceMetricsBuilder {
 	 * Calculate comprehensive distance metrics summary
 	 */
 	public async summary(): Promise<DistanceMetricsSummary> {
-		const results = await calculateDistanceMetricsForProject(this.tsConfigFilePath);
+		const results = await calculateDistanceMetricsForProject(
+			this.tsConfigFilePath,
+			undefined,
+			undefined,
+			(result) =>
+				matchesDistanceFilters(
+					result,
+					this.inheritedFilters,
+					this.targetFile,
+					this.targetFolder
+				)
+		);
 		return results.projectSummary;
 	}
 
@@ -501,4 +529,43 @@ export class ZoneCondition implements Checkable {
 		sharedLogger.endCheck(ruleName, violations.length, options?.logging);
 		return violations;
 	}
+}
+
+function matchesDistanceFilters(
+	result: FileAnalysisResult,
+	filters: Filter[],
+	targetFile?: string,
+	targetFolder?: string
+): boolean {
+	const relativeFilePath = path.relative(process.cwd(), result.filePath);
+	const targetFilters = [
+		...(targetFile ? [RegexFactory.fileNameMatcher(targetFile)] : []),
+		...(targetFolder ? [RegexFactory.folderMatcher(targetFolder)] : []),
+	];
+	const allFilters = [...filters, ...targetFilters];
+	const classFilters = allFilters.filter(
+		(filter) => filter.options.target === 'classname'
+	);
+	const fileFilters = allFilters.filter(
+		(filter) => filter.options.target !== 'classname'
+	);
+	const matchesClassFilters =
+		classFilters.length === 0 ||
+		result.classes.some((classInfo) =>
+			classFilters.every((filter) =>
+				matchesPatternClassInfo(
+					{ ...classInfo, filePath: relativeFilePath },
+					filter
+				)
+			)
+		);
+
+	return (
+		matchesClassFilters &&
+		fileFilters.every(
+			(filter) =>
+				matchesPattern(relativeFilePath, filter) ||
+				matchesPattern(result.filePath, filter)
+		)
+	);
 }
