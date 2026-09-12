@@ -400,6 +400,7 @@ export async function extractEnhancedClassInfo(
 
 	// Extract dependency graph
 	const dependencyGraph = await extractGraph(tsConfigFilePath || configPath, options);
+	const projectRoot = path.dirname(configPath);
 
 	const fileResults: FileAnalysisResult[] = [];
 
@@ -412,7 +413,8 @@ export async function extractEnhancedClassInfo(
 			const result = processSourceFileEnhanced(
 				sourceFile,
 				program,
-				dependencyGraph
+				dependencyGraph,
+				projectRoot
 			);
 			if (result.totalTypes > 0) {
 				// Only include files with classes/interfaces
@@ -427,7 +429,8 @@ export async function extractEnhancedClassInfo(
 function processSourceFileEnhanced(
 	sourceFile: ts.SourceFile,
 	program: ts.Program,
-	dependencyGraph: Edge[]
+	dependencyGraph: Edge[],
+	projectRoot: string
 ): FileAnalysisResult {
 	const classes: EnhancedClassInfo[] = [];
 	let interfaces = 0;
@@ -464,7 +467,8 @@ function processSourceFileEnhanced(
 				abstractMethods: [],
 				dependencies: calculateClassDependencies(
 					sourceFile.fileName,
-					dependencyGraph
+					dependencyGraph,
+					projectRoot
 				),
 				sourceFile: sourceFile,
 			};
@@ -527,7 +531,8 @@ function processSourceFileEnhanced(
 	const totalTypes = interfaces + abstractClasses + concreteClasses;
 	const fileDependencies = calculateClassDependencies(
 		sourceFile.fileName,
-		dependencyGraph
+		dependencyGraph,
+		projectRoot
 	);
 	return {
 		filePath: sourceFile.fileName,
@@ -543,39 +548,50 @@ function processSourceFileEnhanced(
 
 function calculateClassDependencies(
 	filePath: string,
-	dependencyGraph: Edge[]
+	dependencyGraph: Edge[],
+	projectRoot: string
 ): ClassDependencyInfo {
-	const normalizedPath = path.normalize(filePath);
+	const normalizeForComparison = (candidate: string): string => {
+		const absolutePath = path.isAbsolute(candidate)
+			? candidate
+			: path.resolve(projectRoot, candidate);
+		const normalizedPath = path.normalize(absolutePath);
+		return process.platform === 'win32'
+			? normalizedPath.toLowerCase()
+			: normalizedPath;
+	};
+	const normalizedPath = normalizeForComparison(filePath);
+	const internalDependencies = dependencyGraph.filter((edge) => {
+		if (edge.external) {
+			return false;
+		}
+
+		return (
+			normalizeForComparison(edge.source) !== normalizeForComparison(edge.target)
+		);
+	});
 
 	// Find outgoing dependencies (efferent coupling)
-	const outgoingDependencies = dependencyGraph
+	const outgoingDependencies = internalDependencies
 		.filter((edge) => {
-			const normalizedSource = path.normalize(edge.source);
-			return (
-				normalizedSource === normalizedPath ||
-				normalizedSource.endsWith(normalizedPath)
-			);
+			return normalizeForComparison(edge.source) === normalizedPath;
 		})
-		.filter((edge) => !edge.external) // Only internal dependencies
-		.map((edge) => edge.target);
+		.map((edge) => normalizeForComparison(edge.target));
 
 	// Find incoming dependencies (afferent coupling)
-	const incomingDependencies = dependencyGraph
+	const incomingDependencies = internalDependencies
 		.filter((edge) => {
-			const normalizedTarget = path.normalize(edge.target);
-			return (
-				normalizedTarget === normalizedPath ||
-				normalizedTarget.endsWith(normalizedPath)
-			);
+			return normalizeForComparison(edge.target) === normalizedPath;
 		})
-		.filter((edge) => !edge.external) // Only internal dependencies
-		.map((edge) => edge.source);
+		.map((edge) => normalizeForComparison(edge.source));
+	const uniqueOutgoingDependencies = [...new Set(outgoingDependencies)];
+	const uniqueIncomingDependencies = [...new Set(incomingDependencies)];
 
 	return {
-		efferentCoupling: outgoingDependencies.length,
-		afferentCoupling: incomingDependencies.length,
-		outgoingDependencies: [...new Set(outgoingDependencies)], // Remove duplicates
-		incomingDependencies: [...new Set(incomingDependencies)], // Remove duplicates
+		efferentCoupling: uniqueOutgoingDependencies.length,
+		afferentCoupling: uniqueIncomingDependencies.length,
+		outgoingDependencies: uniqueOutgoingDependencies,
+		incomingDependencies: uniqueIncomingDependencies,
 	};
 }
 
