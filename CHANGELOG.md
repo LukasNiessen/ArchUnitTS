@@ -1,3 +1,10 @@
+## [2.4.3](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.4.2...v2.4.3) (2026-09-12)
+
+
+### Bug Fixes
+
+* calculate distance coupling from resolved edges ([ab9fbee](https://github.com/LukasNiessen/ArchUnitTS/commit/ab9fbee504e8ab742fc27b888d90c09a83c5273e))
+
 ## [2.4.2](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.4.1...v2.4.2) (2026-09-12)
 
 
