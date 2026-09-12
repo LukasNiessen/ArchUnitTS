@@ -1,0 +1,13 @@
+ArchUnitTS
+
+ArchUnitTS is inspired by ArchUnit for Java. During its initial development,
+ArchUnitTS used code from the tsarch project:
+
+https://github.com/ts-arch/ts-arch
+
+tsarch is Copyright 2017 mrpatpat <adrian.endrich@googlemail.com> and is
+licensed under the MIT License. Its copyright and permission notice are
+preserved in this distribution's LICENSE file.
+
+ArchUnitTS has since evolved with its own maintenance, features, integrations,
+metrics, reporting, and TypeScript project support.
