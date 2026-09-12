@@ -21,10 +21,8 @@ import { projectToMetricResults } from '../../projection';
 import { MetricsBuilder } from '../metrics';
 import { MetricComparison } from '../types';
 import type { ExportOptions, ProjectMetricsSummary } from '../export-utils';
-import {
-	guessLocationOfTsconfig,
-	TechnicalError,
-} from '../../../common';
+import { guessLocationOfTsconfig } from '../../../common/extraction';
+import { TechnicalError } from '../../../common/error';
 
 /**
  * File-level metric violation
@@ -518,7 +516,8 @@ export class FileCountThresholdBuilder implements Checkable {
 			options?.logging
 		);
 
-		const classes = this.metricsBuilder.getFilter()?.apply(classesExtracted) || [];
+		const classes =
+			this.metricsBuilder.getFilter()?.apply(classesExtracted) ?? classesExtracted;
 
 		// Check for empty test condition
 		if (classes.length === 0 && !options?.allowEmptyTests) {
