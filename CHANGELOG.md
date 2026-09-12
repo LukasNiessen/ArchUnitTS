@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.4.0...v2.4.1) (2026-09-12)
+
+
+### Bug Fixes
+
+* run unfiltered count metrics through package entrypoint ([c9509e9](https://github.com/LukasNiessen/ArchUnitTS/commit/c9509e90b854d94a60a94ead5f7b15e7c23d71ed))
+
 # [2.4.0](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.3.3...v2.4.0) (2026-07-26)
 
 
