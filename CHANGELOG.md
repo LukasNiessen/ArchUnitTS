@@ -1,3 +1,10 @@
+## [2.5.2](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.5.1...v2.5.2) (2026-09-13)
+
+
+### Bug Fixes
+
+* **deps-dev:** bump browserslist from 4.28.2 to 4.28.9 ([a893267](https://github.com/LukasNiessen/ArchUnitTS/commit/a89326700b7ab32faf891899708161cf318fbb19))
+
 ## [2.5.1](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.5.0...v2.5.1) (2026-09-13)
 
 
