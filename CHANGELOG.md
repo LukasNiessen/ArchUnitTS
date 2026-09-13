@@ -1,3 +1,12 @@
+## [2.5.1](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.5.0...v2.5.1) (2026-09-13)
+
+
+### Bug Fixes
+
+* **deps-dev:** bump @humanfs/node from 0.16.7 to 0.16.8 ([e54f703](https://github.com/LukasNiessen/ArchUnitTS/commit/e54f703b71019d0668711ebb62455385969e8780))
+* **deps:** bump the minor-and-patch group across 1 directory with 12 updates ([5629aab](https://github.com/LukasNiessen/ArchUnitTS/commit/5629aab5973f001c1f718c8cd90e26fcd8ffe921))
+* **deps:** bump undici ([487272c](https://github.com/LukasNiessen/ArchUnitTS/commit/487272c517eb878f0cc23a37dc3585ee02d30963))
+
 # [2.5.0](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.4.3...v2.5.0) (2026-09-12)
 
 
