@@ -1,3 +1,10 @@
+## [2.5.4](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.5.3...v2.5.4) (2026-09-13)
+
+
+### Bug Fixes
+
+* **deps:** bump the actions-updates group across 1 directory with 4 updates ([a5838c6](https://github.com/LukasNiessen/ArchUnitTS/commit/a5838c6c501956712a2b5d835ee7367566b49d53))
+
 ## [2.5.3](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.5.2...v2.5.3) (2026-09-13)
 
 
