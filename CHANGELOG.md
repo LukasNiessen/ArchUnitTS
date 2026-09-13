@@ -1,3 +1,11 @@
+## [2.5.3](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.5.2...v2.5.3) (2026-09-13)
+
+
+### Bug Fixes
+
+* **deps-dev:** bump linkify-it from 5.0.1 to 5.0.2 ([a905455](https://github.com/LukasNiessen/ArchUnitTS/commit/a9054553ceed8578eabb3a64bb30a0ab380a7a3c))
+* **deps-dev:** bump lodash-es from 4.17.23 to 4.18.1 ([404e8fb](https://github.com/LukasNiessen/ArchUnitTS/commit/404e8fba098e1474e49a508c6a45eafb46988d55))
+
 ## [2.5.2](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.5.1...v2.5.2) (2026-09-13)
 
 
