@@ -14,6 +14,9 @@ export type MapFunction = (edge: Edge) => MappedEdge | undefined;
 
 export const projectEdges = (graph: Edge[], mapper: MapFunction): ProjectedEdge[] => {
 	const builtGraph: ProjectedEdge[] = [];
+	// Index by label pair: a linear find over builtGraph made projection
+	// quadratic in the number of edges.
+	const bySource = new Map<string, Map<string, ProjectedEdge>>();
 
 	for (const edge of graph) {
 		const mapped = mapper(edge);
@@ -21,16 +24,19 @@ export const projectEdges = (graph: Edge[], mapper: MapFunction): ProjectedEdge[
 			continue;
 		}
 
-		const matchingEdge = builtGraph.find(
-			(mappedEdge) =>
-				mappedEdge.sourceLabel === mapped.sourceLabel &&
-				mappedEdge.targetLabel === mapped.targetLabel
-		);
+		let byTarget = bySource.get(mapped.sourceLabel);
+		if (byTarget === undefined) {
+			byTarget = new Map();
+			bySource.set(mapped.sourceLabel, byTarget);
+		}
+		const matchingEdge = byTarget.get(mapped.targetLabel);
 
 		if (matchingEdge) {
 			matchingEdge.cumulatedEdges.push(edge);
 		} else {
-			builtGraph.push({ ...mapped, cumulatedEdges: [edge] });
+			const projected: ProjectedEdge = { ...mapped, cumulatedEdges: [edge] };
+			byTarget.set(mapped.targetLabel, projected);
+			builtGraph.push(projected);
 		}
 	}
 
