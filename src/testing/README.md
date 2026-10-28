@@ -82,6 +82,16 @@ declare global {
 }
 ```
 
+Vitest 5+ no longer reads `jest.Matchers`, so `vitest.Matchers` is augmented as well (without type parameters, so it merges with both Vitest 4's `Matchers<T>` and Vitest 5's `Matchers<R, T>`):
+
+```typescript
+declare module 'vitest' {
+  interface Matchers {
+    toPassAsync(options?: CheckOptions): Promise<void>;
+  }
+}
+```
+
 2. **For Mocha/QUnit/AVA**: Helper functions like `expectToPassAsync()` are provided since these frameworks don't have built-in matcher systems like Jest/Jasmine.
 
 ### Custom Matcher Implementation

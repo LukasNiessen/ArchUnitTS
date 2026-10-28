@@ -15,7 +15,9 @@
 		"outDir": "dist",
 		"downlevelIteration": true,
 		"noImplicitAny": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"types": ["node", "jest", "vitest"]
 	},
 	"include": ["src", "index.ts", "test", "examples"]
 }

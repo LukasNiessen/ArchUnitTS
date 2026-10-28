@@ -1,6 +1,7 @@
 import { Checkable, CheckOptions } from '../../common/fluentapi';
 import { ResultFactory } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
+import type { Assertion as VitestAssertion } from 'vitest';
 import { extendVitestMatchers } from './vitest-adapter';
 
 jest.mock('../common/result-factory');
@@ -32,12 +33,12 @@ describe('extendVitestMatchers', () => {
 				errorMessage = (e as Error).message;
 			}
 			// Restore before asserting
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(globalThis as any).expect = originalExpect;
 			expect(threw).toBe(true);
 			expect(errorMessage).toContain('ArchUnitTS Vitest Integration Error');
 		} catch (e) {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(globalThis as any).expect = originalExpect;
 			throw e;
 		}
@@ -80,8 +81,7 @@ describe('extendVitestMatchers', () => {
 		it('should return error when checkable is null', async () => {
 			mockResultFactory.error.mockReturnValue({
 				pass: false,
-				message: () =>
-					'expected something checkable as an argument for expect()',
+				message: () => 'expected something checkable as an argument for expect()',
 			});
 
 			const result = await toPassAsync.call({ isNot: false }, null);
@@ -95,8 +95,7 @@ describe('extendVitestMatchers', () => {
 		it('should return error when checkable is undefined', async () => {
 			mockResultFactory.error.mockReturnValue({
 				pass: false,
-				message: () =>
-					'expected something checkable as an argument for expect()',
+				message: () => 'expected something checkable as an argument for expect()',
 			});
 
 			await toPassAsync.call({ isNot: false }, undefined);
@@ -160,6 +159,16 @@ describe('extendVitestMatchers', () => {
 			await toPassAsync.call({ isNot: false }, mockCheckable, options);
 
 			expect(mockCheckable.check).toHaveBeenCalledWith(options);
+		});
+	});
+
+	describe('vitest typings', () => {
+		it('should expose toPassAsync on vitest assertions', () => {
+			// Compile-time check: fails type-checking if the vitest.Matchers augmentation is missing
+			const callToPassAsync = (
+				assertion: VitestAssertion<void, Checkable>
+			): Promise<void> => assertion.toPassAsync({ allowEmptyTests: true });
+			expect(callToPassAsync).toBeInstanceOf(Function);
 		});
 	});
 });
