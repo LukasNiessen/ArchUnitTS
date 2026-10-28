@@ -2,10 +2,14 @@ import { Checkable, CheckOptions } from '../../common/fluentapi';
 import { ResultFactory, TestResult } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 
-// Only declare module augmentation if vitest types are available
-declare global {
-	interface VitestAssertion {
-		toPassAsync(options?: CheckOptions): Promise<TestResult>;
+/*
+ * Extend Vitest. Vitest <5 also reads jest.Matchers (see jest-adapter), Vitest >=5 only reads vitest.Matchers.
+ * No type params on purpose: Vitest 4 declares Matchers<T>, Vitest 5 Matchers<R, T>. All have defaults,
+ * so a param-less declaration merges with both. Ignored if vitest is not installed.
+ */
+declare module 'vitest' {
+	interface Matchers {
+		toPassAsync(options?: CheckOptions): Promise<void>;
 	}
 }
 
