@@ -27,9 +27,22 @@ jobs:
             - run: npm run test
             - run: npm run build
 
+    vitest-compatibility:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                vitest: ['none', '4.1.0', '5.0.5']
+        steps:
+            - uses: actions/checkout@v7
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 22.x
+            - run: npm ci
+            - run: npm run test:vitest-compatibility -- ${{ matrix.vitest }}
+
     publish:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        needs: integrate
+        needs: [integrate, vitest-compatibility]
         runs-on: ubuntu-latest
         permissions:
             contents: write
