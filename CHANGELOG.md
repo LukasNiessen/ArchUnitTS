@@ -1,3 +1,10 @@
+## [2.5.5](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.5.4...v2.5.5) (2026-11-13)
+
+
+### Bug Fixes
+
+* **deps-dev:** bump the minor-and-patch group across 1 directory with 9 updates ([c9d027c](https://github.com/LukasNiessen/ArchUnitTS/commit/c9d027cbd6e15dcb501c480208aea6907720ef1e))
+
 ## [2.5.4](https://github.com/LukasNiessen/ArchUnitTS/compare/v2.5.3...v2.5.4) (2026-09-13)
 
 
