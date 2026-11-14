@@ -37,6 +37,8 @@ jobs:
             - uses: actions/setup-node@v7
               with:
                   node-version: 22.x
+            # npm 10 crashes while resolving Vitest's optional peer dependencies.
+            - run: npm install --global npm@11.19.1
             - run: npm ci
             - run: npm run test:vitest-compatibility -- ${{ matrix.vitest }}
 

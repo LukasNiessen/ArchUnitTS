@@ -1,5 +1,12 @@
 const { execFileSync } = require('child_process');
-const { copyFileSync, existsSync, mkdtempSync, rmSync, writeFileSync } = require('fs');
+const {
+	copyFileSync,
+	existsSync,
+	mkdtempSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} = require('fs');
 const { tmpdir } = require('os');
 const { join, resolve } = require('path');
 
@@ -39,8 +46,17 @@ function checkTypes(files, resolution = 'nodenext', types = 'node') {
 	);
 }
 
+function setModuleType(type) {
+	const path = join(consumer, 'package.json');
+	const manifest = existsSync(path)
+		? JSON.parse(readFileSync(path, 'utf8'))
+		: { private: true };
+	manifest.type = type;
+	writeFileSync(path, JSON.stringify(manifest, null, 2));
+}
+
 try {
-	writeFileSync(join(consumer, 'package.json'), JSON.stringify({ private: true }));
+	setModuleType('commonjs');
 	const [packed] = JSON.parse(
 		npm(
 			['pack', '--ignore-scripts', '--json', '--pack-destination', consumer],
@@ -69,31 +85,35 @@ try {
 	);
 
 	copyFileSync(
-		join(__dirname, 'plain-consumer.cts'),
-		join(consumer, 'plain-consumer.cts')
+		join(__dirname, 'plain-consumer.ts'),
+		join(consumer, 'plain-consumer.ts')
 	);
-	checkTypes(['plain-consumer.cts'], 'nodenext', 'node,jest');
+	for (const type of ['commonjs', 'module']) {
+		setModuleType(type);
+		checkTypes(['plain-consumer.ts'], 'nodenext', 'node,jest');
+	}
 
 	if (version === 'none') {
 		if (existsSync(join(consumer, 'node_modules/vitest'))) {
 			throw new Error('Installing archunit must not install Vitest.');
 		}
 	} else {
-		for (const extension of ['mts', 'cts']) {
-			copyFileSync(
-				join(__dirname, 'matcher.test.mts'),
-				join(consumer, `matcher.test.${extension}`)
-			);
+		copyFileSync(
+			join(__dirname, 'matcher.test.ts'),
+			join(consumer, 'matcher.test.ts')
+		);
+		for (const type of ['commonjs', 'module']) {
+			setModuleType(type);
 			// Separate programs prevent CommonJS from masking an ESM augmentation failure.
-			checkTypes([`matcher.test.${extension}`]);
+			checkTypes(['matcher.test.ts']);
 		}
-		checkTypes(['matcher.test.mts'], 'bundler');
+		checkTypes(['matcher.test.ts'], 'bundler');
 		execFileSync(
 			process.execPath,
 			[
 				join(consumer, 'node_modules/vitest/vitest.mjs'),
 				'run',
-				'matcher.test.mts',
+				'matcher.test.ts',
 				'--globals',
 			],
 			{ cwd: consumer, stdio: 'inherit' }

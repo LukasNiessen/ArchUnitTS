@@ -2,7 +2,7 @@ import { Checkable, CheckOptions } from '../../common/fluentapi';
 import { ResultFactory, TestResult } from '../common/result-factory';
 import { ViolationFactory } from '../common/violation-factory';
 
-export type {} from './vitest-matchers.mjs';
+export type {} from './types/index.js';
 
 // Only declare module augmentation if vitest types are available
 declare global {
